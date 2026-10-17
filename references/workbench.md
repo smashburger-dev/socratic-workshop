@@ -1,10 +1,10 @@
-# Werkbankfiguren for Socratic Workshop
+# Workbench for Socratic Workshop
 
 Read this reference when an interactive figure can address the current understanding gap. Choose a controllable cause and an observable effect. If interaction adds little, a small static diagram is enough.
 
 ## Origin and portable assets
 
-Adapted from [Noa's Werkbankfiguren in Argmin, revision 51cbc90](https://github.com/smashburger-dev/argmin/blob/51cbc90/.devin/skills/werkbank-figuren/SKILL.md). Retained principles are a visible mechanism, model-derived geometry and numbers, meaningful motion, accessible controls, and explicit limits where an analogy could mislead. The original Argmin scene registry, renderer, test workflow, and warm palette are not required here.
+Adapted from the Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin). Retained principles are a visible mechanism, model-derived geometry and numbers, meaningful motion, accessible controls, and explicit limits where an analogy could mislead. The original Argmin scene registry, renderer, test workflow, and warm palette are not required here.
 
 The visual approach is also inspired by [Anatomy](https://github.com/wheresryan22/anatomy), an open-source skill for interactive explanations. This adapter is standalone; Anatomy is an inspiration rather than a runtime dependency.
 

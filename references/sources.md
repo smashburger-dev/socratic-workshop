@@ -18,15 +18,15 @@ This repository paraphrases the methods and links to the source. It does not red
 
 ## Noa's design brief
 
-The project owner specified learner-led explanations, requested hints, external study material, retrospective project learning, standalone HTML, Werkbankfiguren as the initial visual approach, no automated tests, and private development until approved examples and recordings exist. The private voice-note text is not bundled with the repository.
+The project owner specified learner-led explanations, requested hints, external study material, retrospective project learning, standalone HTML, a portable Workbench visualization adapter, no automated tests, and private development until approved examples and recordings exist. The private voice-note text is not bundled with the repository.
 
 The hint ladder, small session handoff, completion criteria, optional prediction/application, spoiler boundaries inside HTML source, and illustrative promotional scenes are this skill's design choices. They should not be attributed to Cranmer as claims made in this segment.
 
 The owner's UI feedback on 17 October 2026 added English presentation, quieter layouts, larger type, light/dark controls, immediate visual feedback, co-located actions, and optional spatial views. Those preferences are implemented in the portable adapter and copyable shell. The Spanish example replaces the initial German example. GIF capture follows approval of the HTML.
 
-## Werkbankfiguren
+## Workbench
 
-The bundled [portable adapter](werkbank-figuren.md) credits its original Argmin source and records which principles were adapted. It carries the visual approach without Argmin's project structure or automated-test workflow. The adapter is not a claim that the original skill already generalized to every subject.
+The bundled [portable adapter](workbench.md) credits its Argmin source and records which principles were adapted. It carries the visual approach without Argmin's project structure or automated-test workflow. The adapter is not a claim that the original skill already generalized to every subject.
 
 The owner also identified [Anatomy by wheresryan22](https://github.com/wheresryan22/anatomy) as visual inspiration. Its upstream repository and MIT license were checked on 17 October 2026. This version credits the approach without bundling Anatomy code or making it a dependency.
 

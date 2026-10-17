@@ -6,7 +6,7 @@ The tutor asks one question at a time and gives a small hint when you get stuck.
 
 When a picture helps, ask for a compact interactive HTML visualization. Explore it, make a prediction, and explain what changed.
 
-Directly inspired by **Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438)**, especially 23:58–34:33. The visual approach uses my Werkbankfiguren Adapter, inspired by **[Anatomy](https://github.com/wheresryan22/anatomy)**.
+Directly inspired by **Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438)**, especially 23:58–34:33. The visual approach uses my Workbench adapter, inspired by **[Anatomy](https://github.com/wheresryan22/anatomy)**.
 
 ## Start a session
 
@@ -65,12 +65,12 @@ You can ask for a hint, a visualization, a direct explanation, or a pause at any
 
 ## Make it yours
 
-Use this skill as a starting point. Adjust the visual style, change how hints work, or extend the learning loop to suit how you learn. Edit [SKILL.md](SKILL.md) and the [visual guidelines](references/werkbank-figuren.md), or ask your agent to help.
+Use this skill as a starting point. Adjust the visual style, change how hints work, or extend the learning loop to suit how you learn. Edit [SKILL.md](SKILL.md) and the [visual guidelines](references/workbench.md), or ask your agent to help.
 
 ## Credits
 
 - [Miles Cranmer's talk](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), shared by MPhil in Data Intensive Science Cambridge, inspired the learning workflow.
-- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted through my Werkbankfiguren work in Argmin.
+- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted from my Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin).
 - [Source notes](references/sources.md) separate the talk's ideas from this skill's additions.
 
 ## License

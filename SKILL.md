@@ -1,6 +1,6 @@
 ---
 name: socratic-workshop
-description: Learn by explaining a concept to the agent, receiving one Socratic question or requested hint at a time, and revising the explanation. Use for interactive tutoring, learning from an existing project, or a requested Werkbankfiguren HTML learning visualization.
+description: Learn by explaining a concept to the agent, receiving one Socratic question or requested hint at a time, and revising the explanation. Use for interactive tutoring, learning from an existing project, or a requested Workbench HTML learning visualization.
 license: MIT
 ---
 
@@ -47,7 +47,7 @@ An explicit request for a direct explanation changes the requested mode. Give th
 
 ## Visualize when it helps the current gap
 
-When requested, use the bundled [Werkbankfiguren adapter](references/werkbank-figuren.md). It adapts Noa's Argmin figure principles, with visual inspiration from [Anatomy](https://github.com/wheresryan22/anatomy), and works without installing either project.
+When requested, use the bundled [Workbench adapter](references/workbench.md). It adapts visualization principles from [Argmin](https://github.com/smashburger-dev/argmin), with visual inspiration from [Anatomy](https://github.com/wheresryan22/anatomy), and works without installing either project.
 
 First determine whether the learner wants a hint or a full explanation, using their wording and the active mode. A hint visualization preserves the current information boundary, including its source code. A full explanation can offer prediction and reveal, or direct exploration when that better serves the request. When intent is ambiguous and the distinction would expose the answer, ask one short question before generating it.
 
