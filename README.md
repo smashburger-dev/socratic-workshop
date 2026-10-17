@@ -6,7 +6,7 @@ The tutor asks one question at a time and gives a small hint when you get stuck.
 
 When a picture helps, ask for a compact interactive HTML visualization. Explore it, make a prediction, and explain what changed.
 
-Directly inspired by **Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438)**, especially 23:58–34:33. The visual approach uses Noa's Werkbankfiguren adapter, inspired by **[Anatomy](https://github.com/wheresryan22/anatomy)**.
+Directly inspired by **Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438)**, especially 23:58–34:33. The visual approach uses my Werkbankfiguren Adapter, inspired by **[Anatomy](https://github.com/wheresryan22/anatomy)**.
 
 ## Start a session
 
