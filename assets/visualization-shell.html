@@ -35,6 +35,23 @@
 .annotated-item.is-empty .item-body{min-width:76px;border:1px dashed var(--border);background:transparent;color:var(--muted)}
 @media(max-width:600px){.comparison{--comparison-columns:52px minmax(0,1fr) 56px;--comparison-gap:12px}.annotated-set{gap:9px}.item-body{min-height:78px;padding:14px 16px}.annotated-item.is-empty .item-body{min-width:56px}}
 </style>
+<!-- Desktop height budget: keep the working scene and controls in one visible frame. -->
+<style>
+.viewport-scene{height:var(--scene-height,auto)}
+.frame-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:18px;align-items:start}
+@media(min-width:901px){
+  :root{--scene-height:clamp(180px,calc(100svh - 470px),320px)}
+  main{max-width:1120px;padding:12px 28px 16px}
+  .topbar{margin-bottom:8px}.topbar button{min-height:44px}
+  header{margin-bottom:14px}h1{font-size:36px;margin-bottom:6px}.intro{font-size:17px;max-width:none}
+  .card{padding:16px;border-radius:22px}.layout{gap:18px}.actions{gap:10px;margin-top:12px}
+  .control{margin-bottom:18px}.metrics{gap:24px;margin-top:14px;padding-top:12px}
+  .metrics dt{font-size:14px;line-height:1.3}.metrics dd{font-size:22px;line-height:1.25}
+  .legend{gap:16px;font-size:14px;margin-top:12px}.feedback{padding:18px;margin-top:18px}
+  .feedback h2{font-size:20px;margin-bottom:8px}.model-notes{margin-top:6px}footer{margin-top:10px}
+}
+@media(max-width:900px){.frame-layout{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <main>

@@ -1,93 +1,60 @@
 # Socratic Workshop
 
-Explain an idea to your AI tutor. Find the gap. Work it out yourself.
+Learn an idea by explaining it to your AI tutor.
 
-Socratic Workshop is an agent skill for learning through your own explanations. The agent listens, checks your reasoning, asks one question at a time, and gives a targeted hint when you ask for help. It can use a book, a paper, a course, or an existing project as the reference.
+The tutor asks one question at a time and gives a small hint when you get stuck. You work through the gap and explain it again. Bring your own book, course, paper, or codebase.
 
-When a picture would help, it creates a standalone interactive HTML file using a portable adaptation of Noa's Werkbankfiguren approach. The figure should make the mechanism visible and give you something to predict, inspect, or explain.
+When a picture helps, ask for a compact interactive HTML visualization. Explore it, make a prediction, and explain what changed.
 
-**Status: private draft.** The repository has no public release approval. The examples are authored drafts, not evidence of learning effectiveness or confirmed user sessions.
+Directly inspired by **Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438)**, especially 23:58–34:33. The visual approach uses Noa's Werkbankfiguren adapter, inspired by **[Anatomy](https://github.com/wheresryan22/anatomy)**.
 
 ## Start a session
 
-Load the skill and say what you want to understand:
+Install with the [skills CLI](https://github.com/vercel-labs/skills), then choose your agent:
 
-```text
-Use $socratic-workshop. I want to understand why a Gaussian prior
-leads to L2 regularization. I have a textbook chapter already.
-Let me explain first; give me one hint only when I ask.
+```sh
+npx skills add smashburger-dev/socratic-workshop
 ```
 
-Or learn from a project:
+Add `-g` to install for your user instead of one project. While the repository is private, installation requires GitHub access.
 
-```text
-Use $socratic-workshop with this repository. Help me choose one part
-of the request pipeline to understand. Ask me to trace it myself.
-```
+| Agent | Start learning |
+| --- | --- |
+| [Claude Code](https://code.claude.com/docs/en/skills) | `/socratic-workshop Help me understand L2 regularization. Let me explain first.` |
+| [Codex](https://developers.openai.com/codex/skills/) | `$socratic-workshop Help me understand L2 regularization. Let me explain first.` |
 
-You can say “hint,” “I’m stuck,” “show me a visualization,” “I want a direct explanation,” or “pause here.” The conversation follows your current explanation rather than a fixed quiz. The tutor responds in your language.
+Claude Code uses `/skill-name`. Codex uses a `$skill-name` mention or its `/skills` picker. You can also ask your agent to use the skill in plain language.
 
 ## The learning loop
 
-1. Choose one concrete learning goal and reference material.
-2. Study externally if needed, then explain the idea in your own words.
-3. Work through one diagnostic question or requested hint at a time.
-4. Use a visualization when it addresses the gap you are working on.
-5. Finish when your explanation establishes the agreed understanding.
+![The learning loop: explain, find a gap, request a hint, revise, apply.](media/learning-loop.jpg)
 
-The agent recommends links, chapters, or timestamps when you need material. It does not fill the tutoring chat with generated reading packs. An optional small handoff makes it possible to resume later.
+Explain what you understand. Work through one question or requested hint. Revise your explanation, then apply the idea to a small new case. Finish when your own reasoning establishes the goal you chose.
 
-A request for a complete explanation changes the mode. Seeing an answer is recorded separately from demonstrating that you understand it.
+![An illustrative L2 regularization learning session.](media/learning-loop.gif)
+
+An illustrative conversation about a Gaussian prior and L2 regularization, rendered for this demo. It is not a recording of a real learner.
 
 ## Visual learning
 
-The bundled [Werkbankfiguren adapter](references/werkbank-figuren.md) creates one HTML file with inline styles, scripts, and graphics. No build step, package installation, external font, CDN, or Argmin installation is required. Its [reusable shell](assets/visualization-shell.html) supplies spacious layouts, readable type, rounded surfaces, and light/dark themes. Controls sit with the visualization; concise feedback has its own area. Relevant calculations and model notes are available on demand.
+Explore the examples:
 
-The shell also supplies comparison rows and externally annotated items. The examples use those same components. Their [example prompts](examples/README.md#request-the-same-learning-scope) specify how to request the same learning scope through the skill.
+- [Gradient descent](examples/gradient-descent.html): change the learning rate and follow the next step.
+- [Spanish word order](examples/spanish-word-order.html): compare the position of a color adjective.
+- [Process bottlenecks](examples/bottleneck.html): see how one station limits a production line.
 
-A hint visualization contains only the information appropriate to the current hint, including in its source. A full explanation can support direct exploration or a prediction and reveal. Inputs visibly change the mechanism or its preview. Isometric or 3D views are available when spatial relationships help, with a precise 2D chart when needed. The tutor then returns to your explanation. Shared examples and default interface copy are in English.
+Download an HTML file and open it in a browser. Each is standalone, with light/dark themes and no build step. GitHub's file view shows the source.
 
-Explore the [three draft examples](examples/README.md):
+The same [visual templates](assets/visualization-shell.html) are available to the skill. A hint view reveals only the current hint; a full explanation can support direct exploration. Desktop examples are composed for a single visible frame.
 
-- [Gradient descent](examples/gradient-descent.html): live next-step feedback and controllable playback on a one-dimensional quadratic.
-- [Spanish word order](examples/spanish-word-order.html): color-adjective placement compared with English.
-- [Process bottlenecks](examples/bottleneck.html): an isometric production chain paired with a capacity comparison.
-
-Download an HTML file and open it directly in a browser. GitHub's file view shows source rather than running the page. These complete-explanation demos are showcases, not the content that every hint request receives.
-
-## Use in a project
-
-The skill asks whether you want a separate worktree, a branch, or read-only study before creating learning artifacts in an existing Git project. In a fresh coding session, agree on a learning folder. In a chat environment, use its file or artifact capability when available.
-
-Learning a project does not authorize production edits, package installation, commits, pushes, or publication.
-
-**No automated tests.** This skill does not write or run unit tests, snapshot tests, browser test suites, coverage jobs, or benchmarks for its learning artifacts. Model inspection and a manual browser review are the intended checks. A generated visualization can still be wrong; inspect the assumptions and what it actually shows.
-
-## Install or load
-
-This repository is itself the skill directory. Its root contains `SKILL.md`, with conditional references alongside it. Use it directly with an agent that can load a skill from a local folder, or place the complete folder in your host's skill discovery directory under the name `socratic-workshop`.
-
-For Codex, the usual personal directory is `~/.codex/skills/socratic-workshop`. For Claude Code, it is `~/.claude/skills/socratic-workshop`. The repository's `agents/openai.yaml` supplies optional Codex UI metadata. Other hosts can read the core `SKILL.md` without it. Host policies and available browsing/file tools still apply.
-
-No packages or services are required. Browsing is useful for verifying resource recommendations; a browser/file artifact capability is useful for HTML. In a text-only environment, the explanation loop remains usable.
-
-## Before public release
-
-Keep this repository private until the owner explicitly approves publication. The release evidence must include:
-
-- Three visualization examples explicitly approved by Noa. The current files are drafts awaiting that review.
-- Three GIFs showing Socratic learning loops, explicitly approved by Noa and cleared for sharing. There are no approved GIFs yet. Label any staged demonstration as staged rather than presenting it as a recorded user session.
-- A record of which examples and recordings were approved, with dates and the scope of each approval.
-- A final review of attribution, shareable content, installation instructions, and the public license.
-
-The owner's confirmation controls each gate. Files existing in the repository, agent review, a completed chat, or a generated GIF do not imply approval. A new explicit instruction is required to change GitHub visibility.
-
-Record a promotional GIF of a visualization only after Noa approves the HTML version being recorded. The gradient-descent demo is the first planned usage recording; no capture is authorized yet.
+You can ask for a hint, a visualization, a direct explanation, or a pause at any point. Study material stays outside the tutoring chat. In a codebase, the tutor offers a worktree, a branch, or read-only study before creating learning files. It creates no automated tests for those artifacts.
 
 ## Credits
 
-Inspired by Miles Cranmer's [How to Avoid AI Brain Rot](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), specifically 23:58–34:33, published by MPhil in Data Intensive Science Cambridge. The [source notes](references/sources.md) distinguish caption-grounded ideas from this skill's additions.
+- [Miles Cranmer's talk](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), shared by MPhil in Data Intensive Science Cambridge, inspired the learning workflow.
+- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted through Noa's Werkbankfiguren work in Argmin.
+- [Source notes](references/sources.md) separate the talk's ideas from this skill's additions.
 
-The visual approach adapts Noa's Werkbankfiguren principles from Argmin. Anatomy is a possible future comparison and is not bundled. Neither the speaker nor any upstream project endorses this skill.
+## License
 
-Copyright 2026 smashburger-dev. All rights reserved during private development. Select the public license before release.
+[MIT](LICENSE).

@@ -1,6 +1,7 @@
 ---
 name: socratic-workshop
 description: Learn by explaining a concept to the agent, receiving one Socratic question or requested hint at a time, and revising the explanation. Use for interactive tutoring, learning from an existing project, or a requested Werkbankfiguren HTML learning visualization.
+license: MIT
 ---
 
 # Socratic Workshop
@@ -46,7 +47,7 @@ An explicit request for a direct explanation changes the requested mode. Give th
 
 ## Visualize when it helps the current gap
 
-When requested, use the bundled [Werkbankfiguren adapter](references/werkbank-figuren.md). It is a portable adaptation of Noa's Argmin figure principles, usable across subjects without installing Argmin or another skill. Anatomy is a possible future comparison, not a dependency of this version.
+When requested, use the bundled [Werkbankfiguren adapter](references/werkbank-figuren.md). It adapts Noa's Argmin figure principles, with visual inspiration from [Anatomy](https://github.com/wheresryan22/anatomy), and works without installing either project.
 
 First determine whether the learner wants a hint or a full explanation, using their wording and the active mode. A hint visualization preserves the current information boundary, including its source code. A full explanation can offer prediction and reveal, or direct exploration when that better serves the request. When intent is ambiguous and the distinction would expose the answer, ask one short question before generating it.
 
@@ -55,6 +56,8 @@ Build a single HTML file with inline CSS, JavaScript, and SVG or Canvas as usefu
 Place actions beside the object they change, with graph playback directly below its graph and readouts beneath it. An input should produce an immediate visible effect within the permitted hint scope. Separate interpretation from controls in a clear feedback area. Keep calculations and relevant model assumptions available on demand; a boilerplate limitations section is not required. Use an isometric or 3D view when spatial relationships help explain the mechanism, optionally paired with a precise 2D chart. A clear observation should lead back to the learner's explanation.
 
 Reuse the shell's comparison-row and annotated-item patterns and the adapter's alignment rules. Showcases and newly requested visualizations share these assets; avoid undocumented scene-specific polish.
+
+Compose desktop examples for one visible frame, targeting 1280×720 with the main visualization, controls, and current result available without scrolling. Reflow or simplify before reducing type; preserve readable labels and never crop content or scale the page to fake a fit. Mobile and expanded reference details may scroll.
 
 For existing work, a plot can also expose an implausible result. Separate what the figure visibly establishes from what still needs evidence. Agreement between a model and its own drawing is not independent confirmation.
 
@@ -72,4 +75,4 @@ Explain briefly what they demonstrated. Separate an outstanding gap or an unveri
 
 When the learner wants to resume later, offer a compact handoff containing the target, source locators, demonstrated understanding, unresolved gap, assistance already revealed, and the next question. Save it only in the agreed location. Keep source text, full transcripts, and solution keys out of the handoff. On resume, read this small handoff rather than replaying every artifact.
 
-For provenance and the distinction between the video's methods and this skill's design additions, see [sources.md](references/sources.md). Repository demo files are showcases; user-approved examples and actual session recordings have separate release criteria in the README.
+For provenance and the distinction between the video's methods and this skill's design additions, see [sources.md](references/sources.md). Label authored promotional conversations as illustrative. Permission to record or publish comes from the owner's current instructions, not the existence of an example.

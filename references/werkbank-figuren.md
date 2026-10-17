@@ -6,6 +6,8 @@ Read this reference when an interactive figure can address the current understan
 
 Adapted from [Noa's Werkbankfiguren in Argmin, revision 51cbc90](https://github.com/smashburger-dev/argmin/blob/51cbc90/.devin/skills/werkbank-figuren/SKILL.md). Retained principles are a visible mechanism, model-derived geometry and numbers, meaningful motion, accessible controls, and explicit limits where an analogy could mislead. The original Argmin scene registry, renderer, test workflow, and warm palette are not required here.
 
+The visual approach is also inspired by [Anatomy](https://github.com/wheresryan22/anatomy), an open-source skill for interactive explanations. This adapter is standalone; Anatomy is an inspiration rather than a runtime dependency.
+
 Use [visualization-shell.html](../assets/visualization-shell.html) as a copyable starting point for layout, theme colors, typography, controls, and theme switching. Copy the relevant parts into one HTML file with inline CSS, JavaScript, and SVG or Canvas. Trim unused styles. The output works directly from disk with system fonts and no network, package installation, CDN, or build step.
 
 Copy its comparison-row or annotated-item pattern when applicable. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
@@ -53,6 +55,10 @@ Co-locate controls with what they change. Graph playback belongs directly below 
 - One datum, one row: label, mark, and value share layout tracks and a scale.
 - Metadata sits above the item in reserved space, outside its content surface.
 - Keep labels attached when wrapping; let content size the row instead of synchronizing separate columns with offsets or guessed heights.
+
+### One frame on desktop
+
+Target 1280×720, with the mechanism, controls, and current result visible together. Budget height before adding a panel. Use columns, shorter copy, and viewport-relative scene height before shrinking labels. Keep notes collapsed. Never hide overflow, zoom, or scale the page to manufacture a fit. Mobile and opened reference details may scroll.
 
 Remove numbered lesson kickers, repeated 'predict then reveal' labels, draft labels, and explanatory mini-paragraphs that repeat the visible control. Keep review status in repository documentation. Additional calculations can live in a 'Calculation' disclosure. Include model assumptions only where their absence could mislead, usually in a collapsed 'Model notes' disclosure. Explain a material analogy limitation near the relevant claim rather than adding a boilerplate footer to every figure.
 

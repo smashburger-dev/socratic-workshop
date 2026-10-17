@@ -18,6 +18,11 @@
 .annotated-item.is-outlined .item-body{background:transparent;border-color:var(--accent);color:var(--accent)}
 .annotated-item.is-empty .item-body{min-width:76px;border:1px dashed var(--border);background:transparent;color:var(--muted)}
 @media(max-width:600px){.annotated-set{gap:9px}.item-body{min-height:78px;padding:14px 16px}.annotated-item.is-empty .item-body{min-width:56px}}
+/* Compact desktop recording view; annotations stay in normal document flow. */
+@media screen and (min-width:901px){
+  main{padding:12px 28px 16px}.topbar{margin-bottom:8px}.theme-toggle{min-height:44px;padding:9px 14px}header{margin-bottom:14px}h1{font-size:36px;margin-bottom:6px}.intro{font-size:17px;max-width:none}.card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;padding:16px}.sentence-group+.sentence-group{margin:0;padding:0 0 0 20px;border-top:0;border-left:1px solid var(--border)}.language-label{font-size:15px;margin-bottom:6px}.annotated-set{gap:8px}.annotated-item{gap:4px}.item-body{min-height:54px;padding:10px 12px;font-size:24px;border-radius:14px}.annotated-item.is-empty .item-body{min-width:46px}
+  .sentence-group+.sentence-group{display:grid;grid-template-columns:minmax(74px,.45fr) minmax(0,2fr);gap:12px 14px;align-content:start}.sentence-group+.sentence-group>.language-label,.sentence-group+.sentence-group>.annotated-set,.sentence-group+.sentence-group>.actions{grid-column:1/-1}.sentence-group+.sentence-group>.language-label{margin:0}.word-tray{flex-direction:column;gap:4px;margin:0;font-size:14px;align-self:center}.prediction{margin:0;align-self:center}.prediction legend{font-size:16px;margin-bottom:8px}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.choice{gap:8px;min-height:44px;padding:8px 10px;font-size:15px}.actions{margin-top:0}.feedback{margin-top:12px;padding:16px 20px}.feedback h2{font-size:20px;margin-bottom:6px}.feedback p{margin-bottom:8px}.feedback .prompt{margin-top:8px}.model-notes{display:inline-block;margin-top:8px;vertical-align:top}footer{display:inline-flex;align-items:center;gap:16px;min-height:44px;margin:8px 0 0 24px;vertical-align:top}
+}
 </style>
 </head>
 <body>
@@ -101,6 +106,7 @@ $('reveal').addEventListener('click',()=>{
   $('spanish-sentence').setAttribute('aria-label',model.map(part=>part.word).join(' '));
   $('spanish-label').textContent = 'Spanish';
   $('word-tray').hidden = true;
+  $('prediction').hidden = true;
   $('comparison').textContent = choice.value === 'after' ? 'You predicted “after coche.” The sentence uses that order.' : 'You predicted “before coche.” The sentence uses the reverse order.';
   choices.forEach(input=>{input.disabled = true;});
   $('reveal').hidden = true;
@@ -113,6 +119,7 @@ $('reset').addEventListener('click',()=>{
   $('spanish-sentence').setAttribute('aria-label',initialSentence.getAttribute('aria-label'));
   $('spanish-label').textContent = 'Spanish · place the adjective';
   $('word-tray').hidden = false;
+  $('prediction').hidden = false;
   choices.forEach(input=>{input.checked = false;input.disabled = false;});
   $('reveal').hidden = false;
   $('reveal').disabled = true;

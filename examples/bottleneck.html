@@ -27,18 +27,32 @@
 .comparison-guide{position:absolute;inset-block:0;left:var(--guide);border-left:2px dashed var(--accent);pointer-events:none}
 .comparison-badge{font-size:14px;font-weight:500;padding:2px 6px;border-radius:7px;background:var(--accent-soft);color:var(--accent)}
 @media(max-width:600px){.comparison{--comparison-columns:52px minmax(0,1fr) 56px;--comparison-gap:12px}}
+
+/* Desktop composition: keep the scene, controls and shared comparison in view. */
+main{max-width:1240px;padding:14px 24px}.topbar{margin-bottom:6px}.theme-toggle{min-height:44px;font-size:14px;padding:8px 13px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:14px}h1{font-size:32px;margin:0;flex:none}.intro{font-size:16px;line-height:1.45;max-width:64ch}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;align-items:start}.card{padding:16px}.card+.card{margin-top:0}h2{font-size:19px}.card-heading{gap:12px}.result{font-size:22px}.result span{font-size:14px}
+.graphic{margin-top:6px}.diagram-label{font-size:var(--scene-label-size,22px)}.diagram-capacity{font-size:var(--scene-capacity-size,24px)}.diagram-limit{font-size:var(--scene-limit-size,22px)}.diagram-caption{font-size:14px;line-height:1.4;margin:0}
+.controls{gap:16px;margin-top:10px;padding-top:10px}.control label{display:flex;font-size:16px;line-height:1.4;gap:8px;margin:0}.control .name{display:inline;font-size:14px;margin-left:6px}.control output{display:block;font-size:14px;margin-top:0}.control-ends{display:none}
+.change-row{margin-top:6px;min-height:0}.change{font-size:14px;line-height:1.5}
+.chart-heading{margin-bottom:10px}#capacity-comparison{--comparison-columns:50px minmax(0,1fr) 44px;--comparison-gap:12px;margin-top:0}.chart-legend{display:block;font-size:14px;margin-top:12px}.equation{display:block}
+.page-meta{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:6px}.model-notes{margin:0;font-size:14px;max-width:none;flex:1}.model-notes summary{min-height:44px;line-height:1.4;padding:12px 0}footer{margin:0;font-size:14px;gap:16px;flex:none}footer a{display:inline-flex;align-items:center;min-height:44px}#reset{min-height:44px;padding:8px 13px;font-size:14px}
+@media(max-width:900px){main{padding:24px 18px 32px}.topbar{margin-bottom:20px}header{display:block}h1{font-size:34px;margin-bottom:10px}.workspace{grid-template-columns:1fr}.card{padding:22px}.page-meta{flex-wrap:wrap}.model-notes{flex-basis:calc(100% - 90px)}footer{width:100%}}
+@media(max-width:600px){#capacity-comparison{--comparison-columns:40px minmax(0,1fr) 40px;--comparison-gap:8px}}
+@media print{header{display:block}.workspace{display:block}.page-meta{display:block}.change-row{display:block}#reset{display:none}}
 </style>
 </head>
 <body>
 <main>
 <div class="topbar"><span class="brand">Socratic Workshop</span><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button></div>
 <header><h1>What sets the pace?</h1><p class="intro">Every product passes through A, B, then C. Change a station's capacity and watch the whole line respond.</p></header>
+<div class="workspace">
 <section class="card" aria-labelledby="line-heading">
 <div class="card-heading"><h2 id="line-heading">Production line</h2><p id="result" class="result" aria-live="polite" aria-atomic="true"></p></div>
 <svg id="line" class="graphic" role="img" aria-labelledby="line-title line-description"></svg>
 <p id="token-caption" class="diagram-caption"></p>
 <div id="controls" class="controls"></div>
-<div class="change-row"><p id="change" class="change">Try changing a single station.</p><button id="reset">Reset</button></div>
+<div class="change-row"><p id="change" class="change">Try changing a single station.</p></div>
 <noscript><p>This interactive model needs JavaScript. A serial line's maximum steady-state throughput is its smallest station capacity.</p></noscript>
 </section>
 <section class="card" aria-labelledby="chart-heading">
@@ -50,8 +64,12 @@
 <p id="chart-description" hidden></p>
 <div class="chart-legend"><span><i class="guide-key" aria-hidden="true"></i>Current throughput</span><span id="equation" class="equation"></span></div>
 </section>
+</div>
+<div class="page-meta">
 <details class="model-notes"><summary>Model notes</summary><p>This is the maximum steady-state rate of a serial line. Supply, demand, and intermediate buffers are sufficient. Stations are reliable, with no scrap, setup time, or downtime. It does not model startup, queue length, or the time one product spends in the line.</p><p>The station boxes show processing stages, not capacity by volume. Capacity is measured by the bars below. Output tokens represent rate, not a snapshot of inventory.</p></details>
+<button id="reset">Reset</button>
 <footer><a href="gradient-descent.html">Gradient descent</a><a href="spanish-word-order.html">Spanish word order</a></footer>
+</div>
 </main>
 <template id="comparison-row-pattern"><div class="comparison-row"><span class="comparison-label" data-slot="label"></span><div class="comparison-track"><div class="comparison-bar" data-slot="bar"></div><i class="comparison-guide" aria-hidden="true"></i></div><span class="comparison-value" data-slot="value"></span></div></template>
 <script>
@@ -71,9 +89,10 @@ const model = {
     product:{size:8,height:10},outputProduct:{size:12,height:14},
     port:{width:24,height:12},arrowInset:15,
     tokens:{columns:5,columnGap:14,rowGap:23,insetX:9,insetY:12},
-    desktop:{width:1050,height:330,origins:[[150,190],[425,190],[700,190]],trayOrigin:[935,190],labels:[[164,38],[439,38],[714,38]],outputLabel:[935,38],labelAlign:'middle'},
+    desktop:{width:1050,height:260,origins:[[150,170],[425,170],[700,170]],trayOrigin:[935,170],labels:[[164,26],[439,26],[714,26]],outputLabel:[935,26],labelAlign:'middle'},
     compact:{width:380,height:795,origins:[[110,110],[110,300],[110,490]],trayOrigin:[110,680],labels:[[218,62],[218,252],[218,442]],outputLabel:[218,652],labelAlign:'start'},
-    labelLine:29,limitLine:57,chartDivisions:4
+    labelLine:29,limitLine:57,chartDivisions:4,
+    typography:{minimumPixels:14,desktop:{label:22,capacity:24,limit:22},compact:{label:24,capacity:25,limit:23}}
   }
 };
 const compact = matchMedia('(max-width: 760px)');
@@ -149,6 +168,15 @@ function label([x,y],heading,value,align,limiting=false){
   return `<text class="diagram-label" x="${x}" y="${y}" text-anchor="${align}">${heading}</text><text class="diagram-label diagram-capacity" x="${x}" y="${y+g.labelLine}" text-anchor="${align}">${value} units/h</text>`
     +(limiting ? `<text class="diagram-label diagram-limit" x="${x}" y="${y+g.limitLine}" text-anchor="${align}">Bottleneck</text>` : '');
 }
+function sizeSceneType(layout){
+  const width = $('line').clientWidth || layout.width;
+  const type = model.geometry.typography;
+  const defaults = compact.matches ? type.compact : type.desktop;
+  Object.entries(defaults).forEach(([role,size]) => {
+    const pixels = Math.max(size,type.minimumPixels*layout.width/width);
+    $('line').style.setProperty(`--scene-${role}-size`,`${pixels}px`);
+  });
+}
 function drawLine(current){
   const g = model.geometry;
   const layout = compact.matches ? g.compact : g.desktop;
@@ -164,6 +192,7 @@ function drawLine(current){
     return `<g class="${limiting ? 'is-limiting' : ''}">${machine(layout.origins[index])}${label(layout.labels[index],`${station.id.toUpperCase()} · ${station.name}`,station.capacity,layout.labelAlign,limiting)}</g>`;
   }).join('');
   $('line').setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
+  sizeSceneType(layout);
   $('line').innerHTML = `<title id="line-title">A serial production line</title><desc id="line-description">${model.stations.map(station => `${station.id.toUpperCase()}, ${station.name}, ${station.capacity} units per hour`).join('. ')}. Throughput is ${current.throughput} units per hour, limited by ${names(current.limiting)}. Each output token represents ${model.unitsPerToken} units per hour.</desc><defs><marker id="flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--muted)"/></marker></defs>${paths}${stations}${outputTray(layout.trayOrigin,current.tokens)}${label(layout.outputLabel,'Output',current.throughput,layout.labelAlign)}`;
 }
 function drawChart(current){
@@ -218,6 +247,14 @@ $('scale').innerHTML = Array.from({length:model.geometry.chartDivisions+1},(_,in
 $('token-caption').textContent = `Each output token = ${model.unitsPerToken} units/h`;
 $('reset').addEventListener('click',()=>{model.stations.forEach(station => {station.capacity = station.initial;});render('Original capacities restored.');});
 compact.addEventListener('change',()=>render());
+let previousSceneWidth = 0;
+const sceneObserver = new ResizeObserver(entries => {
+  const width = entries[0].contentRect.width;
+  if(Math.abs(width-previousSceneWidth) < .5) return;
+  previousSceneWidth = width;
+  drawLine(state());
+});
+sceneObserver.observe($('line'));
 render();
 </script>
 </body>
