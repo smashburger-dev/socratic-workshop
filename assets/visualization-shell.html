@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Socratic Workshop</title>
+<style>
+:root{color-scheme:light;--page:#f5f6fa;--surface:#ffffff;--soft:#f0f1f7;--ink:#20212b;--muted:#656778;--border:#e6e7ef;--accent:#6d3fd4;--accent-soft:#f0eafb;--accent-ink:#fff;--shadow:0 12px 40px #20212b06}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:17px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1180px;padding:32px 32px 56px;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:44px}.brand{font-size:16px;font-weight:650;letter-spacing:-.025em;color:var(--muted)}h1{font-size:clamp(32px,4.8vw,50px);letter-spacing:-.045em;font-weight:650;line-height:1.12;margin:0 0 14px;text-wrap:balance}h2{font-size:22px;letter-spacing:-.025em;line-height:1.3;margin:0 0 20px}.intro{font-size:19px;color:var(--muted);max-width:60ch;margin:0}header{margin-bottom:34px}p{margin:0 0 16px}.card{background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:28px;box-shadow:var(--shadow);min-width:0}.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:24px;align-items:start}.stage{min-width:0}.graphic{display:block;width:100%;height:auto;overflow:visible}.actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px}.button,button,select{font:inherit;min-height:46px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--ink);padding:10px 17px;cursor:pointer;font-weight:550}.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}button:disabled{opacity:.45;cursor:not-allowed}button:active:not(:disabled){transform:scale(.98)}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.theme-toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;background:transparent;box-shadow:none}.theme-toggle svg{width:18px;height:18px;flex:none}.control{margin-bottom:26px}.control label{display:flex;align-items:baseline;justify-content:space-between;gap:14px;font-size:17px;font-weight:550;margin-bottom:10px}output{font-variant-numeric:tabular-nums;color:var(--accent)}input[type="range"]{display:block;width:100%;min-height:44px;margin:0;accent-color:var(--accent);cursor:pointer}.metrics{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--border)}.metrics dl{margin:0;min-width:80px}.metrics dt{color:var(--muted);font-size:15px}.metrics dd{font-size:25px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:3px 0 0}.legend{display:flex;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:15px;margin-top:18px}.feedback{margin-top:24px;background:var(--accent-soft);border:1px solid transparent;border-radius:18px;padding:22px 24px}.feedback h2{font-size:21px;margin-bottom:10px}.feedback p:last-child{margin-bottom:0}.feedback .detail{font-size:16px;color:var(--muted)}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:16px;overflow-wrap:anywhere}.model-notes{margin-top:26px;color:var(--muted);font-size:15px;max-width:80ch}.model-notes summary{display:inline-block;cursor:pointer;min-height:44px;padding:10px 0;color:var(--muted)}.model-notes summary::before{content:"+ ";color:var(--accent)}.model-notes[open] summary::before{content:"− "}.model-notes p{margin-top:8px}footer{display:flex;gap:20px;flex-wrap:wrap;margin-top:34px;font-size:15px}a{color:var(--muted);text-underline-offset:4px}[hidden]{display:none!important}@media(hover:hover) and (pointer:fine){button:hover:not(:disabled){border-color:var(--accent)}a:hover{color:var(--ink)}}@media(max-width:800px){main{padding:24px 18px 40px}.topbar{margin-bottom:32px}.layout{grid-template-columns:1fr}.card{padding:22px;border-radius:22px}header{margin-bottom:26px}.metrics{gap:22px}.feedback{padding:20px}.intro{font-size:18px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media print{:root{color-scheme:light;--page:#fff;--surface:#fff;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}main{max-width:none;padding:0}.topbar,.actions,footer,.theme-toggle,input,select{display:none}.layout{display:block}.card{break-inside:avoid;box-shadow:none;margin-bottom:20px}.graphic{max-height:360px}.model-notes{display:block}}
+</style>
+<style>
+/* Comparison pattern: label, mark and value share one row and one column definition. */
+.comparison{--comparison-columns:88px minmax(0,1fr) 72px;--comparison-gap:20px;--comparison-grid:25%;--guide:0%;margin-top:24px}
+.comparison-axis,.comparison-row{display:grid;grid-template-columns:var(--comparison-columns);column-gap:var(--comparison-gap);align-items:center}
+.comparison-axis{min-height:38px;padding-bottom:12px;color:var(--muted);font-size:14px}
+.comparison-scale{position:relative;height:22px;font-variant-numeric:tabular-nums}
+.comparison-tick{position:absolute;left:var(--tick);transform:translateX(-50%)}
+.comparison-tick:first-child{transform:none}.comparison-tick:last-child{transform:translateX(-100%)}
+.comparison-unit,.comparison-value{text-align:right;font-variant-numeric:tabular-nums}
+.comparison-label{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-weight:600;padding:12px 0}
+.comparison-track{position:relative;align-self:stretch;min-height:56px;display:flex;align-items:center;background:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:var(--comparison-grid) 100%;border-right:1px solid var(--border)}
+.comparison-bar{height:15px;width:var(--value-percent,0%);background:var(--border);border-radius:0 7px 7px 0}
+.comparison-bar.is-limiting{background:var(--accent)}
+.comparison-guide{position:absolute;inset-block:0;left:var(--guide);border-left:2px dashed var(--accent);pointer-events:none}
+.comparison-badge{font-size:14px;font-weight:500;padding:2px 6px;border-radius:7px;background:var(--accent-soft);color:var(--accent)}
+/* Annotation pattern: metadata sits in normal flow above the item surface. */
+.annotated-set{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:12px;list-style:none;margin:0;padding:0}
+.annotated-item{display:grid;grid-template-rows:minmax(20px,auto) auto;gap:10px;flex:0 0 auto;min-width:0}
+.item-role{display:block;min-height:20px;text-align:center;font-size:14px;line-height:1.4;font-weight:550;color:var(--muted);letter-spacing:0}
+.item-body{display:flex;align-items:center;justify-content:center;min-height:86px;padding:16px 20px;border:2px solid transparent;border-radius:18px;background:var(--soft);font-size:clamp(24px,3vw,32px);font-weight:550;line-height:1.25;letter-spacing:-.025em}
+.annotated-item.is-accented .item-body{background:var(--accent-soft);color:var(--accent)}
+.annotated-item.is-outlined .item-body{background:transparent;border-color:var(--accent);color:var(--accent)}
+.annotated-item.is-empty .item-body{min-width:76px;border:1px dashed var(--border);background:transparent;color:var(--muted)}
+@media(max-width:600px){.comparison{--comparison-columns:52px minmax(0,1fr) 56px;--comparison-gap:12px}.annotated-set{gap:9px}.item-body{min-height:78px;padding:14px 16px}.annotated-item.is-empty .item-body{min-width:56px}}
+</style>
+</head>
+<body>
+<main>
+<div class="topbar"><span class="brand">Socratic Workshop</span><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button></div>
+<header><h1>Explore a concept</h1><p class="intro">Choose one meaningful input and make its effect visible.</p></header>
+<!-- Copy this shell into a standalone HTML. Replace the header and this card with the concept's model, controls, and concise feedback. Keep only the classes used by that artifact. -->
+<section class="card"><p>The visualization, its controls, and its current result belong together.</p></section>
+</main>
+<!-- Copy the needed inert pattern into the output, then fill its slots from the model. -->
+<template id="comparison-row-pattern"><div class="comparison-row"><span class="comparison-label" data-slot="label"></span><div class="comparison-track"><div class="comparison-bar" data-slot="bar"></div><i class="comparison-guide" aria-hidden="true"></i></div><span class="comparison-value" data-slot="value"></span></div></template>
+<template id="annotated-item-pattern"><li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body"></span></li></template>
+<script>
+const themeButton = document.getElementById('theme-toggle');
+const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+function currentTheme(){return document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light');}
+function updateThemeButton(){const dark = currentTheme() === 'dark';document.getElementById('theme-label').textContent = dark ? 'Light' : 'Dark';themeButton.setAttribute('aria-label',dark ? 'Switch to light theme' : 'Switch to dark theme');}
+try{const savedTheme = localStorage.getItem('socratic-workshop-theme');if(savedTheme === 'dark' || savedTheme === 'light')document.documentElement.dataset.theme = savedTheme;}catch{}
+themeButton.addEventListener('click',()=>{const theme = currentTheme() === 'dark' ? 'light' : 'dark';document.documentElement.dataset.theme = theme;try{localStorage.setItem('socratic-workshop-theme',theme);}catch{}updateThemeButton();});
+systemTheme.addEventListener('change',updateThemeButton);
+updateThemeButton();
+</script>
+</body>
+</html>

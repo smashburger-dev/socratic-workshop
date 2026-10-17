@@ -41,15 +41,17 @@ A request for a complete explanation changes the mode. Seeing an answer is recor
 
 ## Visual learning
 
-The bundled [Werkbankfiguren adapter](references/werkbank-figuren.md) creates one HTML file with inline styles, scripts, and graphics. No build step, package installation, external font, CDN, or Argmin installation is required. It uses restrained tonal colors, meaningful interaction, readable labels, and a text alternative. Each model states its assumptions and limitations.
+The bundled [Werkbankfiguren adapter](references/werkbank-figuren.md) creates one HTML file with inline styles, scripts, and graphics. No build step, package installation, external font, CDN, or Argmin installation is required. Its [reusable shell](assets/visualization-shell.html) supplies spacious layouts, readable type, rounded surfaces, and light/dark themes. Controls sit with the visualization; concise feedback has its own area. Relevant calculations and model notes are available on demand.
 
-A hint visualization contains only the information appropriate to the current hint, including in its source. A fully explained visualization may reveal its result after your prediction. The tutor then returns to your explanation.
+The shell also supplies comparison rows and externally annotated items. The examples use those same components. Their [example prompts](examples/README.md#request-the-same-learning-scope) specify how to request the same learning scope through the skill.
+
+A hint visualization contains only the information appropriate to the current hint, including in its source. A full explanation can support direct exploration or a prediction and reveal. Inputs visibly change the mechanism or its preview. Isometric or 3D views are available when spatial relationships help, with a precise 2D chart when needed. The tutor then returns to your explanation. Shared examples and default interface copy are in English.
 
 Explore the [three draft examples](examples/README.md):
 
-- [Gradient descent](examples/gradient-descent.html): step size on a one-dimensional quadratic.
-- [German word order](examples/german-word-order.html): finite-verb position in a main clause and a clause introduced by “weil.”
-- [Process bottlenecks](examples/bottleneck.html): capacity and throughput in a simplified process.
+- [Gradient descent](examples/gradient-descent.html): live next-step feedback and controllable playback on a one-dimensional quadratic.
+- [Spanish word order](examples/spanish-word-order.html): color-adjective placement compared with English.
+- [Process bottlenecks](examples/bottleneck.html): an isometric production chain paired with a capacity comparison.
 
 Download an HTML file and open it directly in a browser. GitHub's file view shows source rather than running the page. These complete-explanation demos are showcases, not the content that every hint request receives.
 
@@ -79,6 +81,8 @@ Keep this repository private until the owner explicitly approves publication. Th
 - A final review of attribution, shareable content, installation instructions, and the public license.
 
 The owner's confirmation controls each gate. Files existing in the repository, agent review, a completed chat, or a generated GIF do not imply approval. A new explicit instruction is required to change GitHub visibility.
+
+Record a promotional GIF of a visualization only after Noa approves the HTML version being recorded. The gradient-descent demo is the first planned usage recording; no capture is authorized yet.
 
 ## Credits
 

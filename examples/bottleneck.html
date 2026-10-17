@@ -1,73 +1,224 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Engpass · Socratic Workshop · Entwurf</title>
+<title>The bottleneck · Socratic Workshop</title>
 <style>
-:root{color-scheme:light;--paper:#f6f2eb;--surface:#ece6dc;--mid:#d8d0c4;--ink:#302b34;--muted:#5c5650;--accent:#6d3fd4;--line:#bdb3a5}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1040px;margin:auto;padding:36px 24px 56px}a{color:var(--ink)}.eyebrow,.draft,.step{font-size:14px}.eyebrow{letter-spacing:.08em;text-transform:uppercase}.draft{display:inline-block;border:1px solid var(--line);padding:5px 10px;margin:12px 0 18px}h1{font-size:clamp(30px,5vw,48px);line-height:1.12;letter-spacing:-.035em;margin:0 0 18px;font-weight:650;max-width:20ch}h2,legend{font-size:19px;font-weight:650}h2{margin:0 0 12px}p{max-width:70ch;margin:0 0 14px}.lead{font-size:18px}.workspace{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:24px;margin-top:28px}.panel{padding:22px;border:1px solid var(--line);border-radius:5px;background:var(--surface);min-width:0}.step,.note,.unit{color:var(--muted)}.step{margin-bottom:8px}.note,.unit{font-size:14px}.pipeline{list-style:none;padding:0;margin:20px 0;display:grid;gap:12px}.station{position:relative;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:3px}.station-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}.station-name{font-size:18px;font-weight:600}.capacity{font-variant-numeric:tabular-nums;font-size:18px}.track{height:16px;background:var(--surface);border-radius:2px;overflow:hidden}.bar{height:100%;background:var(--mid);border-right:2px solid var(--muted)}.station.bottleneck{border:2px solid var(--accent);padding:13px 15px}.station.bottleneck .bar{background:var(--accent);border-right:0}.bottleneck-label{display:block;margin-top:9px;font-size:14px;color:var(--accent);font-weight:650}.output{padding:18px;background:var(--paper);border:1px solid var(--line);border-radius:3px}.output strong{display:block;font-size:30px;line-height:1.3;font-variant-numeric:tabular-nums}.control{margin:18px 0}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:600}.control output{font-variant-numeric:tabular-nums}input[type=range]{width:100%;min-height:44px;accent-color:var(--accent);cursor:pointer}select,button{font:inherit;min-height:44px;border:1px solid var(--muted);border-radius:3px;padding:9px 12px;background:var(--paper);color:var(--ink)}select{width:100%;cursor:pointer}fieldset{border:0;padding:0;margin:22px 0 16px}legend{padding:0;margin-bottom:10px}button{cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px}.primary{border-color:var(--ink);background:var(--ink);color:var(--paper)}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.result{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.result p:last-child{margin-bottom:0}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;overflow-wrap:anywhere}.boundary{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}.boundary h2{font-size:16px}footer{margin-top:30px;font-size:14px;color:var(--muted)}[hidden]{display:none!important}@media(max-width:760px){main{padding:24px 16px 36px}.workspace{grid-template-columns:1fr}.panel{padding:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{body{background:white}main{max-width:none;padding:0}.workspace{display:block}.panel{margin:16px 0;break-inside:avoid}input,select,button{display:none}.draft{margin-top:0}.result[hidden]{display:block!important}.result[hidden]::after{content:"Der Durchsatz wurde in dieser Ansicht noch nicht aufgedeckt."}}
+:root{color-scheme:light;--page:#f5f6fa;--surface:#ffffff;--soft:#f0f1f7;--ink:#20212b;--muted:#656778;--border:#e6e7ef;--accent:#6d3fd4;--accent-soft:#f0eafb;--accent-ink:#fff;--shadow:0 12px 40px #20212b06}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:17px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1180px;padding:32px 32px 56px;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:44px}.brand{font-size:16px;font-weight:650;letter-spacing:-.025em;color:var(--muted)}h1{font-size:clamp(32px,4.8vw,50px);letter-spacing:-.045em;font-weight:650;line-height:1.12;margin:0 0 14px;text-wrap:balance}h2{font-size:22px;letter-spacing:-.025em;line-height:1.3;margin:0}.intro{font-size:19px;color:var(--muted);max-width:60ch;margin:0}header{margin-bottom:34px}p{margin:0}.card{background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:28px;box-shadow:var(--shadow);min-width:0}.card+.card{margin-top:24px}.card-heading{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap}.result{font-size:25px;letter-spacing:-.035em;line-height:1.35;font-variant-numeric:tabular-nums}.result strong{font-weight:650;color:var(--accent)}.result span{font-size:17px;letter-spacing:0;color:var(--muted)}.graphic{display:block;width:100%;height:auto;margin-top:12px;overflow:visible}.diagram-label{font-family:inherit;fill:var(--ink);font-size:22px;font-weight:550}.diagram-capacity{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}.diagram-limit{font-size:18px;fill:var(--accent);font-weight:600}.diagram-muted{fill:var(--muted)}.diagram-top{fill:var(--soft)}.diagram-front{fill:var(--surface)}.diagram-side{fill:var(--border)}.machine-face{stroke:var(--muted);stroke-width:1.2;stroke-linejoin:round}.is-limiting .machine-face{stroke:var(--accent);stroke-width:2}.is-limiting .diagram-top,.is-limiting .diagram-front{fill:var(--accent-soft)}.is-limiting .diagram-capacity{fill:var(--accent)}.belt-top{fill:var(--soft);stroke:var(--border);stroke-width:1.4;stroke-linejoin:round}.belt-side{fill:var(--border);stroke:var(--border);stroke-width:1;stroke-linejoin:round}.product-top{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1}.product-front{fill:var(--accent);stroke:var(--accent);stroke-width:1}.product-side{fill:var(--accent);fill-opacity:.65;stroke:var(--accent);stroke-width:1}.diagram-caption{font-size:15px;color:var(--muted);text-align:right;margin-top:4px}.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:26px;padding-top:26px;border-top:1px solid var(--border)}.control label{display:flex;align-items:baseline;justify-content:space-between;gap:14px;font-weight:550;margin-bottom:9px}.control output{font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap}.control .name{color:var(--muted);font-size:15px;font-weight:400;display:block;margin-top:2px}input[type="range"]{display:block;width:100%;min-height:44px;margin:0;accent-color:var(--accent);cursor:pointer}.control-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}.change-row{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:22px;min-height:46px}.change{color:var(--muted);font-size:16px}.button,button{font:inherit;min-height:46px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--ink);padding:10px 17px;cursor:pointer;font-weight:550;flex:none}button:active{transform:scale(.98)}button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.theme-toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;background:transparent;box-shadow:none}.theme-toggle svg{width:18px;height:18px;flex:none}.chart-heading{margin-bottom:28px}.chart-heading p{color:var(--muted);font-size:16px}.chart-legend{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:22px;color:var(--muted);font-size:15px}.guide-key{display:inline-block;width:20px;border-top:2px dashed var(--accent);vertical-align:middle;margin-right:8px}.equation{font-variant-numeric:tabular-nums}.model-notes{margin-top:26px;color:var(--muted);font-size:15px;max-width:85ch}.model-notes summary{display:inline-block;cursor:pointer;min-height:44px;padding:10px 0;color:var(--muted)}.model-notes summary::before{content:"+ ";color:var(--accent)}.model-notes[open] summary::before{content:"− "}.model-notes p{margin-top:8px}footer{display:flex;gap:20px;flex-wrap:wrap;margin-top:34px;font-size:15px}a{color:var(--muted);text-underline-offset:4px}@media(hover:hover) and (pointer:fine){button:hover{border-color:var(--accent)}a:hover{color:var(--ink)}}@media(max-width:800px){main{padding:24px 18px 40px}.topbar{margin-bottom:32px}.card{padding:22px;border-radius:22px}header{margin-bottom:26px}.intro{font-size:18px}.controls{gap:22px}.control label{display:block}.control output{display:block;margin-top:8px}.result{font-size:23px}}@media(max-width:600px){.controls{grid-template-columns:1fr;gap:20px}.control label{display:flex}.control output{margin-top:0}.control .name{display:inline;margin-left:7px}.card-heading{gap:10px}.graphic{margin-top:24px}.diagram-caption{text-align:left}.change-row{align-items:flex-start;gap:14px}.chart-heading{margin-bottom:22px}.chart-legend{gap:10px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media print{:root{color-scheme:light;--page:#fff;--surface:#fff;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}main{max-width:none;padding:0}.topbar,footer,.theme-toggle,input,button,.control-ends,.change-row{display:none}.card{break-inside:avoid;box-shadow:none;margin-bottom:20px}.graphic{max-height:360px}.model-notes{display:block}}
+.diagram-limit{font-size:22px}
+@media(max-width:760px){.graphic{max-width:380px;margin-left:auto;margin-right:auto}.diagram-label{font-size:24px}.diagram-capacity{font-size:25px}.diagram-limit{font-size:23px}}
+
+/* Comparison pattern: label, mark and value share one row and one column definition. */
+.comparison{--comparison-columns:88px minmax(0,1fr) 72px;--comparison-gap:20px;--comparison-grid:25%;--guide:0%;margin-top:24px}
+.comparison-axis,.comparison-row{display:grid;grid-template-columns:var(--comparison-columns);column-gap:var(--comparison-gap);align-items:center}
+.comparison-axis{min-height:38px;padding-bottom:12px;color:var(--muted);font-size:14px}
+.comparison-scale{position:relative;height:22px;font-variant-numeric:tabular-nums}
+.comparison-tick{position:absolute;left:var(--tick);transform:translateX(-50%)}
+.comparison-tick:first-child{transform:none}.comparison-tick:last-child{transform:translateX(-100%)}
+.comparison-unit,.comparison-value{text-align:right;font-variant-numeric:tabular-nums}
+.comparison-label{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-weight:600;padding:12px 0}
+.comparison-track{position:relative;align-self:stretch;min-height:56px;display:flex;align-items:center;background:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:var(--comparison-grid) 100%;border-right:1px solid var(--border)}
+.comparison-bar{height:15px;width:var(--value-percent,0%);background:var(--border);border-radius:0 7px 7px 0}
+.comparison-bar.is-limiting{background:var(--accent)}
+.comparison-guide{position:absolute;inset-block:0;left:var(--guide);border-left:2px dashed var(--accent);pointer-events:none}
+.comparison-badge{font-size:14px;font-weight:500;padding:2px 6px;border-radius:7px;background:var(--accent-soft);color:var(--accent)}
+@media(max-width:600px){.comparison{--comparison-columns:52px minmax(0,1fr) 56px;--comparison-gap:12px}}
 </style>
 </head>
 <body>
 <main>
-<header><div class="eyebrow">Socratic Workshop / Entwurf 03</div><div class="draft">Demo-Entwurf · wartet auf Noas Review</div><h1>Welche Station setzt die Grenze?</h1><p class="lead">Drei Stationen bearbeiten dasselbe Produkt nacheinander. Verändere ihre Kapazitäten und sage voraus, wie viele fertige Stücke pro Stunde die ganze Kette höchstens schafft.</p></header>
-<div class="workspace">
-<section class="panel" aria-labelledby="model-heading"><p class="step">01 · Kapazität ist noch kein Durchsatz</p><h2 id="model-heading">A → B → C</h2><p class="note">Die Balken verwenden dieselbe Skala von 0 bis 100 Stück pro Stunde. Ein Produkt muss durch alle drei Stationen.</p><ol class="pipeline" aria-label="Bearbeitungsstationen in ihrer Reihenfolge"><li id="station-a" class="station"><div class="station-head"><span class="station-name">A · Vorbereiten</span><span class="capacity"><span id="capacity-a">60</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-a" class="bar" style="width:60%"></div></div><span id="bottleneck-a" class="bottleneck-label" hidden>Engpass</span></li><li id="station-b" class="station"><div class="station-head"><span class="station-name">B · Bearbeiten</span><span class="capacity"><span id="capacity-b">40</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-b" class="bar" style="width:40%"></div></div><span id="bottleneck-b" class="bottleneck-label" hidden>Engpass</span></li><li id="station-c" class="station"><div class="station-head"><span class="station-name">C · Verpacken</span><span class="capacity"><span id="capacity-c">80</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-c" class="bar" style="width:80%"></div></div><span id="bottleneck-c" class="bottleneck-label" hidden>Engpass</span></li></ol><div class="output"><span class="note">Maximaler Durchsatz der Kette</span><strong id="throughput">Noch nicht aufgedeckt</strong><span id="throughput-note" class="note">Triff rechts zuerst eine Vorhersage.</span></div><p class="note" style="margin-top:18px">Vergleiche nach dem Aufdecken eine Kapazitätsänderung mit deiner letzten Rechnung. So wird sichtbar, wann ein anderer Engpass übernimmt.</p></section>
-<section class="panel" aria-labelledby="prediction-heading"><p class="step">02 · Vorhersagen, dann aufdecken</p><h2 id="prediction-heading">Wie viel kommt am Ende heraus?</h2><div class="control"><label for="a">Kapazität A <output id="output-a" for="a">60 Stück/h</output></label><input id="a" type="range" min="10" max="100" step="10" value="60"></div><div class="control"><label for="b">Kapazität B <output id="output-b" for="b">40 Stück/h</output></label><input id="b" type="range" min="10" max="100" step="10" value="40"></div><div class="control"><label for="c">Kapazität C <output id="output-c" for="c">80 Stück/h</output></label><input id="c" type="range" min="10" max="100" step="10" value="80"></div><p class="note">Änderst du eine Kapazität, wird die Antwort wieder verdeckt.</p><fieldset><legend>Deine Vorhersage für die ganze Kette</legend><label for="prediction" class="note">Fertige Stücke pro Stunde</label><select id="prediction"><option value="">Bitte wählen</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option><option>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>180</option></select></fieldset><div class="actions"><button id="reveal" class="primary" disabled>Durchsatz aufdecken</button><button id="reset">Zurücksetzen</button></div><p id="instruction" class="note" style="margin-top:12px">Wähle einen Wert, um deine Vorhersage zu prüfen.</p><div id="result" class="result" hidden aria-live="polite" aria-atomic="true"><p id="verdict"></p><p id="equation" class="equation"></p><p id="explanation"></p><p id="comparison"></p></div><noscript><p>Für die Regler ist JavaScript nötig. Mit A = 60, B = 40 und C = 80 Stück/h begrenzt B die ganze Kette auf 40 Stück/h. Eine Erhöhung von A allein ändert diesen maximalen Durchsatz nicht.</p></noscript></section>
+<div class="topbar"><span class="brand">Socratic Workshop</span><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button></div>
+<header><h1>What sets the pace?</h1><p class="intro">Every product passes through A, B, then C. Change a station's capacity and watch the whole line respond.</p></header>
+<section class="card" aria-labelledby="line-heading">
+<div class="card-heading"><h2 id="line-heading">Production line</h2><p id="result" class="result" aria-live="polite" aria-atomic="true"></p></div>
+<svg id="line" class="graphic" role="img" aria-labelledby="line-title line-description"></svg>
+<p id="token-caption" class="diagram-caption"></p>
+<div id="controls" class="controls"></div>
+<div class="change-row"><p id="change" class="change">Try changing a single station.</p><button id="reset">Reset</button></div>
+<noscript><p>This interactive model needs JavaScript. A serial line's maximum steady-state throughput is its smallest station capacity.</p></noscript>
+</section>
+<section class="card" aria-labelledby="chart-heading">
+<div class="card-heading chart-heading"><h2 id="chart-heading">Capacity comparison</h2></div>
+<div id="capacity-comparison" class="comparison" role="img" aria-labelledby="chart-heading" aria-describedby="chart-description">
+<div class="comparison-axis" aria-hidden="true"><span></span><div id="scale" class="comparison-scale"></div><span class="comparison-unit">units/h</span></div>
+<div id="comparison-rows" aria-hidden="true"></div>
 </div>
-<section class="boundary" aria-labelledby="boundary-heading"><h2 id="boundary-heading">Wo das Modell endet</h2><p>Dies ist ein vereinfachtes, deterministisches Modell im eingeschwungenen Zustand. Material, Nachfrage und Zwischenpuffer reichen aus; jede Station arbeitet zuverlässig, ohne Ausschuss, Rüstzeiten oder Unterbrechungen. Das Modell zeigt weder Anlaufzeit noch Warteschlangen oder die Durchlaufzeit eines einzelnen Stücks.</p><p class="note">Zum Weiterdenken: Ändere zunächst genau eine Stationskapazität. Was bleibt gleich, was ändert sich? Begründe deine Beobachtung und suche dann eine Änderung, bei der eine andere Station die Grenze setzt.</p></section>
-<footer>Entwurf, keine aufgezeichnete Lernsitzung und kein Nachweis für Lernerfolg. <a href="gradient-descent.html">Zum Gradientenabstieg</a> · <a href="german-word-order.html">Zum Satzbau</a></footer>
+<p id="chart-description" hidden></p>
+<div class="chart-legend"><span><i class="guide-key" aria-hidden="true"></i>Current throughput</span><span id="equation" class="equation"></span></div>
+</section>
+<details class="model-notes"><summary>Model notes</summary><p>This is the maximum steady-state rate of a serial line. Supply, demand, and intermediate buffers are sufficient. Stations are reliable, with no scrap, setup time, or downtime. It does not model startup, queue length, or the time one product spends in the line.</p><p>The station boxes show processing stages, not capacity by volume. Capacity is measured by the bars below. Output tokens represent rate, not a snapshot of inventory.</p></details>
+<footer><a href="gradient-descent.html">Gradient descent</a><a href="spanish-word-order.html">Spanish word order</a></footer>
 </main>
+<template id="comparison-row-pattern"><div class="comparison-row"><span class="comparison-label" data-slot="label"></span><div class="comparison-track"><div class="comparison-bar" data-slot="bar"></div><i class="comparison-guide" aria-hidden="true"></i></div><span class="comparison-value" data-slot="value"></span></div></template>
 <script>
 const $ = id => document.getElementById(id);
-const stations = ['a','b','c'];
-let previousReveal = null;
-function capacities(){return stations.map(id => Number($(id).value));}
-function freshPrediction(){
-  stations.forEach(id => {
-    const value = Number($(id).value);
-    $(`capacity-${id}`).textContent = value;
-    $(`output-${id}`).textContent = `${value} Stück/h`;
-    $(`bar-${id}`).style.width = `${value}%`;
-    $(`station-${id}`).classList.remove('bottleneck');
-    $(`bottleneck-${id}`).hidden = true;
+const model = {
+  stations:[
+    {id:'a',name:'Prepare',capacity:60,initial:60},
+    {id:'b',name:'Process',capacity:40,initial:40},
+    {id:'c',name:'Pack',capacity:80,initial:80}
+  ],
+  minimum:10,maximum:100,step:10,unitsPerToken:10,
+  geometry:{
+    cosine:Math.sqrt(3)/2,sine:.5,
+    station:{length:92,depth:66,height:64},
+    tray:{length:84,depth:68,height:6},
+    belt:{width:16,height:4,level:22},
+    product:{size:8,height:10},outputProduct:{size:12,height:14},
+    port:{width:24,height:12},arrowInset:15,
+    tokens:{columns:5,columnGap:14,rowGap:23,insetX:9,insetY:12},
+    desktop:{width:1050,height:330,origins:[[150,190],[425,190],[700,190]],trayOrigin:[935,190],labels:[[164,38],[439,38],[714,38]],outputLabel:[935,38],labelAlign:'middle'},
+    compact:{width:380,height:795,origins:[[110,110],[110,300],[110,490]],trayOrigin:[110,680],labels:[[218,62],[218,252],[218,442]],outputLabel:[218,652],labelAlign:'start'},
+    labelLine:29,limitLine:57,chartDivisions:4
+  }
+};
+const compact = matchMedia('(max-width: 760px)');
+const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+const themeButton = $('theme-toggle');
+
+function currentTheme(){return document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light');}
+function updateThemeButton(){const dark = currentTheme() === 'dark';$('theme-label').textContent = dark ? 'Light' : 'Dark';themeButton.setAttribute('aria-label',dark ? 'Switch to light theme' : 'Switch to dark theme');}
+try{const savedTheme = localStorage.getItem('socratic-workshop-theme');if(savedTheme === 'dark' || savedTheme === 'light')document.documentElement.dataset.theme = savedTheme;}catch{}
+themeButton.addEventListener('click',()=>{const theme = currentTheme() === 'dark' ? 'light' : 'dark';document.documentElement.dataset.theme = theme;try{localStorage.setItem('socratic-workshop-theme',theme);}catch{}updateThemeButton();});
+systemTheme.addEventListener('change',updateThemeButton);
+updateThemeButton();
+
+function state(){
+  const capacities = model.stations.map(station => station.capacity);
+  const throughput = Math.min(...capacities);
+  return {capacities,throughput,limiting:model.stations.filter(station => station.capacity === throughput),tokens:throughput/model.unitsPerToken};
+}
+function names(stations){return stations.map(station => station.id.toUpperCase()).join(' and ');}
+function project([x,y,z]){return [(x-y)*model.geometry.cosine,(x+y)*model.geometry.sine-z];}
+function world([screenX,screenY],x=0,y=0,z=0){
+  const {cosine,sine} = model.geometry;
+  return [(screenX/cosine+screenY/sine)/2+x,(screenY/sine-screenX/cosine)/2+y,z];
+}
+function points(vertices){return vertices.map(vertex => project(vertex).join(',')).join(' ');}
+function polygon(vertices,className){return `<polygon class="${className}" points="${points(vertices)}"/>`;}
+function box(origin,dimensions,prefix){
+  const {length,depth,height} = dimensions;
+  const p = (x,y,z) => [origin[0]+x,origin[1]+y,origin[2]+z];
+  return polygon([p(0,depth,0),p(length,depth,0),p(length,depth,height),p(0,depth,height)],`${prefix}-front`)
+    + polygon([p(length,0,0),p(length,depth,0),p(length,depth,height),p(length,0,height)],`${prefix}-side`)
+    + polygon([p(0,0,height),p(length,0,height),p(length,depth,height),p(0,depth,height)],`${prefix}-top`);
+}
+function machine(origin){
+  const g = model.geometry;
+  const {length,depth,height} = g.station;
+  const p = (x,y,z) => world(origin,x,y,z);
+  const shell = box(p(0,0,0),g.station,'diagram').replaceAll('class="diagram-','class="machine-face diagram-');
+  const port = polygon([
+    p(length,depth/2-g.port.width/2,g.belt.level-g.port.height/2),p(length,depth/2+g.port.width/2,g.belt.level-g.port.height/2),
+    p(length,depth/2+g.port.width/2,g.belt.level+g.port.height/2),p(length,depth/2-g.port.width/2,g.belt.level+g.port.height/2)
+  ],'diagram-muted');
+  return shell+port+`<path d="M ${project(p(g.arrowInset,depth/2,height)).join(' ')} L ${project(p(length-g.arrowInset,depth/2,height)).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#flow-arrow)"/>`;
+}
+function belt(from,to,count){
+  const g = model.geometry;
+  const dx = to[0]-from[0],dy = to[1]-from[1];
+  const length = Math.hypot(dx,dy);
+  const ox = -dy/length*g.belt.width/2,oy = dx/length*g.belt.width/2;
+  const edge = (point,side,drop=0) => [point[0]+side*ox,point[1]+side*oy,point[2]-drop];
+  let markup = polygon([edge(from,1,g.belt.height),edge(to,1,g.belt.height),edge(to,1),edge(from,1)],'belt-side')
+    + polygon([edge(from,1),edge(to,1),edge(to,-1),edge(from,-1)],'belt-top');
+  for(let i=0;i<count;i++){
+    const fraction = (i+1)/(count+1);
+    const position = from.map((value,axis) => value+(to[axis]-value)*fraction);
+    position[0] -= g.product.size/2;position[1] -= g.product.size/2;
+    markup += box(position,{length:g.product.size,depth:g.product.size,height:g.product.height},'product');
+  }
+  return markup;
+}
+function outputTray(origin,count){
+  const g = model.geometry;
+  let markup = box(world(origin),g.tray,'diagram').replaceAll('class="diagram-','class="machine-face diagram-');
+  for(let i=0;i<count;i++){
+    const x = g.tokens.insetX+(i%g.tokens.columns)*g.tokens.columnGap;
+    const y = g.tokens.insetY+Math.floor(i/g.tokens.columns)*g.tokens.rowGap;
+    markup += box(world(origin,x,y,g.tray.height),{length:g.outputProduct.size,depth:g.outputProduct.size,height:g.outputProduct.height},'product');
+  }
+  return markup;
+}
+function label([x,y],heading,value,align,limiting=false){
+  const g = model.geometry;
+  return `<text class="diagram-label" x="${x}" y="${y}" text-anchor="${align}">${heading}</text><text class="diagram-label diagram-capacity" x="${x}" y="${y+g.labelLine}" text-anchor="${align}">${value} units/h</text>`
+    +(limiting ? `<text class="diagram-label diagram-limit" x="${x}" y="${y+g.limitLine}" text-anchor="${align}">Bottleneck</text>` : '');
+}
+function drawLine(current){
+  const g = model.geometry;
+  const layout = compact.matches ? g.compact : g.desktop;
+  let paths = '';
+  layout.origins.forEach((origin,index) => {
+    const from = world(origin,g.station.length,g.station.depth/2,g.belt.level);
+    const next = layout.origins[index+1];
+    const to = next ? world(next,0,g.station.depth/2,g.belt.level) : world(layout.trayOrigin,0,g.tray.depth/2,g.tray.height);
+    paths += belt(from,to,current.tokens);
   });
-  $('throughput').textContent = 'Noch nicht aufgedeckt';
-  $('throughput-note').textContent = 'Triff rechts zuerst eine Vorhersage.';
-  $('result').hidden = true;
-  $('prediction').value = '';
-  $('prediction').disabled = false;
-  $('reveal').disabled = true;
-  $('instruction').textContent = 'Wähle einen Wert, um deine Vorhersage zu prüfen.';
+  const stations = model.stations.map((station,index) => {
+    const limiting = station.capacity === current.throughput;
+    return `<g class="${limiting ? 'is-limiting' : ''}">${machine(layout.origins[index])}${label(layout.labels[index],`${station.id.toUpperCase()} · ${station.name}`,station.capacity,layout.labelAlign,limiting)}</g>`;
+  }).join('');
+  $('line').setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
+  $('line').innerHTML = `<title id="line-title">A serial production line</title><desc id="line-description">${model.stations.map(station => `${station.id.toUpperCase()}, ${station.name}, ${station.capacity} units per hour`).join('. ')}. Throughput is ${current.throughput} units per hour, limited by ${names(current.limiting)}. Each output token represents ${model.unitsPerToken} units per hour.</desc><defs><marker id="flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--muted)"/></marker></defs>${paths}${stations}${outputTray(layout.trayOrigin,current.tokens)}${label(layout.outputLabel,'Output',current.throughput,layout.labelAlign)}`;
 }
-function comparison(throughput){
-  if (!previousReveal) return 'Als Nächstes: Ändere genau eine Kapazität und vergleiche den neuen Durchsatz.';
-  const before = previousReveal.values.map((value,i) => `${stations[i].toUpperCase()} ${value}`).join(', ');
-  return `Vorher: ${before} Stück/h, Durchsatz ${previousReveal.throughput} Stück/h. Jetzt: ${throughput} Stück/h. Änderung des Durchsatzes: ${throughput - previousReveal.throughput} Stück/h.`;
+function drawChart(current){
+  const rows = document.createDocumentFragment();
+  const template = $('comparison-row-pattern');
+  model.stations.forEach(station => {
+    const row = template.content.cloneNode(true);
+    const limiting = station.capacity === current.throughput;
+    const label = row.querySelector('[data-slot="label"]');
+    label.textContent = station.id.toUpperCase();
+    if(limiting){
+      const badge = document.createElement('span');
+      badge.className = 'comparison-badge';badge.textContent = 'Limit';
+      label.append(badge);
+    }
+    const bar = row.querySelector('[data-slot="bar"]');
+    bar.style.setProperty('--value-percent',`${station.capacity/model.maximum*100}%`);
+    bar.classList.toggle('is-limiting',limiting);
+    row.querySelector('[data-slot="value"]').textContent = station.capacity;
+    rows.append(row);
+  });
+  $('comparison-rows').replaceChildren(rows);
+  $('capacity-comparison').style.setProperty('--guide',`${current.throughput/model.maximum*100}%`);
+  $('chart-description').textContent = `${model.stations.map(station => `${station.id.toUpperCase()}: ${station.capacity} units per hour`).join('. ')}. All bars use a zero to ${model.maximum} scale. The dashed line shows throughput of ${current.throughput} units per hour, limited by ${names(current.limiting)}.`;
+  $('equation').textContent = `min(${current.capacities.join(', ')}) = ${current.throughput} units/h`;
 }
-function reveal(){
-  if (!$('prediction').value) return;
-  const values = capacities();
-  const throughput = Math.min(...values);
-  const bottlenecks = stations.filter((id,i) => values[i] === throughput);
-  bottlenecks.forEach(id => {$(`station-${id}`).classList.add('bottleneck'); $(`bottleneck-${id}`).hidden = false;});
-  $('throughput').textContent = `${throughput} Stück/h`;
-  $('throughput-note').textContent = `Begrenzt durch ${bottlenecks.map(id => id.toUpperCase()).join(' und ')}.`;
-  $('verdict').textContent = Number($('prediction').value) === throughput ? 'Deine Vorhersage stimmt.' : `Deine Vorhersage war ${$('prediction').value} Stück/h. Die Kette schafft in diesem Modell ${throughput} Stück/h.`;
-  $('equation').textContent = `Durchsatz = min(${values.join(', ')}) = ${throughput} Stück/h`;
-  $('explanation').textContent = bottlenecks.length === 1 ? `Station ${bottlenecks[0].toUpperCase()} begrenzt den Durchsatz. Höhere Kapazität an einer anderen Station allein kann diese Grenze nicht anheben.` : `Die Stationen ${bottlenecks.map(id => id.toUpperCase()).join(' und ')} begrenzen gemeinsam den Durchsatz. Wird nur eine davon schneller, bleibt mindestens eine andere an der bisherigen Grenze.`;
-  $('comparison').textContent = comparison(throughput);
-  previousReveal = {values,throughput};
-  $('result').hidden = false;
-  $('prediction').disabled = true;
-  $('reveal').disabled = true;
-  $('instruction').textContent = 'Ändere jetzt eine Kapazität und sage den neuen Durchsatz voraus.';
+function render(message){
+  const current = state();
+  $('result').innerHTML = `<strong>${current.throughput} units/h</strong> <span>· limited by ${names(current.limiting)}</span>`;
+  model.stations.forEach(station => {
+    $(`capacity-${station.id}`).value = station.capacity;
+    $(`capacity-${station.id}`).setAttribute('aria-valuetext',`${station.capacity} units per hour`);
+    $(`value-${station.id}`).textContent = `${station.capacity} units/h`;
+  });
+  if(message) $('change').textContent = message;
+  drawLine(current);drawChart(current);
 }
-stations.forEach(id => $(id).addEventListener('input',freshPrediction));
-$('prediction').addEventListener('change',() => {$('reveal').disabled = !$('prediction').value;});
-$('reveal').addEventListener('click',reveal);
-$('reset').addEventListener('click',() => {stations.forEach((id,i) => {$(id).value = [60,40,80][i];}); previousReveal = null; freshPrediction();});
-freshPrediction();
+function updateCapacity(station,value){
+  const before = state().throughput;
+  const oldCapacity = station.capacity;
+  station.capacity = value;
+  const after = state().throughput;
+  let effect = `Output stays at ${after} units/h.`;
+  if(after > before) effect = `Output rises from ${before} to ${after} units/h.`;
+  if(after < before) effect = `Output falls from ${before} to ${after} units/h.`;
+  render(`${station.id.toUpperCase()}: ${oldCapacity} → ${value} units/h. ${effect}`);
+}
+$('controls').innerHTML = model.stations.map(station => `<div class="control"><label for="capacity-${station.id}"><span>${station.id.toUpperCase()}<span class="name">${station.name}</span></span><output id="value-${station.id}" for="capacity-${station.id}"></output></label><input id="capacity-${station.id}" type="range" min="${model.minimum}" max="${model.maximum}" step="${model.step}" value="${station.capacity}"><div class="control-ends" aria-hidden="true"><span>${model.minimum}</span><span>${model.maximum}</span></div></div>`).join('');
+model.stations.forEach(station => $(`capacity-${station.id}`).addEventListener('input',event => updateCapacity(station,Number(event.target.value))));
+$('capacity-comparison').style.setProperty('--comparison-grid',`${100/model.geometry.chartDivisions}%`);
+$('scale').innerHTML = Array.from({length:model.geometry.chartDivisions+1},(_,index) => `<span class="comparison-tick" style="--tick:${index/model.geometry.chartDivisions*100}%">${model.maximum*index/model.geometry.chartDivisions}</span>`).join('');
+$('token-caption').textContent = `Each output token = ${model.unitsPerToken} units/h`;
+$('reset').addEventListener('click',()=>{model.stations.forEach(station => {station.capacity = station.initial;});render('Original capacities restored.');});
+compact.addEventListener('change',()=>render());
+render();
 </script>
 </body>
 </html>

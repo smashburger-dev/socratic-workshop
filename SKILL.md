@@ -48,15 +48,21 @@ An explicit request for a direct explanation changes the requested mode. Give th
 
 When requested, use the bundled [Werkbankfiguren adapter](references/werkbank-figuren.md). It is a portable adaptation of Noa's Argmin figure principles, usable across subjects without installing Argmin or another skill. Anatomy is a possible future comparison, not a dependency of this version.
 
-First determine whether the learner wants a hint or a full explanation, using their wording and the active mode. A hint visualization preserves the current information boundary, including its source code. A full explanation may reveal the mechanism after a learner prediction. When intent is ambiguous and the distinction would expose the answer, ask one short question before generating it.
+First determine whether the learner wants a hint or a full explanation, using their wording and the active mode. A hint visualization preserves the current information boundary, including its source code. A full explanation can offer prediction and reveal, or direct exploration when that better serves the request. When intent is ambiguous and the distinction would expose the answer, ask one short question before generating it.
 
-Build a single HTML file with inline CSS, JavaScript, and SVG or Canvas as useful. Use one mechanism, meaningful controls, a text alternative, explicit assumptions, and the limits of any analogy. Prefer flat diagrams when depth adds nothing. A clear observation should lead back to the learner's explanation.
+Build a single HTML file with inline CSS, JavaScript, and SVG or Canvas as useful. Start from the bundled [visualization shell](assets/visualization-shell.html), copying only what the artifact needs so the final file remains standalone. Use English interface copy by default; honor an explicitly requested language. Keep one dominant visualization, larger readable type, generous spacing, rounded surfaces, and a light/dark toggle. Remove numbered section kickers, repeated instructions, draft badges, and unrelated commentary from the learning surface. Repository documentation carries draft and review status.
+
+Place actions beside the object they change, with graph playback directly below its graph and readouts beneath it. An input should produce an immediate visible effect within the permitted hint scope. Separate interpretation from controls in a clear feedback area. Keep calculations and relevant model assumptions available on demand; a boilerplate limitations section is not required. Use an isometric or 3D view when spatial relationships help explain the mechanism, optionally paired with a precise 2D chart. A clear observation should lead back to the learner's explanation.
+
+Reuse the shell's comparison-row and annotated-item patterns and the adapter's alignment rules. Showcases and newly requested visualizations share these assets; avoid undocumented scene-specific polish.
 
 For existing work, a plot can also expose an implausible result. Separate what the figure visibly establishes from what still needs evidence. Agreement between a model and its own drawing is not independent confirmation.
 
 **Automated tests are forbidden for work performed by this skill.** Do not write or run unit tests, snapshot tests, browser test suites, coverage jobs, or benchmark suites. Do not import test requirements from another skill or the source Argmin workflow. Use direct inspection of the model and a manual browser look at the file and its controls when available. Describe only checks actually performed. If a mandatory host rule conflicts, explain the conflict and keep tutoring in chat while resolving file work with the learner.
 
 Return a clickable file link and one short explanation of what to explore. Wait for the learner's prediction or revised explanation. Do not append the solution to a hint artifact's delivery message.
+
+When the learner gives visual feedback, update the reusable adapter or shell when the lesson applies across topics, then apply it to the current artifact. Record GIFs or other promotional demonstrations only after the owner explicitly approves the HTML being recorded. Approval of one draft does not approve another or authorize publication.
 
 ## Establish completion
 

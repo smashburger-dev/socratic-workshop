@@ -1,102 +1,222 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gradientenabstieg · Socratic Workshop · Entwurf</title>
+<title>Gradient descent · Socratic Workshop</title>
 <style>
-:root{color-scheme:light;--paper:#f6f2eb;--surface:#ece6dc;--mid:#d8d0c4;--ink:#302b34;--muted:#5c5650;--accent:#6d3fd4;--line:#bdb3a5}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1040px;margin:auto;padding:36px 24px 56px}a{color:var(--ink)}.eyebrow,.draft{font-size:14px}.eyebrow{letter-spacing:.08em;text-transform:uppercase}.draft{display:inline-block;border:1px solid var(--line);padding:5px 10px;margin:12px 0 18px}h1{font-size:clamp(30px,5vw,48px);line-height:1.12;letter-spacing:-.035em;margin:0 0 18px;font-weight:650;max-width:18ch}h2,legend{font-size:19px;font-weight:650}h2{margin:0 0 12px}p{max-width:70ch;margin:0 0 14px}.lead{font-size:18px}.workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,1fr);gap:24px;margin-top:28px}.panel{padding:22px;border:1px solid var(--line);border-radius:5px;background:var(--surface);min-width:0}figure{margin:0}.chart{display:block;width:100%;height:auto;background:var(--paper);border:1px solid var(--line);border-radius:3px}figcaption,.note,.meta{font-size:14px;color:var(--muted)}figcaption{margin-top:12px}.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.readout div{min-width:0}.readout dt{font-size:14px;color:var(--muted)}.readout dd{margin:3px 0 0;font-size:20px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.readout dl{margin:0}label{display:block}.control{margin:18px 0}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:600}.control output{font-variant-numeric:tabular-nums}input[type=range]{width:100%;min-height:44px;accent-color:var(--accent);cursor:pointer}fieldset{border:0;padding:0;margin:22px 0 16px}legend{padding:0;margin-bottom:10px}.option{display:flex;align-items:center;gap:10px;min-height:44px;margin:3px 0;cursor:pointer}.option input{width:19px;height:19px;accent-color:var(--accent);flex:none}button{font:inherit;min-height:44px;padding:9px 15px;border-radius:3px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px}.primary{border-color:var(--ink);background:var(--ink);color:var(--paper)}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.result{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.result p:last-child{margin-bottom:0}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;overflow-wrap:anywhere}.boundary{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}.boundary h2{font-size:16px}.step{font-size:14px;color:var(--muted);margin-bottom:8px}.legend-line{display:inline-block;width:23px;border-top:3px solid var(--muted);vertical-align:middle;margin-right:5px}.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent);vertical-align:middle;margin:0 5px 0 14px}footer{margin-top:30px;font-size:14px;color:var(--muted)}[hidden]{display:none!important}@media(max-width:760px){main{padding:24px 16px 36px}.workspace{grid-template-columns:1fr}.panel{padding:18px}.readout dd{font-size:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{body{background:white}main{max-width:none;padding:0}.workspace{display:block}.panel{margin:16px 0;break-inside:avoid}input,button,.option{display:none}.control label{display:block}.draft{margin-top:0}a{color:inherit}.chart{max-height:300px}.result[hidden]{display:block!important}.result[hidden]::after{content:"Die Rechnung wurde in dieser Ansicht noch nicht aufgedeckt."}}
-.plot{position:relative}.guide-label{position:absolute;top:8px;left:50%;transform:translateX(-50%);padding:2px 7px;background:var(--paper);border:1px solid var(--line);border-radius:2px;font-size:14px;white-space:nowrap}
+:root{color-scheme:light;--page:#f5f6fa;--surface:#ffffff;--soft:#f0f1f7;--ink:#20212b;--muted:#656778;--border:#e6e7ef;--accent:#6d3fd4;--accent-soft:#f0eafb;--accent-ink:#fff;--shadow:0 12px 40px #20212b06}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:17px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1180px;padding:32px 32px 56px;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:44px}.brand{font-size:16px;font-weight:650;letter-spacing:-.025em;color:var(--muted)}h1{font-size:clamp(32px,4.8vw,50px);letter-spacing:-.045em;font-weight:650;line-height:1.12;margin:0 0 14px;text-wrap:balance}h2{font-size:22px;letter-spacing:-.025em;line-height:1.3;margin:0 0 20px}.intro{font-size:19px;color:var(--muted);max-width:60ch;margin:0}header{margin-bottom:34px}p{margin:0 0 16px}.card{background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:28px;box-shadow:var(--shadow);min-width:0}.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:24px;align-items:start}.stage{min-width:0}.graphic{display:block;width:100%;height:420px;overflow:visible}.actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px}.button,button,select{font:inherit;min-height:46px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--ink);padding:10px 17px;cursor:pointer;font-weight:550}.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}button:disabled{opacity:.45;cursor:not-allowed}button:active:not(:disabled){transform:scale(.98)}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.theme-toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;background:transparent;box-shadow:none}.theme-toggle svg{width:18px;height:18px;flex:none}.control{margin-bottom:26px}.control label{display:flex;align-items:baseline;justify-content:space-between;gap:14px;font-size:17px;font-weight:550;margin-bottom:10px}output{font-variant-numeric:tabular-nums;color:var(--accent)}input[type="range"]{display:block;width:100%;min-height:44px;margin:0;accent-color:var(--accent);cursor:pointer}.metrics{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--border)}.metrics dl{margin:0;min-width:80px}.metrics dt{color:var(--muted);font-size:15px}.metrics dd{font-size:25px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:3px 0 0}.legend{display:flex;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:15px;margin-top:18px}.feedback{margin-top:24px;background:var(--accent-soft);border:1px solid transparent;border-radius:18px;padding:22px 24px}.feedback h2{font-size:21px;margin-bottom:10px}.feedback p:last-child{margin-bottom:0}.feedback .detail{font-size:16px;color:var(--muted)}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:16px;overflow-wrap:anywhere}.model-notes{margin-top:26px;color:var(--muted);font-size:15px;max-width:80ch}.model-notes summary{display:inline-block;cursor:pointer;min-height:44px;padding:10px 0;color:var(--muted)}.model-notes summary::before{content:"+ ";color:var(--accent)}.model-notes[open] summary::before{content:"− "}.model-notes p{margin-top:8px}a{color:var(--muted);text-underline-offset:4px}[hidden]{display:none!important}@media(hover:hover) and (pointer:fine){button:hover:not(:disabled){border-color:var(--accent)}a:hover{color:var(--ink)}}@media(max-width:800px){main{padding:24px 18px 40px}.topbar{margin-bottom:32px}.layout{grid-template-columns:1fr}.card{padding:22px;border-radius:22px}header{margin-bottom:26px}.metrics{gap:22px}.feedback{padding:20px}.intro{font-size:18px}.graphic{height:360px}}@media(max-width:420px){.graphic{height:320px}.actions{gap:8px}.actions button{padding:10px 14px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}button:active:not(:disabled){transform:none}}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--page:#fff;--surface:#fff;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}main{max-width:none;padding:0}.topbar,.actions,.theme-toggle,input,select,.prediction{display:none}.layout{display:block}.card{break-inside:avoid;box-shadow:none;margin-bottom:20px}.graphic{height:320px;max-height:360px}.model-notes{display:block}}
+.plot{position:relative}.graphic text{font:14px system-ui,sans-serif;fill:var(--muted)}.graph-notice{position:absolute;top:42px;left:58px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--ink);box-shadow:var(--shadow)}.legend span{display:inline-flex;align-items:center;gap:8px}.key-line{width:22px;height:0;border-top:2px solid var(--muted)}.key-current{width:11px;height:11px;border-radius:50%;background:var(--ink)}.key-next{width:13px;height:13px;border-radius:50%;border:2px solid var(--accent);background:var(--accent-soft)}.plot-scale{font-size:14px;color:var(--muted);margin:18px 0 0}.feedback summary,.prediction summary{cursor:pointer;min-height:44px;padding:10px 0}.feedback details{margin-top:14px;border-top:1px solid var(--border);padding-top:4px}.feedback details p{margin-top:12px}.prediction{margin-top:26px;border-top:1px solid var(--border);padding-top:14px}.prediction fieldset{border:0;padding:0;margin:14px 0}.prediction legend{font-size:16px;margin-bottom:8px}.prediction label{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}.prediction input{width:19px;height:19px;accent-color:var(--accent);flex:none}.prediction-result{font-size:16px;margin-top:14px}.playback-status{font-size:14px;color:var(--muted);text-align:center;min-height:22px;margin:10px 0 0}.axis-label{font-weight:600}.preview-line{stroke:var(--accent);stroke-width:2;fill:none}.model-notes p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
 <main>
-<header><div class="eyebrow">Socratic Workshop / Entwurf 01</div><div class="draft">Demo-Entwurf · wartet auf Noas Review</div><h1>Wann wird ein Schritt zu groß?</h1><p class="lead">Ein eindimensionales Modell: <strong>f(x) = (x − 3)²</strong>. Verändere Startpunkt und Lernrate. Sage zuerst voraus, was der nächste Schritt macht.</p></header>
-<div class="workspace">
-<section class="panel" aria-labelledby="model-heading"><p class="step">01 · Am Modell beobachten</p><h2 id="model-heading">Ein Punkt auf einer Parabel</h2><figure><div class="plot"><svg id="chart" class="chart" viewBox="0 0 720 440" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title">Gradientenabstieg auf einer quadratischen Funktion</title><desc id="chart-desc">Die Kurve zeigt f(x) = (x − 3)². Ein ausgefüllter Punkt markiert den aktuellen Wert. Die senkrechte gestrichelte Hilfslinie markiert x = 3, die Stelle des Minimums. Die Rechnung und die aktuellen Zahlen stehen unter der Grafik.</desc><path id="axis" fill="none" stroke="var(--line)" stroke-width="1.5"/><path d="M360 32V404" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/><path id="curve" fill="none" stroke="var(--muted)" stroke-width="2.5"/><path id="trail" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 6"/><circle id="start-dot" r="7" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/><circle id="current-dot" r="8" fill="var(--accent)" stroke="var(--paper)" stroke-width="3"/></svg><span class="guide-label">x = 3 · Minimum</span></div><figcaption><span class="legend-line"></span>Funktion <span class="legend-dot"></span>Aktueller Punkt<br>Waagerecht: x. Senkrecht: f(x). Die senkrechte Hilfslinie ist keine Achse bei x = 0. Der Ausschnitt passt sich an die Schritte an. <span id="scale"></span></figcaption></figure><div class="readout" aria-label="Aktuelle Modellwerte"><dl><dt>Schritt</dt><dd id="step-value">0</dd></dl><dl><dt>x</dt><dd id="x-value">−2</dd></dl><dl><dt>f(x)</dt><dd id="loss-value">25</dd></dl></div><p class="note" style="margin-top:18px">Der Hohlkreis bleibt am Start. Die gestrichelte Spur verbindet die berechneten Schritte. Das Minimum liegt bei x = 3 und f(x) = 0.</p></section>
-<section class="panel" aria-labelledby="prediction-heading"><p class="step">02 · Vorhersagen, dann aufdecken</p><h2 id="prediction-heading">Was erwartest du?</h2><div class="control"><label for="start">Startpunkt x <output id="start-output" for="start">−2,0</output></label><input id="start" type="range" min="-2" max="8" step="0.5" value="-2"></div><div class="control"><label for="rate">Lernrate η <output id="rate-output" for="rate">0,25</output></label><input id="rate" type="range" min="0.05" max="1.2" step="0.05" value="0.25"></div><p class="note">Änderst du einen Regler, beginnt eine neue Vorhersage.</p><fieldset><legend>Nach einem Schritt ist der Abstand zu x = 3 …</legend><label class="option"><input type="radio" name="prediction" value="closer"> kleiner.</label><label class="option"><input type="radio" name="prediction" value="same"> gleich groß.</label><label class="option"><input type="radio" name="prediction" value="further"> größer.</label></fieldset><div class="actions"><button id="reveal" class="primary" disabled>Schritt aufdecken</button><button id="next" disabled>Noch ein Schritt</button><button id="reset">Zurücksetzen</button></div><p class="note" id="instruction" style="margin-top:12px">Wähle eine Vorhersage, um die Rechnung aufzudecken.</p><div id="result" class="result" hidden aria-live="polite" aria-atomic="true"><p id="verdict"></p><p id="calculation" class="equation"></p><p class="equation">x neu − 3 = (1 − 2η) · (x − 3)</p><p id="explanation"></p><p class="note">Für diese Parabel ist η = 1 die Grenze zwischen abnehmendem und wachsendem Abstand. Der Start genau im Minimum bleibt in jedem Fall dort.</p></div><noscript><p>Für die Regler ist JavaScript nötig. Als Beispiel ergibt x = −2 und η = 0,25 den nächsten Wert x = 0,5. Der Abstand zum Minimum sinkt von 5 auf 2,5.</p></noscript></section>
+<div class="topbar"><span class="brand">Socratic Workshop</span><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button></div>
+<header><h1>When is a step too large?</h1><p class="intro">Explore gradient descent on f(x) = (x − 3)². Change the learning rate and watch where the next step would land.</p></header>
+<div class="layout">
+<section class="card stage" aria-label="Gradient descent graph and playback">
+<div class="plot"><svg id="chart" class="graphic" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Gradient descent on a one-dimensional quadratic</title><desc id="chart-description">The curve has its minimum at x = 3. A solid point shows the current x and loss. A purple outlined point and arrow preview one step at the selected learning rate. The axes remain fixed; exact values appear below.</desc><defs><clipPath id="plot-clip"><rect id="clip-rectangle"/></clipPath><marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><path id="grid" fill="none" stroke="var(--border)"/><path id="axes" fill="none" stroke="var(--muted)" stroke-opacity=".55"/><path id="minimum-guide" fill="none" stroke="var(--border)" stroke-dasharray="4 6"/><g id="axis-labels"></g><g clip-path="url(#plot-clip)"><path id="curve" fill="none" stroke="var(--muted)" stroke-width="2.5"/><path id="trail" fill="none" stroke="var(--ink)" stroke-width="1.7" stroke-opacity=".65" stroke-dasharray="5 5"/><path id="preview-arrow" class="preview-line" marker-end="url(#arrowhead)"/><circle id="next-dot" r="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2.5"/><circle id="current-dot" r="6" fill="var(--ink)" stroke="var(--surface)" stroke-width="2"/></g></svg><div id="graph-notice" class="graph-notice" hidden></div></div>
+<div class="actions"><button id="run" class="primary">Run</button><button id="step">Step</button><button id="reset">Reset</button></div>
+<p id="playback-status" class="playback-status">Ready · up to 30 steps</p>
+<div class="legend" aria-label="Graph legend"><span><i class="key-line" aria-hidden="true"></i>Loss curve</span><span><i class="key-current" aria-hidden="true"></i>Current</span><span><i class="key-next" aria-hidden="true"></i>Next step</span></div>
+<div class="metrics" aria-label="Current model values"><dl><dt>Step</dt><dd id="step-value">0</dd></dl><dl><dt>x</dt><dd id="x-value">−2</dd></dl><dl><dt>Loss</dt><dd id="loss-value">25</dd></dl></div>
+</section>
+<div>
+<section class="card" aria-labelledby="controls-title"><h2 id="controls-title">Shape the next step</h2><div class="control"><label for="start">Starting x <output id="start-output" for="start">−2</output></label><input id="start" type="range" min="-10" max="16" step="0.5" value="-2"></div><div class="control"><label for="rate">Learning rate η <output id="rate-output" for="rate">0.25</output></label><input id="rate" type="range" min="0.05" max="1.2" step="0.05" value="0.25"></div><details class="prediction"><summary>Try a prediction</summary><fieldset><legend>After the next step, the distance to x = 3 is…</legend><label><input type="radio" name="prediction" value="closer">Smaller</label><label><input type="radio" name="prediction" value="same">The same</label><label><input type="radio" name="prediction" value="farther">Larger</label></fieldset><button id="check-prediction" disabled>Check prediction</button><p id="prediction-result" class="prediction-result" aria-live="polite" hidden></p></details></section>
+<section class="feedback" aria-labelledby="feedback-title" aria-live="polite" aria-atomic="true"><h2 id="feedback-title">A smaller distance</h2><p id="interpretation">The next step moves closer to the minimum.</p><details><summary>See the calculation</summary><p id="calculation" class="equation"></p><p id="next-value" class="detail"></p><p class="equation">x next − 3 = (1 − 2η) · (x − 3)</p></details></section>
 </div>
-<section class="boundary" aria-labelledby="boundary-heading"><h2 id="boundary-heading">Wo das Modell endet</h2><p>Hier gibt es eine exakte Ableitung, eine feste positive Lernrate und nur eine Dimension. Andere Funktionen können andere Lernraten erfordern; Rauschen, mehrere Dimensionen und lokale Minima fehlen hier.</p><p class="note">Zum Weiterdenken: Finde eine Lernrate, bei der der Punkt das Minimum überschreitet und trotzdem näher herankommt. Erkläre, warum die Richtung allein noch keine Divergenz beweist.</p></section>
-<footer>Entwurf, keine aufgezeichnete Lernsitzung und kein Nachweis für Lernerfolg. <a href="german-word-order.html">Weiter zum Satzbau</a> · <a href="bottleneck.html">Weiter zum Engpass</a></footer>
+</div>
+<details class="model-notes"><summary>Model notes</summary><p>This is one exact, one-dimensional quadratic with derivative 2(x − 3), a constant positive learning rate, and no noise. For this function, 0 &lt; η &lt; 1 converges, η = 1 oscillates at a fixed distance, and η &gt; 1 diverges. Starting exactly at x = 3 stays there for every rate.</p><p>The run advances discrete steps every 700 ms, stops after 30 steps or at the graph boundary, and pauses whenever you change a parameter. The view is framed from the starting x and stays fixed through playback and learning-rate changes. Updates are instant, including with reduced motion enabled. This graph does not model other loss functions or multiple dimensions.</p></details>
+<noscript><p>Interactive controls need JavaScript. At x = −2 and η = 0.25, the next x is 0.5 and the loss falls from 25 to 6.25.</p></noscript>
 </main>
 <script>
 const $ = id => document.getElementById(id);
-const number = value => new Intl.NumberFormat('de-DE',{maximumFractionDigits:3}).format(value);
-let history = [-2];
-let firstVerdict = '';
-function selectedPrediction(){return document.querySelector('input[name="prediction"]:checked');}
-function renderChart(){
-  const radius = Math.max(5, ...history.map(x => Math.abs(x - 3) * 1.15));
-  const left = 3 - radius;
-  const yMax = radius * radius;
-  const point = x => [32 + (x - left) / (2 * radius) * 656, 404 - (x - 3) ** 2 / yMax * 372];
-  const coordinate = x => point(x).join(',');
-  $('axis').setAttribute('d','M32 404H688');
-  $('curve').setAttribute('d',Array.from({length:121},(_,i) => `${i ? 'L' : 'M'}${coordinate(left + 2 * radius * i / 120)}`).join(' '));
-  $('trail').setAttribute('d',history.map((x,i) => `${i ? 'L' : 'M'}${coordinate(x)}`).join(' '));
-  [['start-dot',history[0]],['current-dot',history.at(-1)]].forEach(([id,x]) => { const [cx,cy] = point(x); $(id).setAttribute('cx',cx); $(id).setAttribute('cy',cy); });
-  $('scale').textContent = `x von ${number(left)} bis ${number(3 + radius)}; f(x) von 0 bis ${number(yMax)}.`;
+const themeButton = $('theme-toggle');
+const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+function currentTheme(){return document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light');}
+function updateThemeButton(){const dark = currentTheme() === 'dark';$('theme-label').textContent = dark ? 'Light' : 'Dark';themeButton.setAttribute('aria-label',dark ? 'Switch to light theme' : 'Switch to dark theme');}
+try{const savedTheme = localStorage.getItem('socratic-workshop-theme');if(savedTheme === 'dark' || savedTheme === 'light')document.documentElement.dataset.theme = savedTheme;}catch{}
+themeButton.addEventListener('click',()=>{const theme = currentTheme() === 'dark' ? 'light' : 'dark';document.documentElement.dataset.theme = theme;try{localStorage.setItem('socratic-workshop-theme',theme);}catch{}updateThemeButton();});
+systemTheme.addEventListener('change',updateThemeButton);
+updateThemeButton();
+
+const VIEW = {left:-5,right:11,top:64};
+const MAX_STEPS = 30;
+let history = [];
+let running = false;
+let timer = null;
+let runEpoch = 0;
+function number(value){if(value !== 0 && Math.abs(value) < 0.001)return value.toExponential(2);return new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(value);}
+function loss(x){return (x - 3) ** 2;}
+function current(){return history.at(-1);}
+function learningRate(){return Number($('rate').value);}
+function nextValue(x){return x - learningRate() * 2 * (x - 3);}
+function withinView(x){return Number.isFinite(x) && x >= VIEW.left && x <= VIEW.right;}
+function canAdvance(){return history.length - 1 < MAX_STEPS && withinView(current()) && current() !== 3;}
+function attributes(id,values){Object.entries(values).forEach(([key,value]) => $(id).setAttribute(key,value));}
+function geometry(){const width = $('chart').clientWidth || 680;const height = $('chart').clientHeight || 420;return {width,height,left:54,right:width-18,top:32,bottom:height-36};}
+function projected(x,g){return {x:g.left+(x-VIEW.left)/(VIEW.right-VIEW.left)*(g.right-g.left),y:g.bottom-loss(x)/VIEW.top*(g.bottom-g.top)};}
+function pointString(point){return `${point.x},${point.y}`;}
+function clippedEndpoint(from,to,g){
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const tx = dx > 0 ? (g.right-from.x)/dx : dx < 0 ? (g.left-from.x)/dx : Infinity;
+  const ty = dy > 0 ? (g.bottom-from.y)/dy : dy < 0 ? (g.top-from.y)/dy : Infinity;
+  const fraction = Math.min(1,tx,ty);
+  return {x:from.x+fraction*dx,y:from.y+fraction*dy};
 }
-function renderValues(){
-  const current = history.at(-1);
-  $('step-value').textContent = history.length - 1;
-  $('x-value').textContent = number(current);
-  $('loss-value').textContent = number((current - 3) ** 2);
-  $('start-output').textContent = number(Number($('start').value));
-  $('rate-output').textContent = number(Number($('rate').value));
-  renderChart();
+function axisText(text,x,y,anchor='middle'){
+  const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+  label.textContent = text;
+  Object.entries({x,y,'text-anchor':anchor}).forEach(([key,value]) => label.setAttribute(key,value));
+  return label;
 }
-function freshPrediction(){
-  history = [Number($('start').value)];
-  firstVerdict = '';
-  document.querySelectorAll('input[name="prediction"]').forEach(input => {input.checked = false; input.disabled = false;});
-  $('result').hidden = true;
-  $('reveal').disabled = true;
-  $('next').disabled = true;
-  $('instruction').textContent = 'Wähle eine Vorhersage, um die Rechnung aufzudecken.';
-  renderValues();
+function renderAxes(g){
+  const middleY = g.bottom-(g.bottom-g.top)/2;
+  const minimumX = projected(3,g).x;
+  attributes('axes',{d:`M${g.left} ${g.top}V${g.bottom}H${g.right}`});
+  attributes('grid',{d:`M${g.left} ${g.top}H${g.right} M${g.left} ${middleY}H${g.right}`});
+  attributes('minimum-guide',{d:`M${minimumX} ${g.top}V${g.bottom}`});
+  $('axis-labels').replaceChildren(axisText(number(VIEW.top),g.left-9,g.top+5,'end'),axisText(number(VIEW.top/2),g.left-9,middleY+5,'end'),axisText('0',g.left-9,g.bottom+5,'end'),axisText(number(VIEW.left),g.left,g.bottom+24),axisText('x = 3',minimumX,g.bottom+24),axisText(number(VIEW.right),g.right,g.bottom+24),axisText('Loss',g.left,g.top-14,'start'),axisText('x',g.right,g.top-14));
 }
-function relationship(previous,next){
-  const difference = Math.abs(next - 3) - Math.abs(previous - 3);
-  if (Math.abs(difference) < 1e-9) return 'same';
-  return difference < 0 ? 'closer' : 'further';
+function renderPreview(g){
+  const inView = withinView(current());
+  $('current-dot').style.display = inView ? '' : 'none';
+  $('preview-arrow').style.display = inView && current() !== 3 ? '' : 'none';
+  $('next-dot').style.display = 'none';
+  if(!inView)return;
+  const now = projected(current(),g);
+  const next = projected(nextValue(current()),g);
+  const endpoint = clippedEndpoint(now,next,g);
+  attributes('current-dot',{cx:now.x,cy:now.y});
+  attributes('preview-arrow',{d:`M${pointString(now)}L${pointString(endpoint)}`});
+  if(!withinView(nextValue(current())))return;
+  $('next-dot').style.display = '';
+  attributes('next-dot',{cx:next.x,cy:next.y});
 }
-function explain(rate){
-  if (Math.abs(history[0] - 3) < 1e-9) return 'Du startest im Minimum. Die Ableitung ist 0, also bewegt sich der Punkt bei jeder gewählten Lernrate nicht.';
-  if (Math.abs(rate - 0.5) < 1e-9) return 'Bei η = 0,5 landet der erste Schritt genau im Minimum. Alle weiteren Schritte bleiben dort.';
-  if (rate < 1) return 'Für 0 < η < 1 wird der Abstand in jedem Schritt mit |1 − 2η| < 1 multipliziert. Der Punkt nähert sich dem Minimum. Überqueren ist möglich, ohne zu divergieren.';
-  if (Math.abs(rate - 1) < 1e-9) return 'Bei η = 1 wechselt der Punkt die Seite, bleibt aber gleich weit vom Minimum entfernt. Er pendelt und konvergiert nicht.';
-  return 'Für η > 1 wird der Abstand in jedem Schritt mit |1 − 2η| > 1 multipliziert. Er wächst, obwohl die Ableitung an jedem aktuellen Punkt richtig berechnet ist.';
+function renderGraph(){
+  const g = geometry();
+  attributes('chart',{viewBox:`0 0 ${g.width} ${g.height}`});
+  attributes('clip-rectangle',{x:g.left,y:g.top,width:g.right-g.left,height:g.bottom-g.top});
+  renderAxes(g);
+  const samples = Array.from({length:121},(_,i) => VIEW.left+(VIEW.right-VIEW.left)*i/120);
+  attributes('curve',{d:samples.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ')});
+  attributes('trail',{d:history.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ')});
+  renderPreview(g);
+  renderGraphNotice();
 }
-function advance(){
-  const previous = history.at(-1);
-  const rate = Number($('rate').value);
-  const next = previous - rate * 2 * (previous - 3);
-  if (history.length === 1){
-    const choice = selectedPrediction();
-    if (!choice) return;
-    const labels = {closer:'kleiner',same:'gleich groß',further:'größer'};
-    const actual = relationship(previous,next);
-    firstVerdict = `${choice.value === actual ? 'Deine Vorhersage stimmt.' : 'Die Rechnung widerspricht deiner Vorhersage.'} Nach Schritt 1 ist der Abstand ${labels[actual]}.`;
+function renderGraphNotice(){
+  $('graph-notice').hidden = true;
+  if(!withinView(current())){
+    $('graph-notice').textContent = `Stopped outside this view: x = ${number(current())}, loss = ${number(loss(current()))}. The axes have not rescaled.`;
+    $('graph-notice').hidden = false;
+    return;
   }
-  history.push(next);
-  $('verdict').textContent = firstVerdict;
-  $('calculation').textContent = `x neu = ${number(previous)} − ${number(rate)} · 2 · (${number(previous)} − 3) = ${number(next)}`;
-  $('explanation').textContent = explain(rate);
-  $('result').hidden = false;
-  $('reveal').disabled = true;
-  $('next').disabled = history.length >= 13;
-  $('instruction').textContent = history.length >= 13 ? '12 Schritte gezeigt. Ändere einen Regler für eine neue Vorhersage.' : 'Folge weiteren Schritten oder ändere einen Regler für eine neue Vorhersage.';
-  document.querySelectorAll('input[name="prediction"]').forEach(input => {input.disabled = true;});
-  renderValues();
+  if(!withinView(nextValue(current()))){
+    $('graph-notice').textContent = `Next point is off-chart: x = ${number(nextValue(current()))}, loss = ${number(loss(nextValue(current())))}. Playback will stop there.`;
+    $('graph-notice').hidden = false;
+  }
 }
-['start','rate'].forEach(id => $(id).addEventListener('input',freshPrediction));
-document.querySelectorAll('input[name="prediction"]').forEach(input => input.addEventListener('change',() => {$('reveal').disabled = false;}));
-$('reveal').addEventListener('click',advance);
-$('next').addEventListener('click',advance);
-$('reset').addEventListener('click',() => {$('start').value = -2; $('rate').value = 0.25; freshPrediction();});
-renderValues();
+function stepInterpretation(){
+  const rate = learningRate();
+  if(rate === 0.5)return ['One step to the minimum','This rate lands exactly at x = 3. The next loss is zero.'];
+  if(rate < 0.5)return ['A smaller distance','The next step stays on this side of the minimum and reduces the distance to x = 3.'];
+  if(rate < 1)return ['Crossing, still converging','The next step crosses the minimum but lands closer to it. Crossing alone does not mean divergence.'];
+  if(rate === 1)return ['A fixed-distance oscillation','The next step switches sides without reducing the distance. The loss stays the same.'];
+  return ['Growing distance','The next step crosses the minimum and lands farther away. Repeating this rate makes the distance grow.'];
+}
+function interpretation(){
+  if(!withinView(current()))return ['Beyond the graph',`The run stopped at x = ${number(current())}, with loss ${number(loss(current()))}. Reset or change a parameter to explore again.`];
+  if(current() === 3)return ['At the minimum','The gradient is zero at x = 3. Every further step stays here, whatever the learning rate.'];
+  if(history.length-1 >= MAX_STEPS)return ['30 steps completed',`The remaining distance to the minimum is ${number(Math.abs(current()-3))}. Change a parameter or reset to start again.`];
+  return stepInterpretation();
+}
+function renderFeedback(){
+  const [title,description] = interpretation();
+  $('feedback-title').textContent = title;
+  $('interpretation').textContent = description;
+  $('calculation').textContent = `x next = ${number(current())} − ${number(learningRate())} × 2 × (${number(current())} − 3) = ${number(nextValue(current()))}`;
+  $('next-value').textContent = `Next loss: ${number(loss(nextValue(current())))}. Distance multiplier: |1 − 2η| = ${number(Math.abs(1-2*learningRate()))}.`;
+}
+function updatePlayback(){
+  $('run').textContent = running ? 'Pause' : 'Run';
+  $('run').disabled = !running && !canAdvance();
+  $('step').disabled = !canAdvance();
+  if(!canAdvance()){$('playback-status').textContent = 'Stopped';return;}
+  $('playback-status').textContent = running ? 'Running · one step every 700 ms' : 'Paused · up to 30 steps';
+}
+function render(){
+  $('step-value').textContent = history.length-1;
+  $('x-value').textContent = number(current());
+  $('loss-value').textContent = number(loss(current()));
+  $('start-output').textContent = number(Number($('start').value));
+  $('rate-output').textContent = number(learningRate());
+  renderGraph();
+  renderFeedback();
+  updatePlayback();
+}
+function pause(){running=false;clearTimeout(timer);timer=null;runEpoch+=1;updatePlayback();}
+function clearPrediction(){
+  document.querySelectorAll('input[name="prediction"]').forEach(input => {input.checked=false;});
+  $('check-prediction').disabled=true;
+  $('prediction-result').hidden=true;
+}
+function resetPath(){
+  pause();
+  const start=Number($('start').value);
+  const radius=Math.max(8,Math.ceil(Math.abs(start-3)*1.15));
+  VIEW.left=3-radius;
+  VIEW.right=3+radius;
+  VIEW.top=radius**2;
+  history=[start];
+  clearPrediction();
+  render();
+}
+function advance(){if(!canAdvance())return;history.push(nextValue(current()));clearPrediction();render();}
+function scheduleTick(epoch){
+  timer=setTimeout(() => {
+    if(!running || epoch !== runEpoch)return;
+    advance();
+    if(!canAdvance()){pause();return;}
+    scheduleTick(epoch);
+  },700);
+}
+function toggleRun(){
+  if(running){pause();return;}
+  if(!canAdvance())return;
+  running=true;
+  runEpoch+=1;
+  const epoch=runEpoch;
+  advance();
+  if(!canAdvance()){pause();return;}
+  scheduleTick(epoch);
+}
+function nextRelationship(){
+  if(current() === 3)return 'same';
+  const factor=Math.abs(1-2*learningRate());
+  if(factor === 1)return 'same';
+  return factor < 1 ? 'closer' : 'farther';
+}
+function checkPrediction(){
+  const choice=document.querySelector('input[name="prediction"]:checked');
+  if(!choice)return;
+  const actual=nextRelationship();
+  const outcomes={closer:'smaller',same:'the same',farther:'larger'};
+  $('prediction-result').textContent = `${choice.value === actual ? 'Your prediction matches.' : 'The model gives a different result.'} The next distance is ${outcomes[actual]}.`;
+  $('prediction-result').hidden=false;
+}
+['start','rate'].forEach(id => $(id).addEventListener('input',resetPath));
+$('run').addEventListener('click',toggleRun);
+$('step').addEventListener('click',() => {pause();advance();});
+$('reset').addEventListener('click',() => {$('start').value=-2;$('rate').value=0.25;resetPath();});
+document.querySelectorAll('input[name="prediction"]').forEach(input => input.addEventListener('change',() => {pause();$('check-prediction').disabled=false;$('prediction-result').hidden=true;}));
+$('check-prediction').addEventListener('click',checkPrediction);
+document.addEventListener('visibilitychange',() => {if(document.hidden)pause();});
+new ResizeObserver(renderGraph).observe($('chart'));
+resetPath();
 </script>
 </body>
 </html>

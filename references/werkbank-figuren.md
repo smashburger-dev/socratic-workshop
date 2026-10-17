@@ -1,79 +1,71 @@
-# Werkbankfiguren für Socratic Workshop
+# Werkbankfiguren for Socratic Workshop
 
-Lies diese Referenz, wenn eine interaktive Figur einen Zusammenhang leichter untersuchbar macht. Die Figur bearbeitet genau eine offene Verständnisfrage aus dem Gespräch. Eine kurze Textskizze reicht, wenn Bewegung oder veränderbare Eingaben keinen Erkenntnisgewinn bringen.
+Read this reference when an interactive figure can address the current understanding gap. Choose a controllable cause and an observable effect. If interaction adds little, a small static diagram is enough.
 
-## Herkunft und Anpassung
+## Origin and portable assets
 
-Adaptiert aus [Werkbankfiguren im Argmin-Repository, Stand 51cbc90](https://github.com/smashburger-dev/argmin/blob/51cbc90/.devin/skills/werkbank-figuren/SKILL.md). Übernommen sind ein sichtbarer Mechanismus, modellabhängige Darstellung, Vorhersage vor Auflösung, benannte Analogiegrenzen und die Tonwertpalette. Dieser Adapter funktioniert eigenständig. Er benötigt weder Argmin noch eine andere Skill-Installation.
+Adapted from [Noa's Werkbankfiguren in Argmin, revision 51cbc90](https://github.com/smashburger-dev/argmin/blob/51cbc90/.devin/skills/werkbank-figuren/SKILL.md). Retained principles are a visible mechanism, model-derived geometry and numbers, meaningful motion, accessible controls, and explicit limits where an analogy could mislead. The original Argmin scene registry, renderer, test workflow, and warm palette are not required here.
 
-Das Ergebnis ist eine lokale HTML-Datei mit eingebettetem SVG, CSS und JavaScript. Verwende Systemschriften. Die Datei funktioniert ohne CDN, Netzwerk, Paketinstallation oder Build. Die Argmin-Renderer, Szenendateien und Testvorgaben gehören nicht zu diesem Ablauf. Erstelle und starte keine automatisierten Tests für diese Lernfiguren.
+Use [visualization-shell.html](../assets/visualization-shell.html) as a copyable starting point for layout, theme colors, typography, controls, and theme switching. Copy the relevant parts into one HTML file with inline CSS, JavaScript, and SVG or Canvas. Trim unused styles. The output works directly from disk with system fonts and no network, package installation, CDN, or build step.
 
-## 1. Erkenntnis und Freigabe festlegen
+Copy its comparison-row or annotated-item pattern when applicable. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
 
-Übernimm Lernziel, bereits gezeigte Informationen und aktuelle Hinweisstufe aus dem Gespräch. Formuliere vor dem Bau einen Satz: „Durch Ändern von X kann die lernende Person erkennen, wie Y entsteht.“ Wähle eine kontrollierbare Ursache und eine sichtbare Wirkung. Wenn dieser Satz keine konkrete Beziehung nennt, kläre die Beziehung zuerst im Gespräch.
+## Preserve the learning boundary
 
-Der Hauptskill bestimmt, wie viel die Figur verraten darf:
+The main skill determines the permitted scope:
 
-| Modus | Inhalt der Datei | Ende der Interaktion |
-|---|---|---|
-| Hinweis | Nur die bereits freigegebene Hinweisstufe; eine Beobachtung oder ein kleiner Eingriff | Eine offene Frage und Rückkehr ins Gespräch |
-| Vollständige Erklärung | Der ausdrücklich angeforderte Erklärungsumfang mit nachvollziehbarer Herleitung | Vorhersage, Auflösung, eigener Erklärversuch |
+| Mode | Information in the artifact | Interaction |
+| --- | --- | --- |
+| Hint | Only the current hint and already established information | Explore an observation or a smaller subproblem, then return to the conversation |
+| Full explanation | The requested mechanism and explanation | Explore directly or predict and reveal, then explain the observation |
 
-Eine Hinweisdatei enthält keine spätere Auflösung. Lasse Lösungswerte, nächste Rechenschritte, vollständige Erklärtexte und lösungsverratende Zustände vollständig aus HTML, SVG, JavaScript, Daten, Kommentaren und zugänglichen Namen weg. CSS-Verstecken, deaktivierte Knöpfe oder eine clientseitige Freischaltung sind dafür keine Schranke. Auch Schieberegler und berechnete Werte dürfen die erlaubte Hinweisstufe nicht umgehen. Beschränke ihren Wertebereich oder zeige ein passendes Teilproblem.
+A hint file contains no later solution in its HTML, SVG, JavaScript, data, comments, accessible names, or computed states. Hiding content with CSS or a disabled button does not preserve this boundary. Keep sliders and previews within the permitted scope. A prediction or click cannot authorize another hint level. Add a new level only when the learner requests it.
 
-Eine Vorhersage oder ein Klick erteilt keine neue Freigabe für eine höhere Hinweisstufe. Wenn die Person später mehr Hilfe anfordert, ergänze oder ersetze die Datei um genau die nun erlaubten Inhalte. Ein Hinweis endet ohne eingebauten Lösungsbutton.
+Prediction is useful when comparing expectation with an observation. It is not a mandatory gate on every slider or every figure. For a full exploration, show the effect of changing a value immediately. In a prediction activity, keep the learner's choice visible beside a separately presented outcome. Grade only a bounded factual choice; leave open explanations for discussion rather than matching a string.
 
-## 2. Einen Mechanismus bauen
+## Make the mechanism visible
 
-Wähle die Darstellung nach der Beziehung. Nutze flache 2D-Flächen, wenn räumliche Tiefe nichts erklärt. Verwende eine räumliche Analogie nur, wenn deren räumliche Eigenschaften zum Verständnis beitragen.
+Keep a small model containing inputs and derived quantities. Graph coordinates, quantitative geometry, numerical labels, and displayed calculations use that same model. Fixed layout spacing is fine; independently typed copies of scientific values are not. For language or other qualitative topics, use explicit cases rather than invented numerical measurements.
 
-| Gegenstand | Möglicher Mechanismus | Sichtbare Grenze |
-|---|---|---|
-| Mathematik | Koeffizient verändern; Vektor und Rechnung ändern sich gemeinsam | Eine geometrische Deutung gilt nur für den benannten Zahlenraum und die gewählte Operation |
-| Naturwissenschaft | Eine Eingangsgröße verändern; eine Modellvorhersage verfolgen | Annahmen, Einheiten und Gültigkeitsbereich des Modells benennen |
-| Sprache | Ein Satzglied umstellen; Bezüge oder Bedeutungsunterschiede verfolgen | Varianten und Kontextabhängigkeit benennen; die Darstellung beweist keine allgemeine Sprachregel |
-| Prozess oder Business | Ankunftsrate oder Bearbeitungszeit verändern; Warteschlange verfolgen | Vereinfachende Annahmen über Auslastung und Variation offenlegen; Beispieldaten als solche markieren |
+Choose the representation for the question:
 
-Diese Beispiele sind Auswahlhilfen. Baue nur den Mechanismus, der zur konkreten Frage passt. Jedes sichtbare Teil trägt eine Bedeutung oder eine bedienbare Funktion. Eine Werkbank, ein Förderband oder eine Maschine ist keine Pflichtkulisse.
+- A 2D curve can make direction and step size easier to read than a perspective surface.
+- An isometric process can distinguish stages, connections, and flow. Pair it with a common-scale capacity chart when the comparison matters.
+- A 3D view can explain a spatial mechanism. Use SVG projection or a small Canvas renderer when sufficient; importing a 3D framework is not a default requirement. Provide view controls only when changing viewpoint helps the learner.
+- Sentence tiles can make constituent movement visible while keeping the complete example readable.
 
-Halte fachliche Eingaben und abgeleitete Größen in einem kleinen `model`. Berechne quantitative Positionen, Längen, Flächen, Zahlen und Beschriftungen daraus. Die angezeigte Rechnung und die Grafik verwenden dieselben Werte. Layoutabstände dürfen feste Konstanten sein; fachliche Größen erhalten keine unabhängig eingetippten Duplikate. Bei sprachlichen oder qualitativen Beispielen verwendet das Modell explizite, nachvollziehbare Fälle statt vorgetäuschter Messwerte.
+These are examples, not a fixed subject catalog. Apply the same cause-and-effect reasoning to science, mathematics, language, code, planning, or business. Every visible object should carry a meaning or a control.
 
-Ordne die Schritte so, dass eine Veränderung mit ihrer Wirkung verglichen werden kann. Halte Ausgangs- und Folgezustand bei Bedarf nebeneinander sichtbar. Bewahre Achsenskalierung, Objektidentität und Zuordnung zwischen den Schritten. Jede Einheit, Achse und relevante Größe hat eine lesbare Beschriftung.
+Use crisp vector geometry and legible HTML labels where possible. Label axes, units, and scale. Keep the scale stable during a comparison or playback so rescaling cannot disguise growth. If a value leaves the view, show that fact and the actual value rather than clamping it silently. A second chart should answer another necessary question, not decorate the first.
 
-Wenn eine Analogie verwendet wird, ergänze „Wo der Vergleich hinkt“ mit mindestens einer konkreten Grenze. Zeige danach die erlaubte fachliche Entsprechung in derselben Notation oder Begrifflichkeit wie die Lernaufgabe. Im Hinweismodus bleibt auch diese Entsprechung innerhalb der freigegebenen Stufe.
+## Keep the interface quiet
 
-## 3. Vorhersage und Erklärung führen
+The default surface contains a short title, at most one useful introductory sentence, the visualization, its controls, and its current result. Use English for shared examples and default interface copy; honor the learner's explicit language choice. The subject's actual language remains unchanged in a language-learning example.
 
-Beginne mit einer kurzen Beobachtung und einer gezielten Frage zur nächsten Veränderung. Gib der Person Gelegenheit zu einer eigenen Vorhersage. Speichere deren Eingabe nur im Arbeitsspeicher der Seite.
+Use the shell's cool white surfaces in light mode and distinct dark surfaces in dark mode. Respect the system preference initially and provide a visible toggle. Keep essential labels readable in both themes. Saving the theme is optional and must tolerate storage being unavailable. Do not persist learner answers without a request.
 
-In einer vollständigen Erklärung folgt auf „Vorhersage festhalten“ oder „Überspringen“ ein eigener, bewusst ausgelöster Auflösungsschritt. Zeige das Ergebnis und den Mechanismus, der es erzeugt. Die Vorhersage bleibt daneben lesbar. Offene Freitextantworten werden nicht mit einem starren Zeichenkettenvergleich als richtig oder falsch bewertet. Lass die Person ihre Erklärung mit der sichtbaren Wirkung vergleichen und einen Unterschied benennen.
+Use spacious composition, roughly 17–18 px body text, larger important values, and rounded cards around 22–28 px. Keep supporting labels at least 14 px at their actual rendered size. Use borders sparingly; avoid nested boxes and repeated section outlines. Reserve the accent for the current cause, state, or result, with a text or shape cue as well.
 
-In einer Hinweisdatei folgt stattdessen nur die erlaubte Beobachtung. Sie kann die Vorhersage prüfbar machen, solange dabei keine höhere Hilfestufe erscheint. Schließe mit einer Frage, die das Weiterdenken im Gespräch ermöglicht.
+Co-locate controls with what they change. Graph playback belongs directly below the graph; legend and numerical readouts follow the controls. Sentence actions belong below the sentence. Put interpretation in a distinct feedback panel with a short headline and, if useful, one concise explanation. Avoid scattering a verdict, a calculation, and duplicate instructions across unrelated panels.
 
-Beende eine vollständige Erklärung mit einem kurzen Transfer: Was würde sich bei einer veränderten Bedingung ändern, und weshalb? Die Figur unterstützt den eigenen Erklärversuch. Sie ersetzt ihn nicht durch einen langen Mustertext.
+### Alignment and space
 
-## 4. Ruhig und bedienbar gestalten
+- One datum, one row: label, mark, and value share layout tracks and a scale.
+- Metadata sits above the item in reserved space, outside its content surface.
+- Keep labels attached when wrapping; let content size the row instead of synchronizing separate columns with offsets or guessed heights.
 
-Verwende diese Palette als Ausgangspunkt. Wähle eine passende Papierfarbe für den Hintergrund und prüfe die tatsächliche Lesbarkeit von Text und Bedienelementen im gewählten Kontext.
+Remove numbered lesson kickers, repeated 'predict then reveal' labels, draft labels, and explanatory mini-paragraphs that repeat the visible control. Keep review status in repository documentation. Additional calculations can live in a 'Calculation' disclosure. Include model assumptions only where their absence could mislead, usually in a collapsed 'Model notes' disclosure. Explain a material analogy limitation near the relevant claim rather than adding a boilerplate footer to every figure.
 
-| Rolle | Hell | Dunkel |
-|---|---|---|
-| Sockel, Rahmen | `#bdb3a5` | `#3a343f` |
-| Struktur | `#d8d0c4` | `#4a4450` |
-| Gegenstand | `#ece6dc` | `#615a68` |
-| Aktueller Akzent | `#6d3fd4` | `#b79cff` |
-| Kanten | `#5c5650` | `#a89f94` |
+## Make interaction immediate and controllable
 
-Setze pro Schritt einen Akzent für das gerade Wesentliche. Farbe erhält eine zweite Kennzeichnung durch Form, Position oder Text. Falls Farbe selbst Daten kodiert, verwende eine beschriftete sequenzielle Skala oder wenige klar unterscheidbare Klassen mit zusätzlichen Symbolen.
+A slider must visibly change the mechanism, comparison, or an appropriate preview while it moves. Updating only its numeric label is insufficient. In hint mode, immediate feedback still respects the information boundary.
 
-Bewege nur etwas, dessen Änderung eine Bedeutung hat. Jede kurze Bewegung endet in einem stabilen, lesbaren Zustand. Kein Autoplay. `prefers-reduced-motion: reduce` zeigt denselben Endzustand unmittelbar. Halte Erklärung und Bedienelemente auch ohne Bewegung verständlich.
+For a temporal process, offer explicit Run/Pause, Step, and Reset controls when they help. Start motion only after a user action. Pause when inputs change, on reset, and at the end of a bounded sequence. Keep displayed state, active controls, and feedback synchronized. With reduced motion, use discrete updates without travel animations. A static diagram needs no playback bar.
 
-Verwende native Buttons und Eingabefelder mit sichtbaren Beschriftungen, erkennbarem Tastaturfokus und mindestens 44 px hohen Klickflächen. „Zurück“, „Weiter“ und „Von vorn“ reichen meist aus. Zeige „Schritt k von n“ als Text. Fange Tastenkürzel nur ab, wenn sie keine Texteingabe stören. Eine räumliche Ansicht braucht bedienbare Alternativen zum Ziehen; eine 2D-Figur braucht keine Kamerasteuerung.
+Use native buttons and inputs with visible labels, keyboard focus, and at least 44 px hit targets. Avoid capturing keys while someone is typing. Spatial dragging needs button or keyboard alternatives if changing the view is essential. Provide a meaningful accessible title/description and a text equivalent for visual state. Keep small-screen reading order aligned with the interaction order.
 
-Halte Beschriftungen bei normaler Ansicht mindestens 14 px groß. Verhindere Überlappungen, auch auf schmalen Bildschirmen und bei vergrößerter Schrift. Ergänze beim SVG einen zugänglichen Titel und eine kurze Beschreibung. Ein textlicher Ablauf vermittelt dieselbe freigegebene Erkenntnis. Rein visuelle Positions- oder Farbänderungen brauchen eine verständliche textliche Entsprechung.
+## Inspect and deliver
 
-## 5. Manuell prüfen und zurückgeben
+Create or run no automated tests, snapshot checks, coverage jobs, or benchmark suites. Inspect the model and state transitions directly. When browser access is available, manually look at light/dark themes, the permitted controls, a narrow viewport, and reduced motion. Check a hint artifact's source for later answers as well as its visible surface. A blocked browser action is not permission to use a workaround; report the missing visual review honestly.
 
-Öffne die Datei im Browser, wenn Browserzugriff verfügbar ist. Gehe die erlaubten Schritte selbst durch, ändere einen fachlichen Eingangswert und vergleiche Grafik, Beschriftung und Rechnung. Probiere Tastaturbedienung, schmale Ansicht und reduzierte Bewegung. Lies bei einer Hinweisdatei außerdem den Quelltext auf Inhalte höherer Hinweisstufen durch. Diese Prüfung erfolgt ohne Testskripte oder Testframeworks.
-
-Korrigiere sichtbare Überschneidungen, unlesbare Zustände und fachliche Widersprüche vor der Übergabe. Wenn keine Browseransicht verfügbar ist, benenne die fehlende Sichtprüfung knapp. Gib den absoluten Dateipfad und eine Zeile zur untersuchbaren Beziehung zurück. Setze im Gespräch mit der einen offenen Lernfrage fort, die zur aktuellen Stufe gehört.
+Deliver the file link with one short exploration prompt and return to the learner's explanation. Keep GIF capture separate until the owner approves the current HTML. When feedback changes a general design rule, update this reference or the shell as well as the example. Do not encode a particular scene's labels, equations, or learning steps into the reusable shell.

@@ -22,6 +22,8 @@ The project owner specified learner-led explanations, requested hints, external 
 
 The hint ladder, small session handoff, completion criteria, optional prediction/application, spoiler boundaries inside HTML source, and publication checklist are this skill's design choices. They should not be attributed to Cranmer as claims made in this segment.
 
+The owner's UI feedback on 17 October 2026 added English presentation, quieter layouts, larger type, light/dark controls, immediate visual feedback, co-located actions, and optional spatial views. Those preferences are implemented in the portable adapter and copyable shell. The Spanish example replaces the initial German example. GIF capture follows approval of the HTML.
+
 ## Werkbankfiguren
 
 The bundled [portable adapter](werkbank-figuren.md) credits its original Argmin source and records which principles were adapted. It carries the visual approach without Argmin's project structure or automated-test workflow. The adapter is not a claim that the original skill already generalized to every subject.
@@ -31,3 +33,7 @@ Anatomy was considered as a future comparison in the brief. No Anatomy code, ass
 ## Packaging
 
 The folder layout and frontmatter follow the [Agent Skills specification](https://agentskills.io/specification), consulted on 17 October 2026. Product-specific UI metadata is kept in `agents/openai.yaml`; the learning workflow does not depend on it.
+
+## Browser APIs
+
+The theme implementation follows the system preference described by [MDN's prefers-color-scheme reference](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme), with a user override. This implementation reference was consulted on 17 October 2026.
