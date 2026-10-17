@@ -10,7 +10,7 @@ The visual approach is also inspired by [Anatomy](https://github.com/wheresryan2
 
 Use [visualization-shell.html](../assets/visualization-shell.html) as a copyable starting point for layout, theme colors, typography, controls, and theme switching. Copy the relevant parts into one HTML file with inline CSS, JavaScript, and SVG or Canvas. Trim unused styles. The output works directly from disk with system fonts and no network, package installation, CDN, or build step.
 
-Copy its comparison-row or annotated-item pattern when applicable. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
+Copy its comparison-row, annotated-item, or reference-task pattern when applicable. The reference-task wrapper stretches both panels so a shorter reference can center beside the task. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
 
 ## Preserve the learning boundary
 
@@ -46,19 +46,25 @@ The default surface contains a short title, at most one useful introductory sent
 
 Use the shell's cool white surfaces in light mode and distinct dark surfaces in dark mode. Respect the system preference initially and provide a visible toggle. Keep essential labels readable in both themes. Saving the theme is optional and must tolerate storage being unavailable. Do not persist learner answers without a request.
 
-Use spacious composition, roughly 17–18 px body text, larger important values, and rounded cards around 22–28 px. Keep supporting labels at least 14 px at their actual rendered size. Use borders sparingly; avoid nested boxes and repeated section outlines. Reserve the accent for the current cause, state, or result, with a text or shape cue as well.
+Use the shell's semantic type scale: title 28–32 px, panel heading 18 px, body 16 px, supporting text 14 px, key value 20 px. Size SVG text for its actual rendered width. Keep supporting labels at least 14 rendered pixels; shorten copy or reflow before shrinking it. Use rounded cards around 22–28 px and sparse borders. Reserve the accent for the current cause, state, or result, with a text or shape cue as well.
 
-Co-locate controls with what they change. Graph playback belongs directly below the graph; legend and numerical readouts follow the controls. Sentence actions belong below the sentence. Put interpretation in a distinct feedback panel with a short headline and, if useful, one concise explanation. Avoid scattering a verdict, a calculation, and duplicate instructions across unrelated panels.
+Co-locate controls with what they change. Graph playback belongs directly below the graph; legend and numerical readouts follow the controls. Reset stays inside the panel it resets. Put interpretation in a distinct feedback panel with a short headline and, if useful, one concise explanation. Avoid scattering a verdict, a calculation, and duplicate instructions across unrelated panels.
+
+For dialogue, keep the roles in separate, consistently positioned chat panels with names and distinct subdued colors. Hold an overview long enough to read before advancing; a brief transition is not a readable introduction.
 
 ### Alignment and space
 
+- Use the shell's shared header: title and theme toggle on one row, optional introduction below. Omit default branding and links to unrelated examples.
+- Group the task's context and any item to place on one aligned row; put its question, choices, and actions together below. On narrow screens, wrap whole groups in that order.
+- Center a shorter reference within its available panel when the adjacent task is taller. Keep panel headings on the same top line; do not leave the reference stranded at the top.
 - One datum, one row: label, mark, and value share layout tracks and a scale.
 - Metadata sits above the item in reserved space, outside its content surface.
 - Keep labels attached when wrapping; let content size the row instead of synchronizing separate columns with offsets or guessed heights.
+- Use one coherent set of layout rules. Replace obsolete overrides when changing the composition; do not stack compact fixes over earlier layouts.
 
 ### One frame on desktop
 
-Target 1280×720, with the mechanism, controls, and current result visible together. Budget height before adding a panel. Use columns, shorter copy, and viewport-relative scene height before shrinking labels. Keep notes collapsed. Never hide overflow, zoom, or scale the page to manufacture a fit. Mobile and opened reference details may scroll.
+Target 1280×720, with the mechanism, controls, and current result visible together, including after a reveal. Budget height before adding a panel. Use columns, shorter copy, and viewport-relative scene height before shrinking labels. Keep notes collapsed. Never hide overflow, zoom, or scale the page to manufacture a fit. Mobile and opened reference details may scroll.
 
 Remove numbered lesson kickers, repeated 'predict then reveal' labels, draft labels, and explanatory mini-paragraphs that repeat the visible control. Keep review status in repository documentation. Additional calculations can live in a 'Calculation' disclosure. Include model assumptions only where their absence could mislead, usually in a collapsed 'Model notes' disclosure. Explain a material analogy limitation near the relevant claim rather than adding a boilerplate footer to every figure.
 

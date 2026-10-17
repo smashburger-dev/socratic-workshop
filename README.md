@@ -37,11 +37,25 @@ An illustrative conversation about a Gaussian prior and L2 regularization, rende
 
 ## Visual learning
 
-Explore the examples:
+### Gradient descent
 
-- [Gradient descent](examples/gradient-descent.html): change the learning rate and follow the next step.
-- [Spanish word order](examples/spanish-word-order.html): compare the position of a color adjective.
-- [Process bottlenecks](examples/bottleneck.html): see how one station limits a production line.
+![Gradient descent: change the learning rate and follow the next step.](media/gradient-descent.gif)
+
+[HTML file](examples/gradient-descent.html)
+
+### Spanish word order
+
+![Spanish word order: compare the position of a color adjective.](media/spanish-word-order.gif)
+
+[HTML file](examples/spanish-word-order.html)
+
+### Process bottlenecks
+
+![Process bottlenecks: see how one station limits a production line.](media/bottleneck.gif)
+
+[HTML file](examples/bottleneck.html)
+
+These GIFs are rendered previews of the example models.
 
 Download an HTML file and open it in a browser. Each is standalone, with light/dark themes and no build step. GitHub's file view shows the source.
 
@@ -49,10 +63,14 @@ The same [visual templates](assets/visualization-shell.html) are available to th
 
 You can ask for a hint, a visualization, a direct explanation, or a pause at any point. Study material stays outside the tutoring chat. In a codebase, the tutor offers a worktree, a branch, or read-only study before creating learning files. It creates no automated tests for those artifacts.
 
+## Make it yours
+
+Use this skill as a starting point. Adjust the visual style, change how hints work, or extend the learning loop to suit how you learn. Edit [SKILL.md](SKILL.md) and the [visual guidelines](references/werkbank-figuren.md), or ask your agent to help.
+
 ## Credits
 
 - [Miles Cranmer's talk](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), shared by MPhil in Data Intensive Science Cambridge, inspired the learning workflow.
-- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted through Noa's Werkbankfiguren work in Argmin.
+- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted through my Werkbankfiguren work in Argmin.
 - [Source notes](references/sources.md) separate the talk's ideas from this skill's additions.
 
 ## License

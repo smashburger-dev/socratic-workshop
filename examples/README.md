@@ -12,7 +12,7 @@ These are full-explanation showcases. A hint artifact would contain only the cur
 
 ## Shared patterns
 
-The examples use the [shared shell](../assets/visualization-shell.html). The capacity chart uses its comparison-row pattern; the language example uses its annotated-item pattern. The skill has these same components available for new requests.
+The examples use the [shared shell](../assets/visualization-shell.html): a consistent header, type scale, and task grouping. The capacity chart uses its comparison-row pattern; the language example uses its annotated-item pattern. The skill has these same components available for new requests.
 
 ## Request the same learning scope
 
@@ -33,4 +33,4 @@ Create a full-explanation HTML exploration of
 a three-stage production bottleneck, with an isometric line and capacity chart.
 ```
 
-The compact layouts have source review but still need visual confirmation. Example usage GIFs wait for approval of the resized HTML. The README's illustrative learning-loop GIF is a separately authored demonstration.
+The main README includes rendered GIF previews of all three models and an illustrative learning conversation. They are authored previews, not browser recordings. Rendering sources and frames stay outside this repository.

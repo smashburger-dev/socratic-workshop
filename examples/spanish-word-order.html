@@ -3,44 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Spanish adjective order · Socratic Workshop</title>
+<title>Spanish adjective order</title>
 <style>
 :root{color-scheme:light;--page:#f5f6fa;--surface:#ffffff;--soft:#f0f1f7;--ink:#20212b;--muted:#656778;--border:#e6e7ef;--accent:#6d3fd4;--accent-soft:#f0eafb;--accent-ink:#fff;--shadow:0 12px 40px #20212b06}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}}
 :root[data-theme="dark"]{color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}
-*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:17px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1180px;padding:32px 32px 56px;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:44px}.brand{font-size:16px;font-weight:650;letter-spacing:-.025em;color:var(--muted)}h1{font-size:clamp(32px,4.8vw,50px);letter-spacing:-.045em;font-weight:650;line-height:1.12;margin:0 0 14px;text-wrap:balance}h2{font-size:22px;letter-spacing:-.025em;line-height:1.3;margin:0 0 20px}.intro{font-size:19px;color:var(--muted);max-width:60ch;margin:0}header{margin-bottom:34px}p{margin:0 0 16px}.card{background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:32px;box-shadow:var(--shadow);min-width:0}button{font:inherit;min-height:46px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--ink);padding:10px 17px;cursor:pointer;font-weight:550}.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}button:disabled{opacity:.45;cursor:not-allowed}button:active:not(:disabled){transform:scale(.98)}button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.theme-toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;background:transparent;box-shadow:none}.theme-toggle svg{width:18px;height:18px;flex:none}.sentence-group+.sentence-group{border-top:1px solid var(--border);margin-top:32px;padding-top:30px}.language-label{font-size:17px;color:var(--muted);font-weight:550;margin-bottom:16px}.word-tray{display:flex;justify-content:center;align-items:center;gap:14px;margin:22px 0 0;color:var(--muted);font-size:16px}.prediction{border:0;padding:0;margin:30px 0 0;text-align:center}.prediction legend{padding:0;margin:0 auto 16px;font-size:19px;font-weight:550;max-width:100%}.choices{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}.choice{position:relative;display:flex;align-items:center;gap:10px;padding:12px 18px;min-height:48px;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-weight:550}.choice:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.choice:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:4px}.choice input{width:18px;height:18px;margin:0;accent-color:var(--accent);flex:none}.choice input:focus-visible{outline:none}.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}.feedback{margin-top:24px;background:var(--accent-soft);border:1px solid transparent;border-radius:26px;padding:26px 30px}.feedback h2{font-size:23px;margin-bottom:10px}.feedback p:last-child{margin-bottom:0}.feedback .prompt{margin-top:16px;font-weight:550}.model-notes{margin-top:26px;color:var(--muted);font-size:15px;max-width:80ch}.model-notes summary{display:inline-block;cursor:pointer;min-height:44px;padding:10px 0}.model-notes summary::before{content:"+ ";color:var(--accent)}.model-notes[open] summary::before{content:"− "}.model-notes p{margin-top:8px}footer{display:flex;gap:20px;flex-wrap:wrap;margin-top:34px;font-size:15px}a{color:var(--muted);text-underline-offset:4px}[hidden]{display:none!important}@media(hover:hover) and (pointer:fine){button:hover:not(:disabled),.choice:hover{border-color:var(--accent)}a:hover{color:var(--ink)}}@media(max-width:800px){main{padding:24px 18px 40px}.topbar{margin-bottom:32px}.card{padding:24px 18px;border-radius:22px}header{margin-bottom:26px}.intro{font-size:18px}.feedback{padding:22px;border-radius:22px}.sentence-group+.sentence-group{margin-top:26px;padding-top:24px}.choices{gap:10px}.choice{padding:12px 14px}.word-tray{gap:10px;flex-wrap:wrap}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media print{:root{color-scheme:light;--page:#fff;--surface:#fff;--soft:#f4f4f4;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}main{max-width:none;padding:0}.topbar,.prediction,.actions,footer{display:none}.card{break-inside:avoid;box-shadow:none}.feedback{break-inside:avoid}}
-/* Annotation pattern: metadata sits in normal flow above the item surface. */
-.annotated-set{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:12px;list-style:none;margin:0;padding:0}
-.annotated-item{display:grid;grid-template-rows:minmax(20px,auto) auto;gap:10px;flex:0 0 auto;min-width:0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:auto;padding:24px 28px 36px}
+.demo-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 24px;margin-bottom:20px}
+.demo-header h1{min-width:0;margin:0;font-size:clamp(28px,3vw,32px);font-weight:650;line-height:1.15;letter-spacing:-.04em;text-wrap:balance}
+.demo-header .intro{grid-column:1/-1;margin:0;max-width:65ch;font-size:16px;line-height:1.5;color:var(--muted)}
+.demo-header .theme-toggle{grid-column:2;grid-row:1;min-height:44px;font-size:14px;padding:8px 12px}
+h2{font-size:18px;font-weight:600;line-height:1.35;letter-spacing:-.025em;margin:0 0 14px}
+p{margin:0 0 14px}
+button{font:inherit;min-height:46px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--ink);padding:10px 17px;cursor:pointer;font-weight:550}
+.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:active:not(:disabled){transform:scale(.98)}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.theme-toggle{display:inline-flex;align-items:center;gap:8px;flex:none;background:transparent}
+.theme-toggle svg{width:18px;height:18px;flex:none}
+.card{padding:26px;background:var(--surface);border:1px solid var(--border);border-radius:26px;box-shadow:var(--shadow)}
+.learning-layout{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.45fr);gap:28px;align-items:stretch}
+.reference-panel{display:grid;grid-template-rows:auto minmax(0,1fr);gap:18px;min-width:0}
+.panel-content{display:grid;place-content:center;min-width:0;padding-block:16px}
+.target-panel{min-width:0;padding-left:28px;border-left:1px solid var(--border)}
+.language-label{margin:0;text-align:center;font-size:18px;font-weight:550;color:var(--muted)}
+.context-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px}
+.target-group{margin-top:18px}
+.context-row>.annotated-set{flex:0 1 auto;max-width:100%}
+.word-tray{flex:0 0 auto}
+.annotated-set{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:8px;list-style:none;margin:0;padding:0;min-width:0}
+.annotated-item{display:grid;grid-template-rows:minmax(20px,auto) auto;gap:8px;flex:0 0 auto;min-width:0;max-width:100%}
 .item-role{display:block;min-height:20px;text-align:center;font-size:14px;line-height:1.4;font-weight:550;color:var(--muted);letter-spacing:0}
-.item-body{display:flex;align-items:center;justify-content:center;min-height:86px;padding:16px 20px;border:2px solid transparent;border-radius:18px;background:var(--soft);font-size:clamp(24px,3vw,32px);font-weight:550;line-height:1.25;letter-spacing:-.025em}
+.item-body{display:flex;align-items:center;justify-content:center;min-height:56px;padding:10px 12px;border:2px solid transparent;border-radius:14px;background:var(--soft);font-size:22px;font-weight:550;line-height:1.25;letter-spacing:-.025em;white-space:nowrap}
 .annotated-item.is-accented .item-body{background:var(--accent-soft);color:var(--accent)}
 .annotated-item.is-outlined .item-body{background:transparent;border-color:var(--accent);color:var(--accent)}
-.annotated-item.is-empty .item-body{min-width:76px;border:1px dashed var(--border);background:transparent;color:var(--muted)}
-@media(max-width:600px){.annotated-set{gap:9px}.item-body{min-height:78px;padding:14px 16px}.annotated-item.is-empty .item-body{min-width:56px}}
-/* Compact desktop recording view; annotations stay in normal document flow. */
-@media screen and (min-width:901px){
-  main{padding:12px 28px 16px}.topbar{margin-bottom:8px}.theme-toggle{min-height:44px;padding:9px 14px}header{margin-bottom:14px}h1{font-size:36px;margin-bottom:6px}.intro{font-size:17px;max-width:none}.card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;padding:16px}.sentence-group+.sentence-group{margin:0;padding:0 0 0 20px;border-top:0;border-left:1px solid var(--border)}.language-label{font-size:15px;margin-bottom:6px}.annotated-set{gap:8px}.annotated-item{gap:4px}.item-body{min-height:54px;padding:10px 12px;font-size:24px;border-radius:14px}.annotated-item.is-empty .item-body{min-width:46px}
-  .sentence-group+.sentence-group{display:grid;grid-template-columns:minmax(74px,.45fr) minmax(0,2fr);gap:12px 14px;align-content:start}.sentence-group+.sentence-group>.language-label,.sentence-group+.sentence-group>.annotated-set,.sentence-group+.sentence-group>.actions{grid-column:1/-1}.sentence-group+.sentence-group>.language-label{margin:0}.word-tray{flex-direction:column;gap:4px;margin:0;font-size:14px;align-self:center}.prediction{margin:0;align-self:center}.prediction legend{font-size:16px;margin-bottom:8px}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.choice{gap:8px;min-height:44px;padding:8px 10px;font-size:15px}.actions{margin-top:0}.feedback{margin-top:12px;padding:16px 20px}.feedback h2{font-size:20px;margin-bottom:6px}.feedback p{margin-bottom:8px}.feedback .prompt{margin-top:8px}.model-notes{display:inline-block;margin-top:8px;vertical-align:top}footer{display:inline-flex;align-items:center;gap:16px;min-height:44px;margin:8px 0 0 24px;vertical-align:top}
+.annotated-item.is-empty .item-body{min-width:42px;border:1px dashed var(--border);background:transparent;color:var(--muted)}
+.prediction{min-width:0;width:100%;margin:26px 0 0;padding:0;border:0;text-align:center}
+.prediction legend{max-width:100%;padding:0;margin:0 auto 14px;font-size:18px;font-weight:550}
+.choices{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.choice{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 16px;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:16px;font-weight:550}
+.choice:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.choice:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:4px}
+.choice input{width:18px;height:18px;margin:0;accent-color:var(--accent);flex:none}
+.choice input:focus-visible{outline:none}
+.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:18px}
+.feedback{margin-top:20px;padding:22px 26px;border-radius:22px;background:var(--accent-soft)}
+.feedback h2{margin-bottom:10px}
+.feedback p:last-child{margin-bottom:0}
+.feedback .prompt{margin-top:14px;font-weight:550}
+.model-notes{max-width:80ch;margin-top:18px;color:var(--muted);font-size:14px}
+.model-notes summary{display:inline-block;min-height:44px;padding:10px 0;cursor:pointer}
+.model-notes summary::before{content:"+ ";color:var(--accent)}
+.model-notes[open] summary::before{content:"− "}
+.model-notes p{margin-top:8px}
+a{color:var(--muted);text-underline-offset:4px}
+[hidden]{display:none!important}
+@media(hover:hover) and (pointer:fine){button:hover:not(:disabled),.choice:hover{border-color:var(--accent)}a:hover{color:var(--ink)}}
+@media(max-width:980px){
+  .learning-layout{grid-template-columns:1fr;gap:24px}
+  .reference-panel{gap:16px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+  .target-panel{padding-left:0;border-left:0}
+}
+@media(max-width:600px){
+  main{padding:20px 16px 28px}
+  .card{padding:22px 16px;border-radius:22px}
+  .feedback{padding:20px}
+  .choices{gap:10px}
+  .choice{padding:10px 14px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}button:active:not(:disabled){transform:none}}
+@media print{
+  :root,:root[data-theme="dark"]{color-scheme:light;--page:#fff;--surface:#fff;--soft:#f4f4f4;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}
+  main{max-width:none;padding:0}
+  .theme-toggle,.prediction,.actions{display:none}
+  .card,.feedback{break-inside:avoid;box-shadow:none}
 }
 </style>
 </head>
 <body>
 <main>
-<div class="topbar"><span class="brand">Socratic Workshop</span><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button></div>
-<header><h1>Where does the color go?</h1><p class="intro">Translate “The red car is here.” Keep the meaning. Decide where the adjective belongs.</p></header>
-<section class="card" aria-label="Compare English and Spanish word order">
-  <div class="sentence-group">
+<header class="demo-header"><h1>Where does the color go?</h1><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button><p class="intro">Translate “The red car is here.” Keep the meaning. Decide where the adjective belongs.</p></header>
+<section class="card learning-layout" aria-label="Compare English and Spanish word order">
+  <div class="reference-panel">
     <h2 class="language-label">English</h2>
+    <div class="panel-content">
     <ol class="annotated-set" aria-label="The red car is here.">
       <li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body">The</span></li>
       <li class="annotated-item is-accented"><span class="item-role">Adjective</span><span class="item-body">red</span></li>
       <li class="annotated-item is-outlined"><span class="item-role">Noun</span><span class="item-body">car</span></li>
       <li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body">is here.</span></li>
     </ol>
+    </div>
   </div>
-  <div class="sentence-group">
+  <div class="target-panel">
     <h2 class="language-label" id="spanish-label">Spanish · place the adjective</h2>
+    <div class="context-row target-group">
     <ol class="annotated-set" id="spanish-sentence" aria-label="Spanish sentence with a possible position before and after coche">
       <li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body" lang="es">El</span></li>
       <li class="annotated-item is-empty"><span class="item-role" aria-hidden="true"></span><span class="item-body" aria-label="Possible position before coche">?</span></li>
@@ -48,7 +108,8 @@
       <li class="annotated-item is-empty"><span class="item-role" aria-hidden="true"></span><span class="item-body" aria-label="Possible position after coche">?</span></li>
       <li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body" lang="es">está aquí.</span></li>
     </ol>
-    <div class="word-tray" id="word-tray"><span>Word to place</span><ul class="annotated-set"><li class="annotated-item is-accented"><span class="item-role">Adjective</span><span class="item-body" lang="es">rojo</span></li></ul></div>
+    <div class="word-tray" id="word-tray"><ul class="annotated-set" aria-label="Adjective to place"><li class="annotated-item is-accented"><span class="item-role">Adjective</span><span class="item-body" lang="es">rojo</span></li></ul></div>
+    </div>
     <fieldset class="prediction" id="prediction">
       <legend>Where would you put <span lang="es">rojo</span>?</legend>
       <div class="choices">
@@ -67,7 +128,6 @@
 </section>
 <noscript><section class="feedback"><h2>Compare the sentences</h2><p>The Spanish sentence is <span lang="es">“El coche rojo está aquí.”</span> English places <strong>red</strong> before <strong>car</strong>; in this neutral Spanish description, <span lang="es">rojo</span> comes after <span lang="es">coche</span>.</p><p>Enable JavaScript to make a prediction and reveal the tiles.</p></section></noscript>
 <details class="model-notes"><summary>Model notes</summary><p>This example shows the standard, unmarked order for a color adjective describing a noun. Spanish adjectives do not all follow the same position rule; the adjective, intended meaning, and emphasis can change the order. This comparison does not cover those cases.</p><p>Grammar reference: <a href="https://www.ucm.es/plataformaele/posicion-adjetivo-respecto-sustantivo">Universidad Complutense de Madrid · adjective position</a>.</p></details>
-<footer><a href="gradient-descent.html">Explore gradient descent</a><a href="bottleneck.html">Explore process bottlenecks</a></footer>
 </main>
 <template id="annotated-item-pattern"><li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body"></span></li></template>
 <script>
