@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gradientenabstieg · Socratic Workshop · Entwurf</title>
+<style>
+:root{color-scheme:light;--paper:#f6f2eb;--surface:#ece6dc;--mid:#d8d0c4;--ink:#302b34;--muted:#5c5650;--accent:#6d3fd4;--line:#bdb3a5}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1040px;margin:auto;padding:36px 24px 56px}a{color:var(--ink)}.eyebrow,.draft{font-size:14px}.eyebrow{letter-spacing:.08em;text-transform:uppercase}.draft{display:inline-block;border:1px solid var(--line);padding:5px 10px;margin:12px 0 18px}h1{font-size:clamp(30px,5vw,48px);line-height:1.12;letter-spacing:-.035em;margin:0 0 18px;font-weight:650;max-width:18ch}h2,legend{font-size:19px;font-weight:650}h2{margin:0 0 12px}p{max-width:70ch;margin:0 0 14px}.lead{font-size:18px}.workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,1fr);gap:24px;margin-top:28px}.panel{padding:22px;border:1px solid var(--line);border-radius:5px;background:var(--surface);min-width:0}figure{margin:0}.chart{display:block;width:100%;height:auto;background:var(--paper);border:1px solid var(--line);border-radius:3px}figcaption,.note,.meta{font-size:14px;color:var(--muted)}figcaption{margin-top:12px}.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.readout div{min-width:0}.readout dt{font-size:14px;color:var(--muted)}.readout dd{margin:3px 0 0;font-size:20px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.readout dl{margin:0}label{display:block}.control{margin:18px 0}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:600}.control output{font-variant-numeric:tabular-nums}input[type=range]{width:100%;min-height:44px;accent-color:var(--accent);cursor:pointer}fieldset{border:0;padding:0;margin:22px 0 16px}legend{padding:0;margin-bottom:10px}.option{display:flex;align-items:center;gap:10px;min-height:44px;margin:3px 0;cursor:pointer}.option input{width:19px;height:19px;accent-color:var(--accent);flex:none}button{font:inherit;min-height:44px;padding:9px 15px;border-radius:3px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px}.primary{border-color:var(--ink);background:var(--ink);color:var(--paper)}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.result{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.result p:last-child{margin-bottom:0}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;overflow-wrap:anywhere}.boundary{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}.boundary h2{font-size:16px}.step{font-size:14px;color:var(--muted);margin-bottom:8px}.legend-line{display:inline-block;width:23px;border-top:3px solid var(--muted);vertical-align:middle;margin-right:5px}.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent);vertical-align:middle;margin:0 5px 0 14px}footer{margin-top:30px;font-size:14px;color:var(--muted)}[hidden]{display:none!important}@media(max-width:760px){main{padding:24px 16px 36px}.workspace{grid-template-columns:1fr}.panel{padding:18px}.readout dd{font-size:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{body{background:white}main{max-width:none;padding:0}.workspace{display:block}.panel{margin:16px 0;break-inside:avoid}input,button,.option{display:none}.control label{display:block}.draft{margin-top:0}a{color:inherit}.chart{max-height:300px}.result[hidden]{display:block!important}.result[hidden]::after{content:"Die Rechnung wurde in dieser Ansicht noch nicht aufgedeckt."}}
+.plot{position:relative}.guide-label{position:absolute;top:8px;left:50%;transform:translateX(-50%);padding:2px 7px;background:var(--paper);border:1px solid var(--line);border-radius:2px;font-size:14px;white-space:nowrap}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">Socratic Workshop / Entwurf 01</div><div class="draft">Demo-Entwurf · wartet auf Noas Review</div><h1>Wann wird ein Schritt zu groß?</h1><p class="lead">Ein eindimensionales Modell: <strong>f(x) = (x − 3)²</strong>. Verändere Startpunkt und Lernrate. Sage zuerst voraus, was der nächste Schritt macht.</p></header>
+<div class="workspace">
+<section class="panel" aria-labelledby="model-heading"><p class="step">01 · Am Modell beobachten</p><h2 id="model-heading">Ein Punkt auf einer Parabel</h2><figure><div class="plot"><svg id="chart" class="chart" viewBox="0 0 720 440" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title">Gradientenabstieg auf einer quadratischen Funktion</title><desc id="chart-desc">Die Kurve zeigt f(x) = (x − 3)². Ein ausgefüllter Punkt markiert den aktuellen Wert. Die senkrechte gestrichelte Hilfslinie markiert x = 3, die Stelle des Minimums. Die Rechnung und die aktuellen Zahlen stehen unter der Grafik.</desc><path id="axis" fill="none" stroke="var(--line)" stroke-width="1.5"/><path d="M360 32V404" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/><path id="curve" fill="none" stroke="var(--muted)" stroke-width="2.5"/><path id="trail" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 6"/><circle id="start-dot" r="7" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/><circle id="current-dot" r="8" fill="var(--accent)" stroke="var(--paper)" stroke-width="3"/></svg><span class="guide-label">x = 3 · Minimum</span></div><figcaption><span class="legend-line"></span>Funktion <span class="legend-dot"></span>Aktueller Punkt<br>Waagerecht: x. Senkrecht: f(x). Die senkrechte Hilfslinie ist keine Achse bei x = 0. Der Ausschnitt passt sich an die Schritte an. <span id="scale"></span></figcaption></figure><div class="readout" aria-label="Aktuelle Modellwerte"><dl><dt>Schritt</dt><dd id="step-value">0</dd></dl><dl><dt>x</dt><dd id="x-value">−2</dd></dl><dl><dt>f(x)</dt><dd id="loss-value">25</dd></dl></div><p class="note" style="margin-top:18px">Der Hohlkreis bleibt am Start. Die gestrichelte Spur verbindet die berechneten Schritte. Das Minimum liegt bei x = 3 und f(x) = 0.</p></section>
+<section class="panel" aria-labelledby="prediction-heading"><p class="step">02 · Vorhersagen, dann aufdecken</p><h2 id="prediction-heading">Was erwartest du?</h2><div class="control"><label for="start">Startpunkt x <output id="start-output" for="start">−2,0</output></label><input id="start" type="range" min="-2" max="8" step="0.5" value="-2"></div><div class="control"><label for="rate">Lernrate η <output id="rate-output" for="rate">0,25</output></label><input id="rate" type="range" min="0.05" max="1.2" step="0.05" value="0.25"></div><p class="note">Änderst du einen Regler, beginnt eine neue Vorhersage.</p><fieldset><legend>Nach einem Schritt ist der Abstand zu x = 3 …</legend><label class="option"><input type="radio" name="prediction" value="closer"> kleiner.</label><label class="option"><input type="radio" name="prediction" value="same"> gleich groß.</label><label class="option"><input type="radio" name="prediction" value="further"> größer.</label></fieldset><div class="actions"><button id="reveal" class="primary" disabled>Schritt aufdecken</button><button id="next" disabled>Noch ein Schritt</button><button id="reset">Zurücksetzen</button></div><p class="note" id="instruction" style="margin-top:12px">Wähle eine Vorhersage, um die Rechnung aufzudecken.</p><div id="result" class="result" hidden aria-live="polite" aria-atomic="true"><p id="verdict"></p><p id="calculation" class="equation"></p><p class="equation">x neu − 3 = (1 − 2η) · (x − 3)</p><p id="explanation"></p><p class="note">Für diese Parabel ist η = 1 die Grenze zwischen abnehmendem und wachsendem Abstand. Der Start genau im Minimum bleibt in jedem Fall dort.</p></div><noscript><p>Für die Regler ist JavaScript nötig. Als Beispiel ergibt x = −2 und η = 0,25 den nächsten Wert x = 0,5. Der Abstand zum Minimum sinkt von 5 auf 2,5.</p></noscript></section>
+</div>
+<section class="boundary" aria-labelledby="boundary-heading"><h2 id="boundary-heading">Wo das Modell endet</h2><p>Hier gibt es eine exakte Ableitung, eine feste positive Lernrate und nur eine Dimension. Andere Funktionen können andere Lernraten erfordern; Rauschen, mehrere Dimensionen und lokale Minima fehlen hier.</p><p class="note">Zum Weiterdenken: Finde eine Lernrate, bei der der Punkt das Minimum überschreitet und trotzdem näher herankommt. Erkläre, warum die Richtung allein noch keine Divergenz beweist.</p></section>
+<footer>Entwurf, keine aufgezeichnete Lernsitzung und kein Nachweis für Lernerfolg. <a href="german-word-order.html">Weiter zum Satzbau</a> · <a href="bottleneck.html">Weiter zum Engpass</a></footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const number = value => new Intl.NumberFormat('de-DE',{maximumFractionDigits:3}).format(value);
+let history = [-2];
+let firstVerdict = '';
+function selectedPrediction(){return document.querySelector('input[name="prediction"]:checked');}
+function renderChart(){
+  const radius = Math.max(5, ...history.map(x => Math.abs(x - 3) * 1.15));
+  const left = 3 - radius;
+  const yMax = radius * radius;
+  const point = x => [32 + (x - left) / (2 * radius) * 656, 404 - (x - 3) ** 2 / yMax * 372];
+  const coordinate = x => point(x).join(',');
+  $('axis').setAttribute('d','M32 404H688');
+  $('curve').setAttribute('d',Array.from({length:121},(_,i) => `${i ? 'L' : 'M'}${coordinate(left + 2 * radius * i / 120)}`).join(' '));
+  $('trail').setAttribute('d',history.map((x,i) => `${i ? 'L' : 'M'}${coordinate(x)}`).join(' '));
+  [['start-dot',history[0]],['current-dot',history.at(-1)]].forEach(([id,x]) => { const [cx,cy] = point(x); $(id).setAttribute('cx',cx); $(id).setAttribute('cy',cy); });
+  $('scale').textContent = `x von ${number(left)} bis ${number(3 + radius)}; f(x) von 0 bis ${number(yMax)}.`;
+}
+function renderValues(){
+  const current = history.at(-1);
+  $('step-value').textContent = history.length - 1;
+  $('x-value').textContent = number(current);
+  $('loss-value').textContent = number((current - 3) ** 2);
+  $('start-output').textContent = number(Number($('start').value));
+  $('rate-output').textContent = number(Number($('rate').value));
+  renderChart();
+}
+function freshPrediction(){
+  history = [Number($('start').value)];
+  firstVerdict = '';
+  document.querySelectorAll('input[name="prediction"]').forEach(input => {input.checked = false; input.disabled = false;});
+  $('result').hidden = true;
+  $('reveal').disabled = true;
+  $('next').disabled = true;
+  $('instruction').textContent = 'Wähle eine Vorhersage, um die Rechnung aufzudecken.';
+  renderValues();
+}
+function relationship(previous,next){
+  const difference = Math.abs(next - 3) - Math.abs(previous - 3);
+  if (Math.abs(difference) < 1e-9) return 'same';
+  return difference < 0 ? 'closer' : 'further';
+}
+function explain(rate){
+  if (Math.abs(history[0] - 3) < 1e-9) return 'Du startest im Minimum. Die Ableitung ist 0, also bewegt sich der Punkt bei jeder gewählten Lernrate nicht.';
+  if (Math.abs(rate - 0.5) < 1e-9) return 'Bei η = 0,5 landet der erste Schritt genau im Minimum. Alle weiteren Schritte bleiben dort.';
+  if (rate < 1) return 'Für 0 < η < 1 wird der Abstand in jedem Schritt mit |1 − 2η| < 1 multipliziert. Der Punkt nähert sich dem Minimum. Überqueren ist möglich, ohne zu divergieren.';
+  if (Math.abs(rate - 1) < 1e-9) return 'Bei η = 1 wechselt der Punkt die Seite, bleibt aber gleich weit vom Minimum entfernt. Er pendelt und konvergiert nicht.';
+  return 'Für η > 1 wird der Abstand in jedem Schritt mit |1 − 2η| > 1 multipliziert. Er wächst, obwohl die Ableitung an jedem aktuellen Punkt richtig berechnet ist.';
+}
+function advance(){
+  const previous = history.at(-1);
+  const rate = Number($('rate').value);
+  const next = previous - rate * 2 * (previous - 3);
+  if (history.length === 1){
+    const choice = selectedPrediction();
+    if (!choice) return;
+    const labels = {closer:'kleiner',same:'gleich groß',further:'größer'};
+    const actual = relationship(previous,next);
+    firstVerdict = `${choice.value === actual ? 'Deine Vorhersage stimmt.' : 'Die Rechnung widerspricht deiner Vorhersage.'} Nach Schritt 1 ist der Abstand ${labels[actual]}.`;
+  }
+  history.push(next);
+  $('verdict').textContent = firstVerdict;
+  $('calculation').textContent = `x neu = ${number(previous)} − ${number(rate)} · 2 · (${number(previous)} − 3) = ${number(next)}`;
+  $('explanation').textContent = explain(rate);
+  $('result').hidden = false;
+  $('reveal').disabled = true;
+  $('next').disabled = history.length >= 13;
+  $('instruction').textContent = history.length >= 13 ? '12 Schritte gezeigt. Ändere einen Regler für eine neue Vorhersage.' : 'Folge weiteren Schritten oder ändere einen Regler für eine neue Vorhersage.';
+  document.querySelectorAll('input[name="prediction"]').forEach(input => {input.disabled = true;});
+  renderValues();
+}
+['start','rate'].forEach(id => $(id).addEventListener('input',freshPrediction));
+document.querySelectorAll('input[name="prediction"]').forEach(input => input.addEventListener('change',() => {$('reveal').disabled = false;}));
+$('reveal').addEventListener('click',advance);
+$('next').addEventListener('click',advance);
+$('reset').addEventListener('click',() => {$('start').value = -2; $('rate').value = 0.25; freshPrediction();});
+renderValues();
+</script>
+</body>
+</html>

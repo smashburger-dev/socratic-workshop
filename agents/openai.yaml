@@ -1,0 +1,4 @@
+interface:
+  display_name: "Socratic Workshop"
+  short_description: "Learn by explaining, with one hint at a time"
+  default_prompt: "Use $socratic-workshop to help me understand a topic by explaining it myself, with one question or requested hint at a time."

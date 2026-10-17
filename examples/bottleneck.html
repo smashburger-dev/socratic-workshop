@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engpass · Socratic Workshop · Entwurf</title>
+<style>
+:root{color-scheme:light;--paper:#f6f2eb;--surface:#ece6dc;--mid:#d8d0c4;--ink:#302b34;--muted:#5c5650;--accent:#6d3fd4;--line:#bdb3a5}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1040px;margin:auto;padding:36px 24px 56px}a{color:var(--ink)}.eyebrow,.draft,.step{font-size:14px}.eyebrow{letter-spacing:.08em;text-transform:uppercase}.draft{display:inline-block;border:1px solid var(--line);padding:5px 10px;margin:12px 0 18px}h1{font-size:clamp(30px,5vw,48px);line-height:1.12;letter-spacing:-.035em;margin:0 0 18px;font-weight:650;max-width:20ch}h2,legend{font-size:19px;font-weight:650}h2{margin:0 0 12px}p{max-width:70ch;margin:0 0 14px}.lead{font-size:18px}.workspace{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:24px;margin-top:28px}.panel{padding:22px;border:1px solid var(--line);border-radius:5px;background:var(--surface);min-width:0}.step,.note,.unit{color:var(--muted)}.step{margin-bottom:8px}.note,.unit{font-size:14px}.pipeline{list-style:none;padding:0;margin:20px 0;display:grid;gap:12px}.station{position:relative;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:3px}.station-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}.station-name{font-size:18px;font-weight:600}.capacity{font-variant-numeric:tabular-nums;font-size:18px}.track{height:16px;background:var(--surface);border-radius:2px;overflow:hidden}.bar{height:100%;background:var(--mid);border-right:2px solid var(--muted)}.station.bottleneck{border:2px solid var(--accent);padding:13px 15px}.station.bottleneck .bar{background:var(--accent);border-right:0}.bottleneck-label{display:block;margin-top:9px;font-size:14px;color:var(--accent);font-weight:650}.output{padding:18px;background:var(--paper);border:1px solid var(--line);border-radius:3px}.output strong{display:block;font-size:30px;line-height:1.3;font-variant-numeric:tabular-nums}.control{margin:18px 0}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:600}.control output{font-variant-numeric:tabular-nums}input[type=range]{width:100%;min-height:44px;accent-color:var(--accent);cursor:pointer}select,button{font:inherit;min-height:44px;border:1px solid var(--muted);border-radius:3px;padding:9px 12px;background:var(--paper);color:var(--ink)}select{width:100%;cursor:pointer}fieldset{border:0;padding:0;margin:22px 0 16px}legend{padding:0;margin-bottom:10px}button{cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px}.primary{border-color:var(--ink);background:var(--ink);color:var(--paper)}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.result{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.result p:last-child{margin-bottom:0}.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;overflow-wrap:anywhere}.boundary{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}.boundary h2{font-size:16px}footer{margin-top:30px;font-size:14px;color:var(--muted)}[hidden]{display:none!important}@media(max-width:760px){main{padding:24px 16px 36px}.workspace{grid-template-columns:1fr}.panel{padding:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{body{background:white}main{max-width:none;padding:0}.workspace{display:block}.panel{margin:16px 0;break-inside:avoid}input,select,button{display:none}.draft{margin-top:0}.result[hidden]{display:block!important}.result[hidden]::after{content:"Der Durchsatz wurde in dieser Ansicht noch nicht aufgedeckt."}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">Socratic Workshop / Entwurf 03</div><div class="draft">Demo-Entwurf · wartet auf Noas Review</div><h1>Welche Station setzt die Grenze?</h1><p class="lead">Drei Stationen bearbeiten dasselbe Produkt nacheinander. Verändere ihre Kapazitäten und sage voraus, wie viele fertige Stücke pro Stunde die ganze Kette höchstens schafft.</p></header>
+<div class="workspace">
+<section class="panel" aria-labelledby="model-heading"><p class="step">01 · Kapazität ist noch kein Durchsatz</p><h2 id="model-heading">A → B → C</h2><p class="note">Die Balken verwenden dieselbe Skala von 0 bis 100 Stück pro Stunde. Ein Produkt muss durch alle drei Stationen.</p><ol class="pipeline" aria-label="Bearbeitungsstationen in ihrer Reihenfolge"><li id="station-a" class="station"><div class="station-head"><span class="station-name">A · Vorbereiten</span><span class="capacity"><span id="capacity-a">60</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-a" class="bar" style="width:60%"></div></div><span id="bottleneck-a" class="bottleneck-label" hidden>Engpass</span></li><li id="station-b" class="station"><div class="station-head"><span class="station-name">B · Bearbeiten</span><span class="capacity"><span id="capacity-b">40</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-b" class="bar" style="width:40%"></div></div><span id="bottleneck-b" class="bottleneck-label" hidden>Engpass</span></li><li id="station-c" class="station"><div class="station-head"><span class="station-name">C · Verpacken</span><span class="capacity"><span id="capacity-c">80</span> <span class="unit">Stück/h</span></span></div><div class="track" aria-hidden="true"><div id="bar-c" class="bar" style="width:80%"></div></div><span id="bottleneck-c" class="bottleneck-label" hidden>Engpass</span></li></ol><div class="output"><span class="note">Maximaler Durchsatz der Kette</span><strong id="throughput">Noch nicht aufgedeckt</strong><span id="throughput-note" class="note">Triff rechts zuerst eine Vorhersage.</span></div><p class="note" style="margin-top:18px">Vergleiche nach dem Aufdecken eine Kapazitätsänderung mit deiner letzten Rechnung. So wird sichtbar, wann ein anderer Engpass übernimmt.</p></section>
+<section class="panel" aria-labelledby="prediction-heading"><p class="step">02 · Vorhersagen, dann aufdecken</p><h2 id="prediction-heading">Wie viel kommt am Ende heraus?</h2><div class="control"><label for="a">Kapazität A <output id="output-a" for="a">60 Stück/h</output></label><input id="a" type="range" min="10" max="100" step="10" value="60"></div><div class="control"><label for="b">Kapazität B <output id="output-b" for="b">40 Stück/h</output></label><input id="b" type="range" min="10" max="100" step="10" value="40"></div><div class="control"><label for="c">Kapazität C <output id="output-c" for="c">80 Stück/h</output></label><input id="c" type="range" min="10" max="100" step="10" value="80"></div><p class="note">Änderst du eine Kapazität, wird die Antwort wieder verdeckt.</p><fieldset><legend>Deine Vorhersage für die ganze Kette</legend><label for="prediction" class="note">Fertige Stücke pro Stunde</label><select id="prediction"><option value="">Bitte wählen</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option><option>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>180</option></select></fieldset><div class="actions"><button id="reveal" class="primary" disabled>Durchsatz aufdecken</button><button id="reset">Zurücksetzen</button></div><p id="instruction" class="note" style="margin-top:12px">Wähle einen Wert, um deine Vorhersage zu prüfen.</p><div id="result" class="result" hidden aria-live="polite" aria-atomic="true"><p id="verdict"></p><p id="equation" class="equation"></p><p id="explanation"></p><p id="comparison"></p></div><noscript><p>Für die Regler ist JavaScript nötig. Mit A = 60, B = 40 und C = 80 Stück/h begrenzt B die ganze Kette auf 40 Stück/h. Eine Erhöhung von A allein ändert diesen maximalen Durchsatz nicht.</p></noscript></section>
+</div>
+<section class="boundary" aria-labelledby="boundary-heading"><h2 id="boundary-heading">Wo das Modell endet</h2><p>Dies ist ein vereinfachtes, deterministisches Modell im eingeschwungenen Zustand. Material, Nachfrage und Zwischenpuffer reichen aus; jede Station arbeitet zuverlässig, ohne Ausschuss, Rüstzeiten oder Unterbrechungen. Das Modell zeigt weder Anlaufzeit noch Warteschlangen oder die Durchlaufzeit eines einzelnen Stücks.</p><p class="note">Zum Weiterdenken: Ändere zunächst genau eine Stationskapazität. Was bleibt gleich, was ändert sich? Begründe deine Beobachtung und suche dann eine Änderung, bei der eine andere Station die Grenze setzt.</p></section>
+<footer>Entwurf, keine aufgezeichnete Lernsitzung und kein Nachweis für Lernerfolg. <a href="gradient-descent.html">Zum Gradientenabstieg</a> · <a href="german-word-order.html">Zum Satzbau</a></footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const stations = ['a','b','c'];
+let previousReveal = null;
+function capacities(){return stations.map(id => Number($(id).value));}
+function freshPrediction(){
+  stations.forEach(id => {
+    const value = Number($(id).value);
+    $(`capacity-${id}`).textContent = value;
+    $(`output-${id}`).textContent = `${value} Stück/h`;
+    $(`bar-${id}`).style.width = `${value}%`;
+    $(`station-${id}`).classList.remove('bottleneck');
+    $(`bottleneck-${id}`).hidden = true;
+  });
+  $('throughput').textContent = 'Noch nicht aufgedeckt';
+  $('throughput-note').textContent = 'Triff rechts zuerst eine Vorhersage.';
+  $('result').hidden = true;
+  $('prediction').value = '';
+  $('prediction').disabled = false;
+  $('reveal').disabled = true;
+  $('instruction').textContent = 'Wähle einen Wert, um deine Vorhersage zu prüfen.';
+}
+function comparison(throughput){
+  if (!previousReveal) return 'Als Nächstes: Ändere genau eine Kapazität und vergleiche den neuen Durchsatz.';
+  const before = previousReveal.values.map((value,i) => `${stations[i].toUpperCase()} ${value}`).join(', ');
+  return `Vorher: ${before} Stück/h, Durchsatz ${previousReveal.throughput} Stück/h. Jetzt: ${throughput} Stück/h. Änderung des Durchsatzes: ${throughput - previousReveal.throughput} Stück/h.`;
+}
+function reveal(){
+  if (!$('prediction').value) return;
+  const values = capacities();
+  const throughput = Math.min(...values);
+  const bottlenecks = stations.filter((id,i) => values[i] === throughput);
+  bottlenecks.forEach(id => {$(`station-${id}`).classList.add('bottleneck'); $(`bottleneck-${id}`).hidden = false;});
+  $('throughput').textContent = `${throughput} Stück/h`;
+  $('throughput-note').textContent = `Begrenzt durch ${bottlenecks.map(id => id.toUpperCase()).join(' und ')}.`;
+  $('verdict').textContent = Number($('prediction').value) === throughput ? 'Deine Vorhersage stimmt.' : `Deine Vorhersage war ${$('prediction').value} Stück/h. Die Kette schafft in diesem Modell ${throughput} Stück/h.`;
+  $('equation').textContent = `Durchsatz = min(${values.join(', ')}) = ${throughput} Stück/h`;
+  $('explanation').textContent = bottlenecks.length === 1 ? `Station ${bottlenecks[0].toUpperCase()} begrenzt den Durchsatz. Höhere Kapazität an einer anderen Station allein kann diese Grenze nicht anheben.` : `Die Stationen ${bottlenecks.map(id => id.toUpperCase()).join(' und ')} begrenzen gemeinsam den Durchsatz. Wird nur eine davon schneller, bleibt mindestens eine andere an der bisherigen Grenze.`;
+  $('comparison').textContent = comparison(throughput);
+  previousReveal = {values,throughput};
+  $('result').hidden = false;
+  $('prediction').disabled = true;
+  $('reveal').disabled = true;
+  $('instruction').textContent = 'Ändere jetzt eine Kapazität und sage den neuen Durchsatz voraus.';
+}
+stations.forEach(id => $(id).addEventListener('input',freshPrediction));
+$('prediction').addEventListener('change',() => {$('reveal').disabled = !$('prediction').value;});
+$('reveal').addEventListener('click',reveal);
+$('reset').addEventListener('click',() => {stations.forEach((id,i) => {$(id).value = [60,40,80][i];}); previousReveal = null; freshPrediction();});
+freshPrediction();
+</script>
+</body>
+</html>
