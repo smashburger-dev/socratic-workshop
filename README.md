@@ -18,7 +18,7 @@ Install with the [skills CLI](https://github.com/vercel-labs/skills), then choos
 npx skills add smashburger-dev/socratic-workshop
 ```
 
-Add `-g` to install for your user instead of one project. While the repository is private, installation requires GitHub access.
+Add `-g` to install for your user instead of one project.
 
 | Agent | Start learning |
 | --- | --- |
