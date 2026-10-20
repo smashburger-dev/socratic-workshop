@@ -1,5 +1,7 @@
 # Socratic Workshop
 
+By [Noa Katana](https://noakatana.com/work/socratic-workshop/), creative technologist in Munich.
+
 Learn an idea by explaining it to your AI tutor.
 
 The tutor asks one question at a time and gives a small hint when you get stuck. You work through the gap and explain it again. Bring your own book, course, paper, or codebase.
