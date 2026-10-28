@@ -30,6 +30,8 @@ The bundled [portable adapter](workbench.md) credits its Argmin source and recor
 
 The owner also identified [Anatomy by wheresryan22](https://github.com/wheresryan22/anatomy) as visual inspiration. Its upstream repository and MIT license were checked on 17 October 2026. This version credits the approach without bundling Anatomy code or making it a dependency.
 
+The exploded-view mode was inspired by Jakub Krehel's [/teardown skill](https://github.com/jakubkrehel/skills/tree/main/skills/teardown) ([announcement](https://x.com/jakubkrehel/status/2114379959263502712), 25 October 2026; repository MIT-licensed, checked 28 October 2026). His skill draws exportable technical illustrations of an object's parts. This mode is an independent implementation with a different goal: a learner walks an assembly in 3D (L-curve camera, turn and tilt, part popovers with real specifications). No code from his repository is bundled.
+
 ## Packaging
 
 The folder layout and frontmatter follow the [Agent Skills specification](https://agentskills.io/specification), consulted on 17 October 2026. Product-specific UI metadata is kept in `agents/openai.yaml`; the learning workflow does not depend on it.

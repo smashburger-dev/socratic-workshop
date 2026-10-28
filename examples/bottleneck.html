@@ -30,13 +30,12 @@
   --coral-lch:0.62 0.18 35;
   --amber:oklch(var(--amber-lch));
   --coral:oklch(var(--coral-lch));
+  --intro-a:oklch(0.55 0.15 60);
+  --intro-b:oklch(0.52 0.17 35);
   --select-bg:linear-gradient(90deg in oklab,oklch(var(--amber-lch) / .15),oklch(var(--coral-lch) / .06));
   --select-edge:oklch(var(--amber-lch) / .30);
   --slider-fill:linear-gradient(90deg in oklab,rgba(var(--text-rgb),.16),rgba(var(--text-rgb),.05));
-  --ground-top:oklch(0.935 0 0);--dot:oklch(0.885 0 0);
   --ground-bottom:oklch(0.905 0.035 68);
-  --dots-top:oklch(0.885 0 0);
-  --dots-bottom:oklch(0.855 0.038 68);
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   --font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   --mono:"Geist Mono",ui-monospace,SFMono-Regular,monospace;
@@ -54,10 +53,9 @@
   --sep-soft:rgba(255,255,255,.10);
   --amber-lch:0.80 0.13 70;
   --coral-lch:0.70 0.15 35;
-  --ground-top:oklch(0.205 0 0);--dot:oklch(0.255 0 0);
   --ground-bottom:oklch(0.285 0.040 55);
-  --dots-top:oklch(0.255 0 0);
-  --dots-bottom:oklch(0.335 0.045 55);
+  --intro-a:var(--amber);
+  --intro-b:var(--coral);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
@@ -72,10 +70,9 @@
   --sep-soft:rgba(255,255,255,.10);
   --amber-lch:0.80 0.13 70;
   --coral-lch:0.70 0.15 35;
-  --ground-top:oklch(0.205 0 0);--dot:oklch(0.255 0 0);
   --ground-bottom:oklch(0.285 0.040 55);
-  --dots-top:oklch(0.255 0 0);
-  --dots-bottom:oklch(0.335 0.045 55);
+  --intro-a:var(--amber);
+  --intro-b:var(--coral);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -90,29 +87,18 @@ body{
   font:17px/22px var(--font);
   isolation:isolate;
 }
-body::before,body::after,.ground-dots{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none}
 body::before{background:var(--work)}
-.ground-dots{
-  background:var(--dot);
-  -webkit-mask-image:radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
-  mask-image:radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
-  -webkit-mask-size:24px 24px;mask-size:24px 24px;
-}
-body::after{
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23cb8d7d%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23be9383%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23ba929c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23da8661%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23d68293%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23c98e7d%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23c68f82%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23c6935c%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23cf8982%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23c88a9a%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23bd947f%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23d0897e%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23db8465%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23b9958f%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23c09285%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23d88384%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23d48a63%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23b99686%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23c09190%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23ce8c76%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23cb889b%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23bb957d%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23c28f91%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23cc8d6f%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23dc8372%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23c68f7f%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23b6987e%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23cd879b%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d68960%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c58d95%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23b6997a%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d48683%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d28972%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c88b96%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c58f87%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23c98f6e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23df8073%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23bb957d%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23c98d81%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23d78764%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23d68294%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23bd9386%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23c09475%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23d8847b%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23c6916e%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23b79592%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23b09a82%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23ce8985%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23da8661%22/%3E%3C/svg%3E");background-size:168px 168px;
-  -webkit-mask-image:linear-gradient(to top,#000 0%,#000 6%,transparent 45%),radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
-  mask-image:linear-gradient(to top,#000 0%,#000 6%,transparent 45%),radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
-  -webkit-mask-size:auto,24px 24px;mask-size:auto,24px 24px;
-  -webkit-mask-composite:source-in;mask-composite:intersect;
-}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237d5950%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23715f58%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%236e5e62%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%238b5239%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%2387515c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237b5a51%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23785b54%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237c5c3a%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23815652%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237b5861%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23715f55%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23825650%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%238c513c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%236b605e%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725e58%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23895152%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2386563c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%236d605b%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725d5d%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2380584b%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%237e5661%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23755c5d%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%237f5947%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%238d5045%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23795b53%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%236c6157%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23805561%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23885539%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23785a5e%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%236d6154%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23865352%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23845647%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%237a595f%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23775c57%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237d5a47%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23904e45%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237b5a53%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2389543c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2388505c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f59%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23745e4e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2389524c%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%237a5c47%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23696160%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2368625c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23805754%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%238c5239%22/%3E%3C/svg%3E")}}
-:root[data-theme="dark"] body::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237d5950%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23715f58%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%236e5e62%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%238b5239%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%2387515c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237b5a51%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23785b54%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237c5c3a%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23815652%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237b5861%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23715f55%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23825650%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%238c513c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%236b605e%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725e58%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23895152%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2386563c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%236d605b%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725d5d%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2380584b%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%237e5661%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23755c5d%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%237f5947%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%238d5045%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23795b53%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%236c6157%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23805561%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23885539%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23785a5e%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%236d6154%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23865352%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23845647%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%237a595f%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23775c57%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237d5a47%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23904e45%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237b5a53%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2389543c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2388505c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f59%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23745e4e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2389524c%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%237a5c47%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23696160%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2368625c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23805754%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%238c5239%22/%3E%3C/svg%3E")}
+
+
+
+
 .stage-header{
   grid-column:1;grid-row:1;position:relative;
   padding:24px 32px 0 32px;
 }
 .stage-header h1{font-size:30px;line-height:36px;font-weight:600;letter-spacing:-.02em;color:rgba(var(--text-rgb),var(--t-strong));margin:0;text-wrap:balance}
-.stage-header .intro{margin:4px 0 0;max-width:65ch;font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-body))}
+.stage-header .intro{margin:4px 0 0;width:fit-content;max-width:65ch;font-size:15px;line-height:20px;font-weight:500;background:linear-gradient(90deg in oklab,var(--intro-a),var(--intro-b));-webkit-background-clip:text;background-clip:text;color:transparent}
 .stage-header .theme-toggle{
   position:absolute;top:20px;right:32px;overflow:hidden;
   display:inline-flex;align-items:center;gap:8px;
@@ -325,7 +311,7 @@ input[type="range"]::-moz-range-thumb{width:3px;height:36px;border:none;border-r
   :root,:root[data-theme="dark"]{color-scheme:light;--work:#fff;--glass:#fff;--edge:#ddd;--text-rgb:22,22,22;--field:#f5f5f5;--field-edge:#ddd;--inset:#f7f7f7;--sep-strong:#bbb;--sep-soft:#ddd}
   *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   body{display:block;background:#fff}
-  body::before,body::after,.ground-dots{display:none!important}
+  body::before{display:none!important}
   .theme-toggle,.playback button,input{display:none}
   .stage-header,.figure-area{padding:0}
   .pillar{width:auto;margin:16px 0;overflow:visible}
@@ -405,7 +391,7 @@ input[type="range"]::-moz-range-thumb{width:3px;height:36px;border:none;border-r
 </style>
 </head>
 <body>
-<div class="ground-dots" aria-hidden="true"></div>
+
 <header class="stage-header">
   <div><h1>What sets the pace?</h1><p class="intro"></p></div>
   <button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button>

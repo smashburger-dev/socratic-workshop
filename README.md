@@ -62,14 +62,14 @@ An illustrative conversation about a Gaussian prior and L2 regularization, rende
 Ask how something is assembled, and the tutor can build an exploded view:
 
 ```text
-/socratic-workshop How is a mechanical key switch built? Show me the parts, then let me explain how a keypress registers.
+/socratic-workshop How is the new MacBook Pro built? Show me the parts, then let me explain why its screen can sense touch.
 ```
 
-![Exploded view of a mechanical key switch: descend from above to eye level and open a part.](media/keyboard-switch.gif)
+![Exploded view of the MacBook Pro with PROLED XDR Display: open the panel to read how Touch is built in.](media/macbook-pro.gif)
 
-Scroll to descend from a bird's-eye view to eye level, drag to turn and tilt, and click a part to read its job and its real dimensions. Up and Down walk the parts in assembly order. Parts can separate vertically, horizontally, radially, or each in its own direction.
+Scroll to descend from a bird's-eye view to eye level, drag to turn and tilt, and click a part to read its job and its real specifications. Up and Down walk the parts in assembly order. When you stop, the object keeps turning slowly from wherever you left it. Parts can separate vertically, horizontally, radially, or each in its own direction. Export saves the current view as a print-ready PNG or SVG with part labels.
 
-[Key switch](examples/keyboard-switch.html) (vertical) · [Battery cell](examples/battery-cell.html) · [Flashlight](examples/flashlight.html) · [Click pen](examples/click-pen.html) (horizontal)
+[MacBook Pro](examples/macbook-pro.html) · [Key switch](examples/keyboard-switch.html) (vertical) · [Limo door](examples/limo-door.html) · [Flashlight](examples/flashlight.html) · [Studio Display XDR](examples/studio-display-xdr.html) (horizontal)
 
 These GIFs are rendered previews of the example models. The illustrative prompt above was written for this demo.
 
@@ -86,7 +86,7 @@ Use this skill as a starting point. Adjust the visual style, change how hints wo
 ## Credits
 
 - [Miles Cranmer's talk](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), shared by MPhil in Data Intensive Science Cambridge, inspired the learning workflow.
-- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach and the exploded views, adapted from my Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin). The exploded-view kit is an independent implementation.
+- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach and the exploded views, adapted from my Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin). The exploded views and their PNG/SVG export are inspired by Jakub Krehel's [/teardown skill](https://github.com/jakubkrehel/skills/tree/main/skills/teardown); the kit here is an independent implementation.
 - The frosted-glass visual language comes from my chiasma design system, with material and legibility guidance from Apple's [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/materials).
 - [Source notes](references/sources.md) separate the talk's ideas from this skill's additions.
 

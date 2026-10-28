@@ -112,7 +112,7 @@ function box(w, h, d) {
 }
 /* Rounded box: prism whose xz cross-section is a rounded rectangle (vertical
    edges rounded, flat caps). */
-function roundedBox(w, h, d, r, seg) {
+function roundedBox(w, h, d, r, seg = 6) {
   const hx = w / 2 - r, hz = d / 2 - r;
   const outline = [];
   const corners = [
@@ -145,7 +145,16 @@ function roundedBox(w, h, d, r, seg) {
   return { pos, nrm, idx };
 }
 /* Solid truncated cone, base r1 at -h/2, top r2 at +h/2. */
-function frustum(r1, r2, h, seg) {
+function shell(r1, r2, h, seg, wall) {
+  const f = frustum(r1, r2, h, seg);
+  const base = f.pos.length / 3;
+  const s2 = frustum(Math.max(0.1, r1 - wall), Math.max(0.1, r2 - wall), h, seg);
+  f.pos.push(...s2.pos); f.nrm.push(...s2.nrm.map(v => -v));
+  const keep = s2.idx.slice(0, seg * 6).map(i => i + base);
+  for (let i = 0; i < keep.length; i += 3) f.idx.push(keep[i], keep[i + 2], keep[i + 1]);
+  return f;
+}
+function frustum(r1, r2, h, seg = 32) {
   const pos = [], nrm = [], idx = [];
   const slope = (r1 - r2) / h;
   for (let i = 0; i <= seg; i++) {
@@ -168,13 +177,13 @@ function frustum(r1, r2, h, seg) {
       nrm.push(0, ny, 0);
     }
     for (let i = 0; i < seg; i++) {
-      if (ny > 0) idx.push(centre, centre + 1 + i + 1, centre + 1 + i);
-      else idx.push(centre, centre + 1 + i, centre + 1 + i + 1);
+      if (ny > 0) idx.push(centre, centre + 1 + i, centre + 1 + i + 1);
+      else idx.push(centre, centre + 1 + i + 1, centre + 1 + i);
     }
   }
   return { pos, nrm, idx };
 }
-function cylinder(r, h, seg) { return frustum(r, r, h, seg); }
+function cylinder(r, h, seg = 32) { return frustum(r, r, h, seg); }
 /* Hollow wall: outer wall, inner wall, two annuli. */
 function ring(rOut, rIn, h, seg) {
   const pos = [], nrm = [], idx = [];
@@ -195,8 +204,8 @@ function ring(rOut, rIn, h, seg) {
     const b = i * 8, n = (i + 1) * 8;
     idx.push(b, n, n + 1, b, n + 1, b + 1);                 // outer
     idx.push(b + 2, b + 3, n + 3, b + 2, n + 3, n + 2);     // inner
-    idx.push(b + 4, n + 4, n + 5, b + 4, n + 5, b + 5);     // top annulus
-    idx.push(b + 6, b + 7, n + 7, b + 6, n + 7, n + 6);     // bottom annulus
+    idx.push(b + 4, n + 5, n + 4, b + 4, b + 5, n + 5);     // top annulus
+    idx.push(b + 6, n + 7, b + 7, b + 6, n + 6, n + 7);     // bottom annulus
   }
   return { pos, nrm, idx };
 }
@@ -225,6 +234,76 @@ function helix(radius, wire, turns, height, segPerTurn = 14, sides = 7) {
   return { pos, nrm, idx };
 }
 /* Convex 2D polygon (points [[x,z],…] CCW seen from +y) extruded in y, centred. */
+function earclip(P) {
+  const ids = [...P.keys()];
+  let s = 0;
+  for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length]; s += a[0] * b[1] - b[0] * a[1]; }
+  if (s < 0) ids.reverse();
+  const cross = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  const tri = [];
+  let guard = P.length * P.length * 4;
+  while (ids.length > 3 && guard-- > 0) {
+    let found = false;
+    for (let i = 0; i < ids.length; i++) {
+      const i0 = ids[(i - 1 + ids.length) % ids.length], i1 = ids[i], i2 = ids[(i + 1) % ids.length];
+      const a = P[i0], b = P[i1], c = P[i2];
+      if (cross(a, b, c) <= 1e-9) continue;
+      let inside = false;
+      for (const j of ids) {
+        if (j === i0 || j === i1 || j === i2) continue;
+        const p = P[j];
+        if (cross(a, b, p) >= -1e-9 && cross(b, c, p) >= -1e-9 && cross(c, a, p) >= -1e-9) { inside = true; break; }
+      }
+      if (inside) continue;
+      tri.push(i0, i1, i2); ids.splice(i, 1); found = true; break;
+    }
+    if (!found) break;
+  }
+  if (ids.length === 3) tri.push(ids[0], ids[1], ids[2]);
+  return tri;
+}
+/* Simple (possibly non-convex) polygon in the local (z, y) plane, extruded
+   along x by h. Closed solid, outward normals, winding checked per face. */
+function extrudePolygon(points, h) {
+  const pos = [], nrm = [], idx = [];
+  const x0 = -h / 2, x1 = h / 2;
+  const n = points.length;
+  const cz = points.reduce((s, p) => s + p[0], 0) / n;
+  const cy = points.reduce((s, p) => s + p[1], 0) / n;
+  const pushTri = (a, b, c, want) => {
+    const base = pos.length / 3;
+    const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+    let nx = u[1] * v[2] - u[2] * v[1], ny = u[2] * v[0] - u[0] * v[2], nz = u[0] * v[1] - u[1] * v[0];
+    const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
+    if (nx * want[0] + ny * want[1] + nz * want[2] < 0) pos.push(...a, ...c, ...b);
+    else pos.push(...a, ...b, ...c);
+    for (let k = 0; k < 3; k++) nrm.push(nx, ny, nz);
+    idx.push(base, base + 1, base + 2);
+  };
+  // walls
+  for (let i = 0; i < n; i++) {
+    const [z1, y1] = points[i], [z2, y2] = points[(i + 1) % n];
+    const base = pos.length / 3;
+    const my = (y1 + y2) / 2 - cy, mz = (z1 + z2) / 2 - cz;
+    let nx = y2 - y1, ny = 0, nz = -(z2 - z1); // face zy-tangent x +x
+    // geometric normal of quad (v0=x0v1, v1=x0v2, v2=x1v2): cross((0,dy,dz),(h,0,0)) = (0, dy*0-dz*0... compute directly
+    const u = [0, y2 - y1, z2 - z1], v = [x1 - x0, 0, 0];
+    nx = u[1] * v[2] - u[2] * v[1]; ny = u[2] * v[0] - u[0] * v[2]; nz = u[0] * v[1] - u[1] * v[0];
+    const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
+    const flip = nx * 0 + ny * my + nz * mz < 0;
+    if (flip) pos.push(x0, y1, z1, x0, y2, z2, x1, y2, z2, x1, y1, z1), nrm.push(-nx, -ny, -nz, -nx, -ny, -nz, -nx, -ny, -nz, -nx, -ny, -nz);
+    else pos.push(x1, y1, z1, x1, y2, z2, x0, y2, z2, x0, y1, z1), nrm.push(nx, ny, nz, nx, ny, nz, nx, ny, nz, nx, ny, nz);
+    idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+  }
+  // caps
+  const tris = earclip(points);
+  for (let t = 0; t < tris.length; t += 3) {
+    const [a, b, c] = [points[tris[t]], points[tris[t + 1]], points[tris[t + 2]]];
+    pushTri([x1, a[1], a[0]], [x1, b[1], b[0]], [x1, c[1], c[0]], [1, 0, 0]);
+    pushTri([x0, a[1], a[0]], [x0, b[1], b[0]], [x0, c[1], c[0]], [-1, 0, 0]);
+  }
+  return { pos, nrm, idx };
+}
 function extrudeConvex(points, h) {
   const n = points.length;
   const pos = [], nrm = [], idx = [];
@@ -274,7 +353,7 @@ function creaseEdges(g){
   return out;
 }
 
-const GEOM = { box, roundedBox, cylinder, frustum, ring, helix, extrudeConvex, custom };
+const GEOM = { box, roundedBox, cylinder, frustum, shell, ring, helix, extrudeConvex, extrudePolygon, custom };
 
 /* ---------------- materials ---------------- */
 
@@ -321,6 +400,9 @@ function mount(root, config) {
     '<button type="button" role="radio" aria-checked="true" data-e="1">Exploded</button></div>' +
     '<button type="button" data-view="above">Above</button>' +
     '<button type="button" data-view="eye">Eye level</button>' +
+    '<button type="button" class="td-icon" data-view="export" aria-label="Export" data-tip="Export">' +
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11"/><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/><path d="M4 20h16"/></svg>' +
+    '<span class="td-tip" role="tooltip">Export</span></button>' +
     '<button type="button" class="td-icon" data-view="reset" aria-label="Reset view" data-tip="Reset view">' +
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/></svg>' +
     '<span class="td-tip" role="tooltip">Reset view</span></button>' +
@@ -354,6 +436,7 @@ function mount(root, config) {
 
   function bakePart(part) {
     const pos = [], nrm = [], idx = [], decal = [], edge = [];
+    const altGroups = new Map();
     let yMin = Infinity, yMax = -Infinity;
     const bMin = [Infinity, Infinity, Infinity], bMax = [-Infinity, -Infinity, -Infinity];
     for (const prim of part.prims) {
@@ -369,13 +452,22 @@ function mount(root, config) {
         for (let k = 0; k < 3; k++) { bMin[k] = Math.min(bMin[k], q[k]); bMax[k] = Math.max(bMax[k], q[k]); }
         yMin = Math.min(yMin, q[1]); yMax = Math.max(yMax, q[1]);
       }
-      prim.g.idx.forEach(ix => (prim.decal ? decal : idx).push(ix + base));
+      prim.g.idx.forEach(ix => {
+        if (prim.decal) decal.push(ix + base);
+        else if (prim.material === undefined) idx.push(ix + base);
+        else {
+          const k = JSON.stringify(prim.material);
+          if (!altGroups.has(k)) altGroups.set(k, { mat: prim.material, idx: [] });
+          altGroups.get(k).idx.push(ix + base);
+        }
+      });
       const eg = creaseEdges(prim.g);
       if(prim.lines) eg.push(...prim.lines);
       for(let i = 0; i < eg.length; i += 3) edge.push(...xformPoint(m, [eg[i], eg[i+1], eg[i+2]]));
     }
     part.edges = new Float32Array(edge);
     part.decal = new Uint32Array(decal);
+    part.altGroups = [...altGroups.values()].map(g => ({ mat: g.mat, idx: new Uint32Array(g.idx) }));
     part.localCentre = [(bMin[0] + bMax[0]) / 2, (bMin[1] + bMax[1]) / 2, (bMin[2] + bMax[2]) / 2];
     part.localMin = bMin; part.localMax = bMax;
     part.y0 = yMin; part.y1 = Math.max(yMax, yMin + 0.001);
@@ -401,12 +493,21 @@ function mount(root, config) {
   const P1 = (A + 1) % 3 === 1 ? 0 : (A === 0 ? 1 : 0), P2 = A === 0 ? 2 : 2;
   const Pq1 = A === 1 ? 0 : 1, Pq2 = 2;
   const foot = p => Math.max(p.localMax[Pq1] - p.localMin[Pq1], p.localMax[Pq2] - p.localMin[Pq2]);
+  /* plates (thin along A) separate by 0.2 x their smaller face side, so a
+     stack of large panels does not stretch into a corridor */
+  const face = p => Math.min(p.localMax[Pq1] - p.localMin[Pq1], p.localMax[Pq2] - p.localMin[Pq2]);
+  const isPlate = p => (p.localMax[A] - p.localMin[A]) < 0.25 * face(p);
+  const plateMajority = parts.filter(isPlate).length > parts.length / 2;
+  const gapOf = (p, q) => {
+    const pl = [p, q].filter(isPlate);
+    return plateMajority && pl.length ? 0.2 * Math.min(...pl.map(face)) : 0.6 * Math.max(foot(p), foot(q));
+  };
   {
     let cursor = parts[0].at[A];
     parts[0].explodeOffset = [0, 0, 0];
     for (let i = 1; i < parts.length; i++) {
       const prev = parts[i - 1], cur = parts[i];
-      const gap = 0.6 * Math.max(foot(prev), foot(cur));
+      const gap = gapOf(prev, cur);
       cursor = cursor + (prev.localMax[A] - prev.localMin[A]) * 0 + (cursor === parts[i-1].at[A] ? 0 : 0);
       /* pos_{i+1} = pos_i + (part_i.max - part_{i+1}.min) + gap, all along A */
       const posPrev = cursor;
@@ -448,8 +549,18 @@ function mount(root, config) {
   });
   const c = [(eMin[0] + eMax[0]) / 2, (eMin[1] + eMax[1]) / 2, (eMin[2] + eMax[2]) / 2];
   const dims = [eMax[0]-eMin[0], eMax[1]-eMin[1], eMax[2]-eMin[2]].sort((a,b)=>a-b);
-  const longRow = axis === 'horizontal' && dims[2] > 2 * Math.max(dims[0], dims[1]);
-  const DEFAULT_YAW = (longRow ? -15 : -35) * Math.PI / 180;
+  /* plate stack: parts thin along the explode axis (extent < 0.25 x smallest
+     other extent); when most parts are plates the stack opens at 45 degrees
+     and fits the swept envelope like a compact object */
+  const plateAxis = axis === 'horizontal' ? 0 : 1;
+  const plateCount = parts.filter(p => {
+    const e = [p.localMax[0]-p.localMin[0], p.localMax[1]-p.localMin[1], p.localMax[2]-p.localMin[2]];
+    const others = [0,1,2].filter(k => k !== plateAxis).map(k => e[k]);
+    return e[plateAxis] < 0.25 * Math.min(...others);
+  }).length;
+  const plateStack = plateCount > parts.length / 2;
+  const longRow = axis === 'horizontal' && !plateStack && dims[2] > 2 * Math.max(dims[0], dims[1]);
+  const DEFAULT_YAW = (plateStack ? 45 : longRow ? -15 : -35) * Math.PI / 180;
   const TAnim = c.slice();
   let focusT0 = 0, focusFrom = [0, 0, 0, 0];
   let R = 0;
@@ -501,7 +612,7 @@ function mount(root, config) {
           else { r = +hm[1]; g = +hm[2]; b = +hm[3]; }
           const f = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
           Y = 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
-          theme.groundL = Math.max(0, Math.min(1, Math.cbrt(Y) * 1.227 - 0.138));
+          theme.groundL = Math.cbrt(Y); /* OKLab L of a neutral grey is the cube root of its luminance */
         } else theme.groundL = theme.dark ? 0.2 : 0.93;
       }
     }
@@ -534,8 +645,10 @@ function mount(root, config) {
   out vec4 o;
   vec3 srgb(vec3 c){ return mix(12.92*c, 1.055*pow(c,vec3(1./2.4))-0.055, step(0.0031308,c)); }
   void main(){
-    vec3 n = normalize(vN);
     vec3 v = normalize(uCam - vW);
+    /* double-sided: every face is drawn and lit from the side the camera sees,
+       so a flipped triangle can never open a hole in a part */
+    vec3 n = normalize(vN); if(dot(n,v) < 0.) n = -n;
     vec3 albedo = uMode==2 ? mix(uCoral,uAmber,clamp((vY-uY0)/(uY1-uY0),0.,1.)) : uAlbedo;
     if(uMode==1) albedo *= 0.70;
     float dif = max(dot(n,uLightDir),0.);
@@ -612,10 +725,16 @@ function mount(root, config) {
       const dbo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, dbo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, p.decal, gl.STATIC_DRAW);
-      p.gl = { vbo, nbo, ibo, ebo, dbo, count: p.mesh.idx.length, dcount: p.decal.length, ecount: p.edges.length/3 };
+      const alts = (p.altGroups || []).map(g => {
+        const abo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, abo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, g.idx, gl.STATIC_DRAW);
+        return { abo, count: g.idx.length, mat: g.mat };
+      });
+      p.gl = { vbo, nbo, ibo, ebo, dbo, count: p.mesh.idx.length, dcount: p.decal.length, ecount: p.edges.length/3, alts };
     });
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
+    gl.disable(gl.CULL_FACE);
   }
 
   const shadowGeom = { x: aC[0], y: aMin[1] - 0.6, z: aC[2], r: Math.max(aSize[0], aSize[2]) * 0.75 };
@@ -633,7 +752,7 @@ function mount(root, config) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     pickDepth = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, pickDepth);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, w, h);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, w, h);
     pickFbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, pickFbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTex, 0);
@@ -673,6 +792,22 @@ function mount(root, config) {
       } else gl.disableVertexAttribArray(1);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, p.gl.ibo);
       gl.drawElements(gl.TRIANGLES, p.gl.count, gl.UNSIGNED_INT, 0);
+      for(const alt of (p.gl.alts || [])){
+        if(!idPass){
+          const am = typeof alt.mat === 'object' ? alt.mat : (MATERIALS[alt.mat] || MATERIALS.darkPlastic);
+          const amL = theme.dark ? 0.38 + (am.L - 0.30) * 0.93 : 0.22 + (am.L - 0.30) * 0.97;
+          gl.uniform3fv(uni.uAlbedo.p, oklabNeutralLinear(amL + (i === state.hoverPart ? 0.06 : 0)));
+          gl.uniform1f(uni.uSpec.p, am.spec);
+        }
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, alt.abo);
+        gl.drawElements(gl.TRIANGLES, alt.count, gl.UNSIGNED_INT, 0);
+        if(!idPass && p.gl.alts.length){
+          const m0 = typeof p.material === 'object' ? p.material : (MATERIALS[p.material] || MATERIALS.darkPlastic);
+          const m0L = theme.dark ? 0.38 + (m0.L - 0.30) * 0.93 : 0.22 + (m0.L - 0.30) * 0.97;
+          gl.uniform3fv(uni.uAlbedo.p, oklabNeutralLinear(m0L + (i === state.hoverPart ? 0.06 : 0)));
+          gl.uniform1f(uni.uSpec.p, m0.spec);
+        }
+      }
       if(p.gl.dcount){
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, p.gl.dbo);
         if(!idPass){ gl.polygonOffset(-1, -1); }
@@ -694,7 +829,9 @@ function mount(root, config) {
   vec3 srgb(vec3 c){ return mix(12.92*c, 1.055*pow(c,vec3(1./2.4))-0.055, step(0.0031308,c)); }
   void main(){ float a=uC.a*vA; o=vec4(srgb(uC.rgb)*a, a); }`;
   const floorProg = program(FLOOR_V, FLOOR_F);
-  let floorVBO = null, floorCount = 0, floorRX = 1, floorRZ = 1, floorR = 1;
+  let floorRX = 1, floorRZ = 1, floorR = 1;
+  let plinthFlat = null;
+  let plinthEBO = null, plinthECount = 0, plinthH = 4;
   function buildFloor(){
         let mn = [1e9,1e9,1e9], mx = [-1e9,-1e9,-1e9], maxHD = 0;
     parts.forEach(p => {
@@ -704,34 +841,59 @@ function mount(root, config) {
         for(let k2 = 0; k2 < 3; k2++){ mn[k2]=Math.min(mn[k2],q[k2]); mx[k2]=Math.max(mx[k2],q[k2]); }
         maxHD = Math.max(maxHD, Math.hypot(q[0]-c[0], q[2]-c[2]));
       }});
-    floorRX = floorRZ = Math.max(0.6*Math.max(mx[0]-mn[0], mx[1]-mn[1], mx[2]-mn[2]), 1.15*maxHD, 8);
+    floorRX = floorRZ = Math.max(0.4*Math.max(mx[0]-mn[0], mx[1]-mn[1], mx[2]-mn[2]), 1.1*maxHD, 8);
     floorR = floorRX;
-    const seg = 64, pos = [];
-    for(let i = 0; i < seg; i++){
-      const a0 = i/seg*Math.PI*2, a1 = (i+1)/seg*Math.PI*2;
-      pos.push(0,0,0,1, Math.cos(a0)*0.7,0,Math.sin(a0)*0.7,1, Math.cos(a1)*0.7,0,Math.sin(a1)*0.7,1);
-      pos.push(Math.cos(a0)*0.7,0,Math.sin(a0)*0.7,1, Math.cos(a0),0,Math.sin(a0),0, Math.cos(a1),0,Math.sin(a1),0);
-      pos.push(Math.cos(a0)*0.7,0,Math.sin(a0)*0.7,1, Math.cos(a1),0,Math.sin(a1),0, Math.cos(a1)*0.7,0,Math.sin(a1)*0.7,1);
+    if (longRow) floorR = floorRX = floorRZ = Math.max(8, 0.35 * Math.max(mx[0]-mn[0], mx[1]-mn[1], mx[2]-mn[2]));
+    plinthH = Math.max(4, 0.02 * floorR);
+    /* flat (unlit) plinth: top disc and side band, drawn with the floor program */
+    const top = [], side = [];
+    for(let i = 0; i < 96; i++){
+      const a0 = i/96*Math.PI*2, a1 = (i+1)/96*Math.PI*2;
+      const c0 = Math.cos(a0)*floorR, s0 = Math.sin(a0)*floorR, c1 = Math.cos(a1)*floorR, s1 = Math.sin(a1)*floorR, hy = plinthH/2;
+      top.push(0,hy,0,1, c1,hy,s1,1, c0,hy,s0,1);
+      side.push(c0,hy,s0,1, c1,hy,s1,1, c1,-hy,s1,1, c0,hy,s0,1, c1,-hy,s1,1, c0,-hy,s0,1);
     }
-    floorCount = pos.length/4;
-    if(floorVBO) gl.deleteBuffer(floorVBO);
-    floorVBO = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, floorVBO);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.STATIC_DRAW);
+    plinthFlat = { top: gl.createBuffer(), side: gl.createBuffer(), nTop: top.length/4, nSide: side.length/4 };
+    gl.bindBuffer(gl.ARRAY_BUFFER, plinthFlat.top); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(top), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, plinthFlat.side); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(side), gl.STATIC_DRAW);
+    if(plinthEBO) gl.deleteBuffer(plinthEBO);
+    const ring = [];
+    for(let i = 0; i < 64; i++){
+      const a0 = i/64*Math.PI*2, a1 = (i+1)/64*Math.PI*2;
+      ring.push(Math.cos(a0)*floorR, plinthH/2, Math.sin(a0)*floorR, Math.cos(a1)*floorR, plinthH/2, Math.sin(a1)*floorR);
+    }
+    plinthEBO = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, plinthEBO);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(ring), gl.STATIC_DRAW);
+    plinthECount = ring.length/3;
   }
-  function drawFloor(vp, y, cen){
-    if(!floorVBO || !floorCount) return;
+  function drawPlinth(vp, topY, cen){
+    if(!plinthFlat) return;
+    const model = [1,0,0,0, 0,1,0,0, 0,0,1,0, cen[0], topY - plinthH/2, cen[2], 1];
     gl.useProgram(floorProg);
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.depthMask(false); gl.disable(gl.CULL_FACE);
-    const model = [floorRX,0,0,0, 0,1,0,0, 0,0,floorRZ,0, cen[0],y,cen[2],1];
+    gl.disable(gl.CULL_FACE); gl.disable(gl.BLEND);
     gl.uniformMatrix4fv(gl.getUniformLocation(floorProg,'uMVP'), false, mul4(vp, model));
-    const gc = oklchToLinear(theme.groundL + (theme.dark ? 0.07 : -0.07), 0, 0);
-    gl.uniform4f(gl.getUniformLocation(floorProg,'uC'), gc[0],gc[1],gc[2],1);
-    gl.bindBuffer(gl.ARRAY_BUFFER, floorVBO);
-    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);
-    gl.drawArrays(gl.TRIANGLES, 0, floorCount);
-    gl.enable(gl.CULL_FACE); gl.depthMask(true); gl.disable(gl.BLEND);
+    gl.disableVertexAttribArray(1);
+    for (const [buf, n, dL] of [[plinthFlat.side, plinthFlat.nSide, theme.dark ? 0.025 : -0.09], [plinthFlat.top, plinthFlat.nTop, theme.dark ? 0.06 : -0.045]]) {
+      const gc = oklchToLinear(theme.groundL + dL, 0, 0);
+      gl.uniform4f(gl.getUniformLocation(floorProg,'uC'), gc[0],gc[1],gc[2],1);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);
+      gl.drawArrays(gl.TRIANGLES, 0, n);
+    }
+    gl.disable(gl.CULL_FACE);
+    if(plinthECount){
+      gl.useProgram(idProg);
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.uniformMatrix4fv(uni.uMVP.i, false, mul4(vp, model));
+      const L = theme.groundL + (theme.dark ? -0.06 : -0.16);
+      gl.uniform4fv(uni.uId.i, [...oklabNeutralLinear(L), 0.55]);
+      gl.bindBuffer(gl.ARRAY_BUFFER, plinthEBO);
+      gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);
+      gl.disableVertexAttribArray(1);
+      gl.drawArrays(gl.LINES, 0, plinthECount);
+      gl.disable(gl.BLEND);
+      gl.useProgram(prog);
+    }
   }
 
   function lineColor(part, i){
@@ -759,14 +921,14 @@ function mount(root, config) {
       gl.disableVertexAttribArray(1);
       gl.drawArrays(gl.LINES, 0, p.gl.ecount);
     }
-    gl.enable(gl.CULL_FACE);
+    gl.disable(gl.CULL_FACE);
     gl.disable(gl.BLEND);
   }
 
   function render() {
     const w = canvas.width, h = canvas.height;
     gl.viewport(0, 0, w, h);
-    gl.clearColor(0, 0, 0, 0);
+    gl.clearColor(exportMode ? 1 : 0, exportMode ? 1 : 0, exportMode ? 1 : 0, exportMode ? 1 : 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /* bounds at the current explode amount drive the fitted distance */
@@ -811,7 +973,8 @@ function mount(root, config) {
     if(!env){
       const pj = perspective(fov, cr.width/cr.height, 1, 4000);
       const u = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
-      const D_REF = 1000; /* far outside any assembly; NDC scales as D_REF/d */
+      let D_REF = 1000; /* far outside the assembly; NDC scales as D_REF/d */
+      for(const q of corners) D_REF = Math.max(D_REF, 20 * Math.hypot(q[0]-cDyn[0], q[1]-cDyn[1], q[2]-cDyn[2]));
       const yaws = longRow ? [DEFAULT_YAW] : Array.from({length:12},(_,t)=>t/12*Math.PI*2);
       for(const th of yaws){
         const dir = [Math.cos(phi)*Math.sin(th), Math.sin(phi), Math.cos(phi)*Math.cos(th)];
@@ -821,13 +984,13 @@ function mount(root, config) {
           u.x0 = Math.min(u.x0, n[0]); u.y0 = Math.min(u.y0, n[1]);
           u.x1 = Math.max(u.x1, n[0]); u.y1 = Math.max(u.y1, n[1]); }
       }
-      env = { w: u.x1-u.x0, h: u.y1-u.y0, cx: (u.x0+u.x1)/2, cy: (u.y0+u.y1)/2 };
+      env = { w: (u.x1-u.x0)*D_REF/1000, h: (u.y1-u.y0)*D_REF/1000, cx: (u.x0+u.x1)/2, cy: (u.y0+u.y1)/2 };
       fitCache.set(ckey, env);
     }
     const wFrac = axis === 'horizontal' ? 0.80 : 0.70;
     const dFit = Math.max(env.h * 1000 * cr.height / (1.2 * fr.h), env.w * 1000 * cr.width / (2 * wFrac * fr.w));
     const d = dFit * k;
-    const eye = [T[0] + d*Math.cos(phi)*Math.sin(state.yaw), T[1] + d*Math.sin(phi), T[2] + d*Math.cos(phi)*Math.cos(state.yaw)];
+    const eye = [T[0] + d*Math.cos(phi)*Math.sin(state.yaw), Math.max(T[1] + d*Math.sin(phi), bMin[1] + 0.02 * d), T[2] + d*Math.cos(phi)*Math.cos(state.yaw)];
     let Renv = 0; for(const q of corners) Renv = Math.max(Renv, Math.hypot(q[0]-cDyn[0],q[1]-cDyn[1],q[2]-cDyn[2]));
     const far = d + 3*Renv, near = Math.max(Math.max(0.02, d - 3*Renv), far/1000);
     const proj = perspective(fov, w / h, near, far);
@@ -837,9 +1000,10 @@ function mount(root, config) {
     proj[8] = -ndcFx;
     proj[9] = -ndcFy;
     const vp = mul4(proj, view);
-    lastVP = vp; lastEye = eye; lastFree = fr; lastCam = { d, env, near, far, cDyn: cDyn.slice(), T: T.slice(), floorR, longRow };
+    lastVP = vp; lastEye = eye; lastFree = fr; lastCam = { d, env, near, far, cDyn: cDyn.slice(), T: T.slice(), floorR, longRow, plateStack };
 
-    drawFloor(vp, bMin[1] - 0.05, cDyn);
+    /* seamless cove: the ground behind is the page colour; only the plinth and the contact shadow mark the floor */
+    if(!exportMode) drawPlinth(vp, bMin[1], cDyn);
     gl.useProgram(prog);
     gl.uniform3fv(uni.uLightDir.p, norm3([-0.4, 0.8, 0.45]));
     gl.uniform3fv(uni.uFillDir.p, norm3([0.7, 0.3, -0.65]));
@@ -860,12 +1024,13 @@ function mount(root, config) {
     gl.depthMask(false);
     const sm = [shadowGeom.r, 0, 0, 0, 0, shadowGeom.r, 0, 0, 0, 0, 1, 0, shadowGeom.x, shadowGeom.y, shadowGeom.z, 1];
     gl.uniformMatrix4fv(uni.uMVP.s, false, mul4(vp, sm));
+    shadowGeom.y = bMin[1] + 0.15;
     gl.uniform1f(uni.uA.s, theme.shadow * (1 - state.e));
     gl.bindBuffer(gl.ARRAY_BUFFER, shadowBuf);
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.disableVertexAttribArray(1);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    if(!exportMode) gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     gl.depthMask(true);
     gl.disable(gl.BLEND);
   }
@@ -942,7 +1107,7 @@ function mount(root, config) {
     api._drain();
     updatePopover();
     if (moving) requestRender();
-    else if(!state.spinTimer && state.z < 0.35 && state.openPart < 0 && !reducedMotion.matches){
+    else if(!state.spinTimer && state.openPart < 0 && !reducedMotion.matches){
       const wait = 3050 - (performance.now() - state.lastInput);
       if(wait > 0) state.spinTimer = setTimeout(() => { state.spinTimer = 0; requestRender(); }, wait);
     }
@@ -983,7 +1148,7 @@ function mount(root, config) {
     }
     /* idle spin */
     const idle = performance.now() - state.lastInput > 3000;
-    if (idle && state.z < 0.35 && Math.abs(state.tilt) < 5 && state.openPart < 0 && !state.dragging && !rm) {
+    if (idle && state.openPart < 0 && !state.dragging && !rm) { /* any elevation, zoom or tilt */
       state.spinRamp = Math.min(1, state.spinRamp + dt);
       state.yaw += (8 * Math.PI / 180) * state.spinRamp * dt;
       state.yawTarget = state.yaw;
@@ -1285,6 +1450,7 @@ function mount(root, config) {
     if (b.dataset.e != null) api.setExploded(b.dataset.e === '1');
     else if (b.dataset.view === 'above') state.zTarget = 0.12;
     else if (b.dataset.view === 'eye') state.zTarget = 0.72;
+    else if (b.dataset.view === 'export') toggleExportMenu(b);
     else if (b.dataset.view === 'reset') { state.z = state.zTarget = 0.12; state.yaw = state.yawTarget = DEFAULT_YAW; state.yawVel = 0; state.tiltTarget = 0; focusFrom = TAnim.slice().concat([state.tilt]); focusT0 = reducedMotion.matches ? 0 : performance.now(); api.open(null); }
     requestRender();
   });
@@ -1318,7 +1484,410 @@ function mount(root, config) {
   seg.dataset.active = '1';
   const pendingApi = [];
   buildFloor();
-  const api = {
+  
+  /* ---- export: print-ready PNG/SVG of the current view ---- */
+  function exportVp(){
+    /* rebuild the current view-projection at canvas CSS size */
+    const bMin = [1/0,1/0,1/0], bMax = [-1/0,-1/0,-1/0];
+    for(const p of parts){
+      const o = [p.at[0]+state.e*p.explodeOffset[0], p.at[1]+state.e*p.explodeOffset[1], p.at[2]+state.e*p.explodeOffset[2]];
+      for(let k = 0; k < 3; k++){ bMin[k] = Math.min(bMin[k], o[k]+p.localMin[k]); bMax[k] = Math.max(bMax[k], o[k]+p.localMax[k]); }
+    }
+    return { vp: lastVP, eye: lastEye, bMin, bMax };
+  }
+  const EXP_LIGHT = { dark: false, groundL: 0.93 };
+  function expMatL(mat){ return 0.22 + (mat.L - 0.30) * 0.97; }
+  function partMats(p){
+    const list = [{ mat: (typeof p.material === 'object' ? p.material : (MATERIALS[p.material] || MATERIALS.darkPlastic)), idx: p.mesh.idx }];
+    (p.altGroups || []).forEach(g => list.push({ mat: (typeof g.mat === 'object' ? g.mat : (MATERIALS[g.mat] || MATERIALS.darkPlastic)), idx: g.idx }));
+    return list;
+  }
+  function matOf(p){ return typeof p.material === 'object' ? p.material : (MATERIALS[p.material] || MATERIALS.darkPlastic); }
+  function expProjects(){
+    /* world-space transformed triangles + projected screen tris per part */
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const out = [];
+    parts.forEach((p, pi) => {
+      const m = [1,0,0,0, 0,1,0,0, 0,0,1,0,
+        p.at[0]+state.e*p.explodeOffset[0], p.at[1]+state.e*p.explodeOffset[1], p.at[2]+state.e*p.explodeOffset[2], 1];
+      const wv = [], sv = [], dv = [];
+      for(let i = 0; i < p.mesh.pos.length; i += 3){
+        const q = xformPoint(m, [p.mesh.pos[i], p.mesh.pos[i+1], p.mesh.pos[i+2]]);
+        wv.push(q);
+        const n = xformPoint(lastVP, q);
+        sv.push([(n[0]*0.5+0.5)*cw, (0.5-n[1]*0.5)*ch]);
+        dv.push(n[2]);
+      }
+      out.push({ p, wv, sv, dv, model: m });
+    });
+    return out;
+  }
+  function exportLabels(projParts){
+    if(state.e <= 0.5) return null;
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    /* projected union bounds over all vertices */
+    let x0 = 1e9, x1 = -1e9;
+    projParts.forEach(t => t.sv.forEach(v => { x0 = Math.min(x0, v[0]); x1 = Math.max(x1, v[1]) ? Math.max(x1, v[0]) : x1; x1 = Math.max(x1, v[0]); }));
+    /* all screen-space triangle bboxes for the no-overlap test */
+    const triB = [];
+    projParts.forEach(t => {
+      partMats(t.p).forEach(({ idx }) => {
+        for(let i = 0; i < idx.length; i += 3){
+          const a = t.sv[idx[i]], b = t.sv[idx[i+1]], c = t.sv[idx[i+2]];
+          const r = [Math.min(a[0],b[0],c[0]), Math.min(a[1],b[1],c[1]), Math.max(a[0],b[0],c[0]), Math.max(a[1],b[1],c[1])];
+          if(r[2]-r[0] > 0.4 || r[3]-r[1] > 0.4) triB.push(r);
+        }
+      });
+    });
+    const overlap = (rx0, ry0, rx1, ry1) => {
+      for(const r of triB) if(r[0] < rx1 && r[2] > rx0 && r[1] < ry1 && r[3] > ry0) return true;
+      return false;
+    };
+    const pts = projParts.map((t, i) => {
+      const o = [t.p.at[0]+state.e*t.p.explodeOffset[0]+t.p.localCentre[0],
+                 t.p.at[1]+state.e*t.p.explodeOffset[1]+t.p.localCentre[1],
+                 t.p.at[2]+state.e*t.p.explodeOffset[2]+t.p.localCentre[2]];
+      const n = xformPoint(lastVP, o);
+      return { i, x: (n[0]*0.5+0.5)*cw, y: (0.5-n[1]*0.5)*ch };
+    });
+    const cx = (x0 + x1) / 2;
+    const out = [];
+    [0, 1].forEach(si => {
+      const lane = pts.filter(t => (t.x < cx) === (si === 0)).sort((a, b) => a.y - b.y);
+      const lx = si === 0 ? x0 - 32 : x1 + 32;
+      let y = 28;
+      lane.forEach(t => {
+        const name = parts[t.i].name;
+        const tw = textW(name, 13);
+        let ly = Math.max(t.y, y);
+        for(let guard = 0; guard < 40; guard++){
+          const rx0 = si === 0 ? lx - tw - 6 : lx - 2, rx1 = si === 0 ? lx + 2 : lx + tw + 6;
+          if(!overlap(rx0, ly - 12, rx1, ly + 3)) break;
+          ly += 22;
+        }
+        out.push({ i: t.i, tx: lx, ly, ax: t.x, ay: t.y, right: si === 1, name, tw });
+        y = ly + 22;
+      });
+    });
+    return { labels: out, objX0: x0, objX1: x1 };
+  }
+  const measC = document.createElement('canvas').getContext('2d');
+  function textW(t, px){ measC.font = `${px}px Inter, system-ui`; return measC.measureText(t).width; }
+  function wrapIntro(text, maxW){
+    measC.font = '15px Inter, system-ui';
+    const lines = []; let cur = '';
+    for(const w of text.split(/\s+/)){
+      const t = cur ? cur + ' ' + w : w;
+      if(measC.measureText(t).width > maxW && cur){ lines.push(cur); cur = w; }
+      else cur = t;
+    }
+    if(cur) lines.push(cur);
+    return lines;
+  }
+  function exportCrop(projParts, lab){
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    projParts.forEach(t => t.sv.forEach(v => { x0=Math.min(x0,v[0]); y0=Math.min(y0,v[1]); x1=Math.max(x1,v[0]); y1=Math.max(y1,v[1]); }));
+    if(lab) lab.labels.forEach(l => {
+      x0 = Math.min(x0, l.right ? l.tx : l.tx - l.tw - 6);
+      x1 = Math.max(x1, l.right ? l.tx + l.tw + 6 : l.tx);
+      y0 = Math.min(y0, l.ly - 14); y1 = Math.max(y1, l.ly + 4);
+    });
+    const M = 48;
+    const bx = Math.max(0, x0 - M), by = Math.max(0, y0 - M);
+    const intro = (document.querySelector('.stage-header .intro') || {}).textContent || '';
+    const introW = Math.min(64 * 8.5, Math.min(cw, x1 + M) - bx - 32);
+    const lines = intro ? wrapIntro(intro, introW) : [];
+    const titleH = 20 + (lines.length ? 4 + 20 * lines.length : 0);
+    const ty = Math.max(0, by - 24 - titleH);
+    return { x: bx, y: ty, w: Math.min(cw, x1 + M) - bx, h: Math.min(ch, y1 + M) - ty, titleY: by - 24 - 20 * lines.length - 4, lines };
+  }
+  function expMatL(mat){ return 0.22 + (mat.L - 0.30) * 0.97; }
+  function expShade(nW, mat){
+    const ld = norm3([-0.4, 0.8, 0.45]), fd = norm3([0.7, 0.3, -0.65]);
+    const n = norm3(nW);
+    const alb = oklabNeutralLinear(expMatL(mat))[0];
+    const dif = Math.max(n[0]*ld[0]+n[1]*ld[1]+n[2]*ld[2], 0);
+    const fil = Math.max(n[0]*fd[0]+n[1]*fd[1]+n[2]*fd[2], 0) * 0.25;
+    const amb = 0.18 + 0.27 * (n[1]*0.5+0.5);
+    const c = Math.min(1, alb * (dif + fil + amb) + (mat.spec || 0) * 0.15);
+    const v = Math.round(255 * (c <= 0.0031308 ? 12.92*c : 1.055*Math.pow(c, 1/2.4) - 0.055));
+    return `rgb(${v},${v},${v})`;
+  }
+  function slug(){ return (document.querySelector('.stage-header h1') || document.title).textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function exportFrame(){
+    /* 4x PNG frame of just the object on white, cropped — shared by both exporters */
+    const ow = canvas.width, oh = canvas.height;
+    const saved = { dark: theme.dark, groundL: theme.groundL, shadow: theme.shadow, rim: theme.rim.slice() };
+    theme.dark = false; theme.groundL = 0.93; theme.shadow = 0; theme.rim = [0.9,0.9,0.9];
+    exportMode = true;
+    canvas.width = canvas.clientWidth * 4; canvas.height = canvas.clientHeight * 4;
+    render();
+    const projParts = expProjects();
+    const lab = exportLabels(projParts);
+    const crop = exportCrop(projParts, lab);
+    const s = 4;
+    const off = document.createElement('canvas');
+    off.width = Math.round(crop.w * s); off.height = Math.round(crop.h * s);
+    const cx = off.getContext('2d');
+    cx.fillStyle = '#fff'; cx.fillRect(0, 0, off.width, off.height);
+    cx.drawImage(canvas, crop.x*s, crop.y*s, crop.w*s, crop.h*s, 0, 0, off.width, off.height);
+    canvas.width = ow; canvas.height = oh;
+    Object.assign(theme, saved); exportMode = false; requestRender();
+    return { off, crop, lab, s };
+  }
+  async function exportSVG(){
+    const t0 = performance.now();
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const projParts = expProjects();
+    const lab = exportLabels(projParts);
+    const crop = exportCrop(projParts, lab);
+    /* registry of all triangles across parts */
+    const all = [];
+    projParts.forEach(t => {
+      partMats(t.p).forEach(({ mat, idx }) => {
+        for(let i = 0; i < idx.length; i += 3){
+          all.push({ p: t.p, mat,
+            w: [t.wv[idx[i]], t.wv[idx[i+1]], t.wv[idx[i+2]]],
+            s: [t.sv[idx[i]], t.sv[idx[i+1]], t.sv[idx[i+2]]],
+            d: [t.dv[idx[i]], t.dv[idx[i+1]], t.dv[idx[i+2]]] });
+        }
+      });
+    });
+    /* 1. GPU visibility pass: per-vertex triangle id at 2x */
+    const vw = Math.round(cw*2), vh = Math.round(ch*2);
+    const idArr = new Float32Array(all.length * 12);
+    all.forEach((t, i) => { t.id = i;
+      for(let k = 0; k < 3; k++){ const o = i*12 + k*4;
+        idArr[o] = t.w[k][0]; idArr[o+1] = t.w[k][1]; idArr[o+2] = t.w[k][2]; idArr[o+3] = i + 1; } });
+    if(!exportIdProg) exportIdProg = program(`#version 300 es
+      layout(location=0) in vec3 aP; layout(location=1) in float aI;
+      uniform mat4 uMVP; flat out vec3 vI;
+      void main(){ float i=aI; /* id+1, 0 stays 'no triangle' */ vI=vec3(mod(i,256.)/255., mod(floor(i/256.),256.)/255., floor(i/65536.)/255.); gl_Position=uMVP*vec4(aP,1.); }`,
+      `#version 300 es
+      precision highp float; flat in vec3 vI; out vec4 o;
+      void main(){ o=vec4(vI,1.); }`);
+    ensurePickBuffer(vw, vh);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFbo);
+    gl.viewport(0, 0, vw, vh);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE);
+    /* ids must be written raw: no blending, depth writes on */
+    gl.disable(gl.BLEND); gl.depthMask(true); gl.depthFunc(gl.LESS); gl.disable(gl.POLYGON_OFFSET_FILL);
+    gl.useProgram(exportIdProg);
+    gl.uniformMatrix4fv(gl.getUniformLocation(exportIdProg, 'uMVP'), false, lastVP);
+    const idBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, idBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, idArr, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 16, 0);
+    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 16, 12);
+    gl.drawArrays(gl.TRIANGLES, 0, all.length * 3);
+    const px = new Uint8Array(vw * vh * 4);
+    gl.readPixels(0, 0, vw, vh, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.deleteBuffer(idBuf);
+    gl.enable(gl.CULL_FACE);
+    const idAt = (x, y) => { /* css px -> id (1-based, 0 = none), 2x buffer */
+      const bx = Math.min(vw-1, Math.max(0, Math.round(x*2))), by = Math.min(vh-1, Math.max(0, Math.round(y*2)));
+      const o = ((vh-1-by) * vw + bx) * 4;
+      return px[o] + px[o+1]*256 + px[o+2]*65536;
+    };
+    const visible = new Set();
+    for(let o = 0; o < px.length; o += 4){
+      const id = px[o] + px[o+1]*256 + px[o+2]*65536;
+      if(id) visible.add(id - 1);
+    }
+    /* 2. visible + projected area >= 0.05 px^2 */
+    const keep = all.filter(t => visible.has(t.id) &&
+      Math.abs((t.s[1][0]-t.s[0][0])*(t.s[2][1]-t.s[0][1]) - (t.s[2][0]-t.s[0][0])*(t.s[1][1]-t.s[0][1])) / 2 >= 0.05);
+    /* shade + geometric normal per tri */
+    const sceneR = lastCam ? Math.max(...lastCam.env ? [lastCam.env.w, lastCam.env.h, 1] : [1]) : 1;
+    const EPS = 1e-4 * (sceneR * 1000);
+    keep.forEach(t => {
+      const [a,b,c] = t.w;
+      const u = [b[0]-a[0],b[1]-a[1],b[2]-a[2]], v = [c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+      let n = [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]];
+      const l = Math.hypot(...n) || 1; n = n.map(x => x/l);
+      const mid = [(a[0]+b[0]+c[0])/3 - lastEye[0], (a[1]+b[1]+c[1])/3 - lastEye[1], (a[2]+b[2]+c[2])/3 - lastEye[2]];
+      if(n[0]*mid[0]+n[1]*mid[1]+n[2]*mid[2] > 0) n = n.map(x => -x);
+      t.n = n; t.fill = expShade(n, t.mat);
+    });
+    /* 3. BSP in world space */
+    const planeOf = t => ({ n: t.n, d: -(t.n[0]*t.w[0][0] + t.n[1]*t.w[0][1] + t.n[2]*t.w[0][2]) });
+    const classify = (t, pl) => {
+      const ds = t.w.map(v => pl.n[0]*v[0] + pl.n[1]*v[1] + pl.n[2]*v[2] + pl.d);
+      if(ds.every(d => d > EPS)) return 1;
+      if(ds.every(d => d < -EPS)) return -1;
+      if(ds.every(d => Math.abs(d) <= EPS)) return 0;
+      return ds;
+    };
+    const clip = (t, ds, keepSign) => {
+      const pts = [];
+      for(let i = 0; i < 3; i++){
+        const j = (i + 1) % 3;
+        const inA = ds[i] * keepSign >= -EPS * 0.5, inB = ds[j] * keepSign >= -EPS * 0.5;
+        if(inA) pts.push(i);
+        if(inA !== inB){
+          const f = ds[i] / (ds[i] - ds[j]);
+          pts.push({ w: t.w[i].map((v,k) => v + (t.w[j][k]-v)*f),
+                     s: t.s[i].map((v,k) => v + (t.s[j][k]-v)*f),
+                     d: t.d[i] + (t.d[j]-t.d[i])*f });
+        }
+      }
+      const out = [];
+      for(let k = 1; k < pts.length - 1; k++){
+        const g = i => typeof pts[i] === 'number' ? { w: t.w[pts[i]], s: t.s[pts[i]], d: t.d[pts[i]] } : pts[i];
+        out.push({ p: t.p, mat: t.mat, fill: t.fill, n: t.n,
+                   w: [g(0).w, g(k).w, g(k+1).w], s: [g(0).s, g(k).s, g(k+1).s], d: [g(0).d, g(k).d, g(k+1).d] });
+      }
+      return out;
+    };
+    const tBSP0 = performance.now();
+    const buildBSP = list => {
+      if(!list.length) return null;
+      /* splitter: of up to 8 candidates, the one that straddles fewest of a 64-tri sample */
+      let best = 0, bestCost = Infinity;
+      for(let c = 0; c < Math.min(8, list.length); c++){
+        const ci = Math.floor(c * list.length / 8), pl = planeOf(list[ci]);
+        let cost = 0;
+        for(let s = 0; s < Math.min(64, list.length); s++){
+          const r = classify(list[Math.floor(s * list.length / 64)], pl);
+          if(typeof r !== 'number') cost++;
+        }
+        if(cost < bestCost){ bestCost = cost; best = ci; }
+      }
+      if(best){ const t = list[0]; list[0] = list[best]; list[best] = t; }
+      const node = { pl: planeOf(list[0]), tris: [list[0]], f: null, b: null };
+      const F = [], B = [];
+      for(let i = 1; i < list.length; i++){
+        const c = classify(list[i], node.pl);
+        if(c === 0){ node.tris.push(list[i]); continue; }
+        if(c === 1){ F.push(list[i]); continue; }
+        if(c === -1){ B.push(list[i]); continue; }
+        const f = clip(list[i], c, 1), b = clip(list[i], c, -1);
+        F.push(...f); B.push(...b);
+      }
+      node.f = buildBSP(F); node.b = buildBSP(B);
+      return node;
+    };
+    const root = buildBSP(keep);
+    const ordered = [];
+    const walk = node => {
+      if(!node) return;
+      const side = node.pl.n[0]*lastEye[0] + node.pl.n[1]*lastEye[1] + node.pl.n[2]*lastEye[2] + node.pl.d > 0;
+      walk(side ? node.b : node.f);
+      node.tris.forEach(t => ordered.push(t));
+      walk(side ? node.f : node.b);
+    };
+    walk(root);
+    const totalAfter = ordered.length;
+    /* 4. emit */
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${crop.x.toFixed(1)} ${crop.y.toFixed(1)} ${crop.w.toFixed(1)} ${crop.h.toFixed(1)}" font-family="Inter, system-ui">`;
+    svg += `<rect x="${crop.x.toFixed(1)}" y="${crop.y.toFixed(1)}" width="${crop.w.toFixed(1)}" height="${crop.h.toFixed(1)}" fill="#fff"/>`;
+    /* consecutive triangles with the same part and fill share one <path> (painter order kept) */
+    const hex = f => { const m = f.match(/\d+/g); return m ? '#' + m.slice(0, 3).map(v => (+v).toString(16).padStart(2, '0')).join('') : f; };
+    svg += '<g stroke-width="0.35" stroke-linejoin="round">';
+    let cur = '', curFill = '', d = '';
+    const flush = () => { if(d) svg += `<path d="${d}" fill="${curFill}" stroke="${curFill}"/>`; d = ''; };
+    const r1 = v => Math.round(v * 10) / 10;
+    ordered.forEach(t => {
+      const f = hex(t.fill);
+      if(t.p.name !== cur){ flush(); if(cur) svg += '</g>'; svg += `<g><title>${t.p.name}</title>`; cur = t.p.name; }
+      if(f !== curFill){ flush(); curFill = f; }
+      const [a,b,c] = t.s;
+      d += `M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}L${r1(c[0])} ${r1(c[1])}Z`;
+    });
+    flush(); if(cur) svg += '</g>';
+    svg += '</g>';
+    /* 5. crease lines: 3 sample points must hit a same-part triangle in the id buffer */
+    svg += '<g stroke="#666" stroke-width="0.75" fill="none" opacity="0.8">';
+    projParts.forEach(t => {
+      for(let i = 0; i < t.p.edges.length; i += 6){
+        const a = xformPoint(t.model, [t.p.edges[i], t.p.edges[i+1], t.p.edges[i+2]]);
+        const b = xformPoint(t.model, [t.p.edges[i+3], t.p.edges[i+4], t.p.edges[i+5]]);
+        const na = xformPoint(lastVP, a), nb = xformPoint(lastVP, b);
+        const pa = [(na[0]*0.5+0.5)*cw, (0.5-na[1]*0.5)*ch], pb = [(nb[0]*0.5+0.5)*cw, (0.5-nb[1]*0.5)*ch];
+        if(Math.hypot(pb[0]-pa[0], pb[1]-pa[1]) < 0.4) continue;
+        let ok = true;
+        for(const f of [0.25, 0.5, 0.75]){
+          const mx = a[0]+(b[0]-a[0])*f, my = a[1]+(b[1]-a[1])*f, mz = a[2]+(b[2]-a[2])*f;
+          const nm = xformPoint(lastVP, [mx,my,mz]);
+          const sx = (nm[0]*0.5+0.5)*cw, sy = (0.5-nm[1]*0.5)*ch;
+          let hit = false;
+          for(let dx = -1; dx <= 1 && !hit; dx++) for(let dy = -1; dy <= 1 && !hit; dy++){
+            const id = idAt(sx + dx*0.5, sy + dy*0.5);
+            if(id && all[id-1] && all[id-1].p === t.p) hit = true;
+          }
+          if(!hit){ ok = false; break; }
+        }
+        if(ok) svg += `<line x1="${pa[0].toFixed(1)}" y1="${pa[1].toFixed(1)}" x2="${pb[0].toFixed(1)}" y2="${pb[1].toFixed(1)}"/>`;
+      }
+    });
+    svg += '</g>';
+    if(lab){
+      svg += '<g stroke="#555" stroke-width="1" fill="#555">';
+      lab.labels.forEach(l => {
+        const lx = l.right ? l.tx - 6 : l.tx + 6;
+        svg += `<line x1="${lx.toFixed(1)}" y1="${l.ly.toFixed(1)}" x2="${l.ax.toFixed(1)}" y2="${l.ay.toFixed(1)}"/>`;
+        svg += `<circle cx="${l.ax.toFixed(1)}" cy="${l.ay.toFixed(1)}" r="1.2"/>`;
+      });
+      svg += '</g><g fill="#555" font-size="13">';
+      lab.labels.forEach(l => svg += `<text x="${l.tx.toFixed(1)}" y="${(l.ly+4).toFixed(1)}" text-anchor="${l.right?'start':'end'}">${l.name}</text>`);
+      svg += '</g>';
+    }
+    const title = (document.querySelector('.stage-header h1') || {}).textContent || '';
+    const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    svg += `<text x="${(crop.x+16).toFixed(1)}" y="${(crop.titleY+20).toFixed(1)}" font-size="20" font-weight="600" fill="#222">${esc(title)}</text>`;
+    crop.lines.forEach((ln, i) => svg += `<text x="${(crop.x+16).toFixed(1)}" y="${(crop.titleY+24+20*(i+1)).toFixed(1)}" font-size="15" fill="#666">${esc(ln)}</text>`);
+    console.log(`[export] tris ${all.length} -> visible ${visible.size} -> kept ${keep.length} -> after BSP ${totalAfter}; BSP ${Math.round(performance.now()-tBSP0)}ms total ${Math.round(performance.now()-t0)}ms`);
+    return svg + '</svg>';
+  }
+  let exportIdProg = null;
+  function exportPNGBlob(){
+    const { off, crop, lab, s } = exportFrame();
+    const cx = off.getContext('2d');
+    cx.translate(-crop.x*s, -crop.y*s);
+    if(lab){
+      cx.strokeStyle = '#555'; cx.lineWidth = s; cx.fillStyle = '#555';
+      cx.font = `${13*s}px Inter, system-ui`;
+      lab.labels.forEach(l => {
+        const lx = l.right ? l.tx - 6 : l.tx + 6;
+        cx.beginPath(); cx.moveTo(lx*s, l.ly*s); cx.lineTo(l.ax*s, l.ay*s); cx.stroke();
+        cx.beginPath(); cx.arc(l.ax*s, l.ay*s, 1.2*s, 0, 7); cx.fill();
+        cx.textAlign = l.right ? 'left' : 'right';
+        cx.fillText(l.name, l.tx*s, (l.ly+4)*s);
+      });
+    }
+    cx.textAlign = 'left'; cx.fillStyle = '#222'; cx.font = `600 ${20*s}px Inter, system-ui`;
+    cx.fillText((document.querySelector('.stage-header h1') || {}).textContent || '', (crop.x+16)*s, (crop.titleY+20)*s);
+    cx.fillStyle = '#666'; cx.font = `${15*s}px Inter, system-ui`;
+    crop.lines.forEach((ln, i) => cx.fillText(ln, (crop.x+16)*s, (crop.titleY+24+20*(i+1))*s));
+    return new Promise(res => off.toBlob(res, 'image/png'));
+  }
+  let exportMode = false;
+  const exportMenu = document.createElement('div');
+  exportMenu.className = 'td-popover td-export';
+  exportMenu.hidden = true;
+  exportMenu.innerHTML = '<button type="button">PNG</button><button type="button">SVG</button>';
+  document.body.appendChild(exportMenu);
+  exportMenu.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+    exportMenu.hidden = true;
+    const name = slug() + '.' + b.textContent.toLowerCase();
+    const blob = b.textContent === 'PNG' ? await exportPNGBlob() : new Blob([await exportSVG()], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }));
+  function toggleExportMenu(btn){
+    if(!exportMenu.hidden){ exportMenu.hidden = true; return; }
+    exportMenu.hidden = false;
+    const r = btn.getBoundingClientRect();
+    exportMenu.style.position = 'fixed';
+    exportMenu.style.left = Math.max(8, r.left - 20) + 'px';
+    exportMenu.style.top = Math.max(8, r.top - exportMenu.offsetHeight - 12) + 'px';
+  }
+  document.addEventListener('pointerdown', e => { if(!exportMenu.hidden && !exportMenu.contains(e.target) && e.target.dataset.view !== 'export') exportMenu.hidden = true; });
+
+const api = {
     setView(z) { state.z = state.zTarget = Math.max(0, Math.min(1, z)); state.lastInput = performance.now(); requestRender(); },
     open(index) { setOpen(index == null ? -1 : index); },
     setExploded(on) {
@@ -1338,6 +1907,8 @@ function mount(root, config) {
     popRect: () => pop.hidden ? null : { x: popPos.x, y: popPos.y, w: pop.offsetWidth, h: pop.offsetHeight, side: popPos.side },
     leaderLen: i => leaderLength(partScreenBBox(i)),
     targetPoint: () => TAnim.slice(),
+    exportPNG: () => exportPNGBlob(),
+    exportSVG: () => exportSVG(),
     frameTimes: () => perfBuf.slice(),
   };
   window.explodedView = api;

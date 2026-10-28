@@ -7,10 +7,11 @@ Open a file directly in a browser; no installation, server, CDN, or framework is
 | [Gradient descent](gradient-descent.html) | Change the learning rate, inspect the next-step preview, then run, pause, or advance the trajectory. | Exact one-dimensional quadratic, fixed positive learning rate, no noise. |
 | [Spanish word order](spanish-word-order.html) | Compare English and Spanish sentence tiles and predict the position of a color adjective. | Neutral color-adjective placement in the selected example, not a rule for every Spanish adjective. |
 | [Process bottlenecks](bottleneck.html) | Change station capacities in an isometric chain and compare capacity with output in the accompanying chart. | Deterministic serial production with sufficient material, demand, and buffers. |
+| [MacBook Pro](macbook-pro.html) | Exploded view of the 14-inch MacBook Pro with PROLED XDR Display: the lid's layer stack (glass, tandem OLED with built-in touch sensor, camera, lid) and the base. Export a labelled PNG or SVG. | Apple's published specs, announced 28 October 2026; proportions illustrative, items marked reported come from press coverage. |
 | [Key switch](keyboard-switch.html) | Exploded view, vertical: descend from above to eye level, turn and tilt, open each of the eight parts. | Typical linear switch; dimensions and forces are typical values. |
-| [Battery cell](battery-cell.html) | Exploded view, horizontal along the cell's axis. | Typical 18650 cylindrical lithium-ion cell. |
+| [Limo door](limo-door.html) | Exploded view, horizontal through the door's thickness; armour and five-ply window. | Public reporting only; layer split and thicknesses are illustrative. |
 | [Flashlight](flashlight.html) | Exploded view, horizontal along the beam. | Generic two-cell AA flashlight; typical values. |
-| [Click pen](click-pen.html) | Exploded view, horizontal along the pen. | Generic retractable ballpoint; typical values. |
+| [Studio Display XDR](studio-display-xdr.html) | Exploded view, horizontal from glass to back. | Apple specs; generic mini-LED layers marked typical. |
 
 These are full-explanation showcases. A hint artifact would contain only the current hint, including in its source. They are not recordings of real tutoring sessions or evidence of learning effectiveness.
 
