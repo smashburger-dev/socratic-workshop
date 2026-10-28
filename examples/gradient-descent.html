@@ -5,110 +5,356 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gradient descent · Socratic Workshop</title>
 <style>
-:root{color-scheme:light;--page:#f5f6fa;--surface:#fff;--soft:#f0f1f7;--ink:#20212b;--muted:#656778;--border:#e6e7ef;--accent:#6d3fd4;--accent-soft:#f0eafb;--accent-ink:#fff;--shadow:0 12px 40px #20212b06;--type-title:clamp(28px,3vw,32px);--type-panel:18px;--type-body:16px;--type-note:14px;--type-value:20px;--scene-height:clamp(220px,calc(100svh - 420px),340px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}}
-:root[data-theme="dark"]{color-scheme:dark;--page:#111218;--surface:#1a1c25;--soft:#222530;--ink:#f1f1f7;--muted:#a3a6b9;--border:#303341;--accent:#b69aff;--accent-soft:#2e2545;--accent-ink:#1b132b;--shadow:none}
+@property --p{syntax:'<percentage>';inherits:false;initial-value:0%}
+:root{
+  color-scheme:light;
+  --work:#ececec;
+  --glass:rgba(250,250,250,.60);
+  --edge:rgba(0,0,0,.12);
+  --text-rgb:22,22,22;
+  --field:rgba(0,0,0,.04);
+  --field-edge:rgba(0,0,0,.10);
+  --inset:rgba(0,0,0,.03);
+  --sep-strong:rgba(0,0,0,.14);
+  --sep-soft:rgba(0,0,0,.08);
+  --t-strong:1;
+  --t-value:.84;
+  --t-body:.68;
+  --t-label:.60;
+  --t-hint:.56;
+  --t-off:.31;
+  --grid-line:rgba(var(--text-rgb),.07);
+  --axis-line:rgba(var(--text-rgb),.20);
+  --mark-neutral:rgba(var(--text-rgb),.74);
+  --amber-lch:0.70 0.16 60;
+  --coral-lch:0.62 0.18 35;
+  --amber:oklch(var(--amber-lch));
+  --coral:oklch(var(--coral-lch));
+  --select-bg:linear-gradient(90deg in oklab,oklch(var(--amber-lch) / .15),oklch(var(--coral-lch) / .06));
+  --select-edge:oklch(var(--amber-lch) / .30);
+  --slider-fill:linear-gradient(90deg in oklab,rgba(var(--text-rgb),.16),rgba(var(--text-rgb),.05));
+  --ground-top:oklch(0.935 0 0);--dot:oklch(0.885 0 0);
+  --ground-bottom:oklch(0.905 0.035 68);
+  --dots-top:oklch(0.885 0 0);
+  --dots-bottom:oklch(0.855 0.038 68);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  --font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --work:#1b1b1b;
+  --glass:rgba(30,30,30,.50);
+  --edge:rgba(255,255,255,.20);
+  --text-rgb:255,255,255;
+  --field:rgba(255,255,255,.05);
+  --field-edge:rgba(255,255,255,.13);
+  --inset:rgba(255,255,255,.03);
+  --sep-strong:rgba(255,255,255,.20);
+  --sep-soft:rgba(255,255,255,.10);
+  --amber-lch:0.80 0.13 70;
+  --coral-lch:0.70 0.15 35;
+  --ground-top:oklch(0.205 0 0);--dot:oklch(0.255 0 0);
+  --ground-bottom:oklch(0.285 0.040 55);
+  --dots-top:oklch(0.255 0 0);
+  --dots-bottom:oklch(0.335 0.045 55);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --work:#1b1b1b;
+  --glass:rgba(30,30,30,.50);
+  --edge:rgba(255,255,255,.20);
+  --text-rgb:255,255,255;
+  --field:rgba(255,255,255,.05);
+  --field-edge:rgba(255,255,255,.13);
+  --inset:rgba(255,255,255,.03);
+  --sep-strong:rgba(255,255,255,.20);
+  --sep-soft:rgba(255,255,255,.10);
+  --amber-lch:0.80 0.13 70;
+  --coral-lch:0.70 0.15 35;
+  --ground-top:oklch(0.205 0 0);--dot:oklch(0.255 0 0);
+  --ground-bottom:oklch(0.285 0.040 55);
+  --dots-top:oklch(0.255 0 0);
+  --dots-bottom:oklch(0.335 0.045 55);
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--page);color:var(--ink);font:var(--type-body)/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1180px;padding:24px 28px 20px;margin:auto}
-h1{font-size:var(--type-title);letter-spacing:-.035em;font-weight:650;line-height:1.15;margin:0;text-wrap:balance}
-h2{font-size:var(--type-panel);letter-spacing:-.02em;line-height:1.35;margin:0 0 16px}
-p{margin:0 0 12px}
-.demo-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 24px;margin-bottom:20px}
-.demo-header .intro{grid-column:1/-1;margin:0;max-width:65ch;font-size:var(--type-body);line-height:1.5;color:var(--muted)}
-.demo-header .theme-toggle{grid-column:2;grid-row:1;min-height:44px;font-size:var(--type-note);padding:8px 12px}
-.theme-toggle{display:inline-flex;align-items:center;gap:8px;background:transparent;box-shadow:none}
-.theme-toggle svg{width:18px;height:18px;flex:none}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:20px;box-shadow:var(--shadow);min-width:0}
-.layout,.frame-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:20px;align-items:start}
-.stage{min-width:0}
-.graphic{display:block;width:100%;height:auto;overflow:visible}
-.viewport-scene{height:var(--scene-height)}
-.actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
-.button,button,select{font:inherit;min-height:44px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--ink);padding:9px 15px;cursor:pointer;font-weight:550}
-.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
-button:disabled{opacity:.45;cursor:not-allowed}
-button:active:not(:disabled){transform:scale(.98)}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
-.control{margin-bottom:18px}
-.control label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:var(--type-body);font-weight:550;margin-bottom:6px}
-output{font-variant-numeric:tabular-nums;color:var(--accent)}
-input[type="range"]{display:block;width:100%;min-height:44px;margin:0;accent-color:var(--accent);cursor:pointer}
-.metrics{display:flex;gap:26px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.metrics dl{margin:0;min-width:64px}
-.metrics dt{color:var(--muted);font-size:var(--type-note)}
-.metrics dd{font-size:var(--type-value);line-height:1.25;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:2px 0 0}
-.legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:var(--type-note);margin-top:10px}
-.feedback{margin-top:16px;background:var(--accent-soft);border:1px solid transparent;border-radius:18px;padding:16px 18px}
-.feedback h2{font-size:var(--type-panel);line-height:1.35;margin-bottom:8px}
-.feedback p:last-child{margin-bottom:0}
-.feedback .detail{font-size:var(--type-note);color:var(--muted)}
-.equation{font-family:ui-monospace,SFMono-Regular,monospace;font-size:var(--type-note);overflow-wrap:anywhere}
-.model-notes{margin-top:8px;color:var(--muted);font-size:var(--type-note);max-width:80ch}
-.model-notes summary{display:inline-block;cursor:pointer;min-height:44px;padding:10px 0}
-.model-notes summary::before{content:"+ ";color:var(--accent)}
-.model-notes[open] summary::before{content:"− "}
-.model-notes p{margin-top:8px}
-.reference-panel{display:grid;grid-template-rows:auto minmax(0,1fr);gap:18px;min-width:0}
-.panel-content{display:grid;place-content:center;min-width:0;padding-block:16px}
-.context-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px}
-a{color:var(--muted);text-underline-offset:4px}
 [hidden]{display:none!important}
-@media(hover:hover) and (pointer:fine){button:hover:not(:disabled){border-color:var(--accent)}a:hover{color:var(--ink)}}
-@media(max-width:900px){main{padding:20px 18px 28px}.layout,.frame-layout{grid-template-columns:1fr}.card{padding:20px;border-radius:22px}.metrics{gap:22px}.graphic.viewport-scene{height:300px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}button:active:not(:disabled){transform:none}}
-@media print{:root,:root[data-theme="dark"]{color-scheme:light;--page:#fff;--surface:#fff;--ink:#111;--muted:#444;--border:#ddd;--accent:#5630a8;--accent-soft:#f5f1fb;--accent-ink:#fff}main{max-width:none;padding:0}.actions,.theme-toggle,input,select,.prediction{display:none}.layout,.frame-layout{display:block}.card{break-inside:avoid;box-shadow:none;margin-bottom:20px}.graphic{max-height:360px}.model-notes{display:block}}
-
-.plot{position:relative}
-.graphic{height:var(--scene-height)}
-.graphic text{font:14px system-ui,sans-serif;fill:var(--muted)}
-.graph-notice{position:absolute;top:42px;left:58px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:var(--type-note);color:var(--ink);box-shadow:var(--shadow)}
-.legend span{display:inline-flex;align-items:center;gap:8px}
-.key-line{width:22px;height:0;border-top:2px solid var(--muted)}
-.key-current{width:11px;height:11px;border-radius:50%;background:var(--ink)}
-.key-next{width:13px;height:13px;border-radius:50%;border:2px solid var(--accent);background:var(--accent-soft)}
-.feedback summary,.prediction summary{cursor:pointer;min-height:44px;padding:10px 0}
-.feedback details{margin-top:12px;border-top:1px solid var(--border);padding-top:4px}
-.feedback details p{margin-top:12px}
-.prediction{margin-top:10px;border-top:1px solid var(--border);padding-top:6px}
+body{
+  margin:0;
+  min-height:100svh;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 392px;
+  grid-template-rows:auto minmax(0,1fr);
+  background:var(--work);
+  color:rgba(var(--text-rgb),var(--t-body));
+  font:17px/22px var(--font);
+  isolation:isolate;
+}
+body::before,body::after,.ground-dots{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none}
+body::before{background:var(--work)}
+.ground-dots{
+  background:var(--dot);
+  -webkit-mask-image:radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
+  mask-image:radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
+  -webkit-mask-size:24px 24px;mask-size:24px 24px;
+}
+body::after{
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23cb8d7d%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23be9383%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23ba929c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23da8661%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23d68293%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23c98e7d%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23c68f82%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23c6935c%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23cf8982%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23c88a9a%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23bd947f%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23d0897e%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23db8465%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23b9958f%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23c09285%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23d88384%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23d48a63%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23b99686%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23c09190%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23ce8c76%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23cb889b%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23bb957d%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23c28f91%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23cc8d6f%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23dc8372%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23c68f7f%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23b6987e%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23cd879b%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d68960%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c58d95%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23b6997a%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d48683%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23d28972%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c88b96%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23c58f87%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23c98f6e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23df8073%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23bb957d%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23c98d81%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23d78764%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23d68294%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23bd9386%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23c09475%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23d8847b%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23c6916e%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23b79592%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23b09a82%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23ce8985%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23da8661%22/%3E%3C/svg%3E");background-size:168px 168px;
+  -webkit-mask-image:linear-gradient(to top,#000 0%,#000 6%,transparent 45%),radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
+  mask-image:linear-gradient(to top,#000 0%,#000 6%,transparent 45%),radial-gradient(circle at 12px 12px,#000 1px,transparent 1.6px);
+  -webkit-mask-size:auto,24px 24px;mask-size:auto,24px 24px;
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237d5950%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23715f58%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%236e5e62%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%238b5239%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%2387515c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237b5a51%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23785b54%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237c5c3a%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23815652%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237b5861%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23715f55%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23825650%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%238c513c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%236b605e%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725e58%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23895152%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2386563c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%236d605b%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725d5d%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2380584b%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%237e5661%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23755c5d%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%237f5947%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%238d5045%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23795b53%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%236c6157%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23805561%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23885539%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23785a5e%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%236d6154%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23865352%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23845647%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%237a595f%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23775c57%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237d5a47%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23904e45%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237b5a53%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2389543c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2388505c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f59%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23745e4e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2389524c%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%237a5c47%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23696160%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2368625c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23805754%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%238c5239%22/%3E%3C/svg%3E")}}
+:root[data-theme="dark"] body::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22168%22%20height%3D%22168%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237d5950%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23715f58%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%236e5e62%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%238b5239%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%2387515c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%237b5a51%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23785b54%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237c5c3a%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23815652%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%237b5861%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23715f55%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%23825650%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%238c513c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2236%22%20r%3D%221.1%22%20fill%3D%22%236b605e%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725e58%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23895152%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2386563c%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%236d605b%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%23725d5d%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%2380584b%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2260%22%20r%3D%221.1%22%20fill%3D%22%237e5661%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23755c5d%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%237f5947%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%238d5045%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23795b53%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%236c6157%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%2284%22%20r%3D%221.1%22%20fill%3D%22%23805561%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23885539%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23785a5e%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%236d6154%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23865352%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23845647%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%237a595f%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22108%22%20r%3D%221.1%22%20fill%3D%22%23775c57%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237d5a47%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23904e45%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f55%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%237b5a53%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2389543c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%2388505c%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22132%22%20r%3D%221.1%22%20fill%3D%22%23705f59%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23745e4e%22/%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2389524c%22/%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%237a5c47%22/%3E%3Ccircle%20cx%3D%2284%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23696160%22/%3E%3Ccircle%20cx%3D%22108%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%2368625c%22/%3E%3Ccircle%20cx%3D%22132%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%23805754%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22156%22%20r%3D%221.1%22%20fill%3D%22%238c5239%22/%3E%3C/svg%3E")}
+.stage-header{
+  grid-column:1;grid-row:1;position:relative;
+  padding:24px 32px 0 32px;
+}
+.stage-header h1{font-size:30px;line-height:36px;font-weight:600;letter-spacing:-.02em;color:rgba(var(--text-rgb),var(--t-strong));margin:0;text-wrap:balance}
+.stage-header .intro{margin:4px 0 0;max-width:65ch;font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-body))}
+.stage-header .theme-toggle{
+  position:absolute;top:20px;right:32px;overflow:hidden;
+  display:inline-flex;align-items:center;gap:8px;
+  height:44px;min-height:44px;padding:0 16px;border-radius:10px;
+  background:var(--field);border:1px solid var(--field-edge);
+  color:rgba(var(--text-rgb),var(--t-value));font-size:15px;cursor:pointer;
+}
+.theme-toggle svg{width:18px;height:18px;flex:none}
+.pillar{
+  grid-column:2;grid-row:1/3;
+  width:392px;margin:0;
+  display:flex;flex-direction:column;
+  min-height:0;overflow-y:auto;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border-left:1px solid var(--edge);
+}
+.pillar>.panel{
+  background:none;border:none;border-radius:0;
+  padding:24px;min-width:0;
+}
+.pillar>.panel+.panel{border-top:1px solid var(--sep-strong)}
+.panel>h2{font-size:20px;line-height:25px;font-weight:600;color:rgba(var(--text-rgb),var(--t-strong));margin:0 0 16px}
+.figure-area{
+  grid-column:1;grid-row:2;
+  display:grid;grid-template-rows:minmax(0,1fr) auto auto;
+  gap:12px;min-width:0;min-height:0;
+  padding:32px 0 80px 32px;
+}
+.plot{position:relative;min-height:0}
+.graphic{display:block;width:100%;height:100%}
+.graphic text{font:15px var(--font);fill:rgba(var(--text-rgb),var(--t-hint))}
+#next-dot,#preview-arrow{transition:opacity .12s}
+#next-dot.is-arriving,#preview-arrow.is-arriving{opacity:0}
+.notice{
+  position:absolute;top:12px;left:56px;right:16px;
+  background:var(--glass);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  border:1px solid var(--edge);border-radius:10px;padding:8px 12px;
+  font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-value));
+}
+.playback{
+  position:fixed;left:0;right:392px;bottom:0;z-index:10;
+  height:64px;padding:10px 32px;
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+  overflow-x:auto;scrollbar-width:none;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border:none;border-top:1px solid var(--edge);border-radius:0;
+}
+.playback::-webkit-scrollbar{display:none}
+.playback>button{flex:1 1 0;min-width:max-content;max-width:200px;height:44px;padding:0 16px;font-size:15px}
+.readouts{flex:none;margin-left:auto;align-self:stretch;display:flex;align-items:center;gap:32px;padding:0 0 0 24px;border-left:1px solid var(--sep-strong)}
+.readouts dl{margin:0;width:7ch;text-align:center}
+.readouts dt{font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-label));margin-bottom:4px;text-align:center}
+.readouts dd{margin:0;font-size:17px;font-weight:400;line-height:22px;font-variant-numeric:tabular-nums;color:rgba(var(--text-rgb),var(--t-value));text-align:center}
+.figure-meta{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-hint))}
+.legend i{flex:none;display:block}
+.legend .key-line{width:22px;height:0;border-top:2.5px solid var(--mark-neutral)}
+.legend .key-current{width:14px;height:14px;border-radius:50%;background:var(--amber);border:2px solid var(--work);box-sizing:border-box}
+.legend .key-next{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--coral);box-sizing:border-box}
+.legend button{min-height:44px;padding:8px;border-radius:10px;background:none;border:none;border-radius:8px;color:inherit;font:inherit;font-size:15px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+@media(hover:hover) and (pointer:fine){.legend button:hover{background:rgba(var(--text-rgb),.05)}}
+.playback-status{font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-hint));margin:0;min-height:20px}
+button{
+  position:relative;overflow:hidden;
+  font:inherit;font-size:15px;
+  min-height:44px;padding:0 16px;
+  border:1px solid var(--field-edge);border-radius:10px;
+  background-color:var(--field);
+  color:rgba(var(--text-rgb),var(--t-value));
+  cursor:pointer;
+}
+button::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(var(--text-rgb),0);transition:background .12s;pointer-events:none}
+button.primary{background-color:transparent;background-image:var(--select-bg);border-color:var(--select-edge);color:rgba(var(--text-rgb),var(--t-strong))}
+button:disabled{color:rgba(var(--text-rgb),var(--t-off));cursor:default}
+@media(hover:hover) and (pointer:fine){button:hover:not(:disabled)::after{background:rgba(var(--text-rgb),.05)}}
+button:active:not(:disabled)::after{background:rgba(var(--text-rgb),.08)}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.control{margin-bottom:24px}
+.control>label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:17px;color:rgba(var(--text-rgb),var(--t-label));margin-bottom:8px}
+.control output{font-size:17px;font-variant-numeric:tabular-nums;color:rgba(var(--text-rgb),var(--t-value))}
+input[type="range"]{
+  -webkit-appearance:none;appearance:none;
+  display:block;width:100%;height:44px;margin:0;overflow:hidden;
+  --p:0%;
+  background:
+    var(--noise) 0 0/128px 128px,
+    linear-gradient(90deg,transparent calc(var(--p) - 1.5px),var(--amber) 0 calc(var(--p) + 1.5px),transparent 0) 0 4px/100% calc(100% - 8px) no-repeat,
+    var(--slider-fill) 0 0/var(--p) 100% no-repeat,
+    var(--field);
+  border:1px solid var(--field-edge);border-radius:10px;
+  cursor:pointer;
+  transition:--p 120ms cubic-bezier(0.2,0.8,0.2,1);
+}
+input[type="range"]::-webkit-slider-runnable-track{height:44px;background:transparent;border:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:3px;height:36px;margin-top:4px;border:none;background:transparent}
+input[type="range"]::-moz-range-track{height:100%;background:var(--field);border:none;border-radius:10px}
+input[type="range"]::-moz-range-progress{height:100%;background:var(--slider-fill);border-radius:10px 0 0 10px}
+input[type="range"]::-moz-range-thumb{width:3px;height:36px;border:none;border-radius:2px;background:var(--amber)}
+.feedback{background:var(--inset);border-left:2px solid var(--amber);border-radius:8px;padding:16px}
+.feedback h2{font-size:17px;line-height:22px;font-weight:600;color:rgba(var(--text-rgb),var(--t-strong));margin:0 0 6px}
+.feedback p{margin:0 0 8px;font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-body))}
+.feedback p:last-child{margin-bottom:0}
+.feedback .detail{font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-hint))}
+.equation{font-family:var(--mono);font-size:15px;overflow-wrap:anywhere}
+.disclosure{border-top:1px solid var(--sep-soft)}
+.panel *:not(.disclosure):has(+ .disclosure){margin-bottom:16px}
+/* Row = separator + 52 px; the hover fill is inset 4 px from the separators
+   (44 px tall) and bleeds 8 px into the panel padding on both sides. */
+.disclosure summary{
+  position:relative;
+  list-style:none;display:flex;align-items:center;height:52px;margin:0 -8px;padding:0 8px;
+  font-size:17px;color:rgba(var(--text-rgb),var(--t-body));cursor:pointer;
+}
+.disclosure summary::before{
+  content:"";position:absolute;top:4px;bottom:4px;left:0;right:0;z-index:-1;
+  border-radius:10px;background:rgba(var(--text-rgb),0);transition:background .12s;
+}
+.disclosure summary::-webkit-details-marker{display:none}
+/* Chevron is a centred 16 px box on the row's own centre line. */
+.disclosure summary::after{
+  content:"";margin-left:auto;width:16px;height:16px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.disclosure summary::after{
+  background:none;
+}
+.disclosure summary::after{
+  content:"";
+  border-right:1.5px solid rgba(var(--text-rgb),var(--t-hint));
+  border-bottom:1.5px solid rgba(var(--text-rgb),var(--t-hint));
+  width:8px;height:8px;
+  transform:rotate(45deg) translateY(-2px);
+  transition:transform .2s;
+}
+.disclosure[open] summary::after{transform:rotate(225deg) translateY(-2px)}
+@media(hover:hover) and (pointer:fine){
+  .disclosure summary:hover::before{background:rgba(var(--text-rgb),.05)}
+  .disclosure summary:hover::after{border-color:rgba(var(--text-rgb),var(--t-value))}
+}
+.disclosure summary:active::before{background:rgba(var(--text-rgb),.08)}
+.disclosure .summary-label{display:flex;align-items:center}
+@supports (text-box: trim-both cap alphabetic){
+  .disclosure .summary-label{text-box:trim-both cap alphabetic}
+}
+@supports not (text-box: trim-both cap alphabetic){
+  .disclosure .summary-label{padding-top:1px}
+}
+.disclosure .disclosure-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .2s ease-in-out}
+.disclosure[open] .disclosure-body{grid-template-rows:1fr}
+.disclosure.closing .disclosure-body{grid-template-rows:0fr}
+.disclosure-inner{overflow:hidden;min-height:0}
+.disclosure-inner>:first-child{margin-top:8px}
+.disclosure-inner>:last-child{margin-bottom:16px}
+.disclosure p{font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-body))}
+#run{min-width:calc(6ch + 32px)}
 .prediction fieldset{border:0;padding:0;margin:12px 0}
-.prediction legend{font-size:var(--type-body);margin-bottom:8px}
-.prediction label{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
-.prediction input{width:19px;height:19px;accent-color:var(--accent);flex:none}
-.prediction-result{font-size:var(--type-body);margin-top:12px}
-.playback-status{font-size:var(--type-note);color:var(--muted);text-align:center;min-height:22px;margin:10px 0 0}
-.axis-label{font-weight:600}
-.preview-line{stroke:var(--accent);stroke-width:2;fill:none}
-.model-notes p:last-child{margin-bottom:0}
-@media(min-width:901px){.layout>div>.card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}.layout>div>.card>h2,.layout>div>.card>.prediction{grid-column:1/-1}.control{margin-bottom:0}.playback-status{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip-path:inset(50%);white-space:nowrap}}
-@media(max-width:900px){.graphic{height:300px}}
-@media(max-width:420px){.graphic{height:260px}.actions{gap:8px}.actions button{padding:9px 13px}}
-@media print{.graphic{height:320px}}
+.prediction legend{font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-body));margin-bottom:8px}
+.prediction label{display:flex;align-items:center;gap:10px;min-height:44px;font-size:17px;color:rgba(var(--text-rgb),var(--t-body));cursor:pointer}
+.prediction input{width:19px;height:19px;accent-color:var(--amber);flex:none}
+.prediction-result{font-size:17px;margin:12px 0 0}
+[data-mark]{cursor:pointer;transition:filter .12s}
+[data-mark]:hover{filter:brightness(1.25)}
+[data-mark].is-open:hover{filter:drop-shadow(0 0 1px var(--amber))}
+[data-mark]:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+[data-mark].is-open{filter:drop-shadow(0 0 1px var(--amber))}
+.mark-hit{fill:transparent;stroke:transparent;stroke-width:44px}
+.mark-popover{
+  position:fixed;z-index:20;box-sizing:border-box;margin:0;
+  max-width:260px;padding:12px;
+  background:var(--glass);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  border:1px solid var(--edge);border-radius:10px;
+  opacity:0;transition:opacity .12s ease-in,transform .12s ease-in;
+}
+.mark-popover[data-side="right"]{transform:translateX(-4px) scale(.96);transform-origin:left center}
+.mark-popover[data-side="left"]{transform:translateX(4px) scale(.96);transform-origin:right center}
+.mark-popover.is-open{opacity:1;transform:translateX(0) scale(1);transition:opacity .16s cubic-bezier(.2,.8,.2,1),transform .16s cubic-bezier(.2,.8,.2,1)}
+.mark-popover h3{margin:0 0 4px;font-size:17px;line-height:22px;font-weight:600;color:rgba(var(--text-rgb),var(--t-strong))}
+.mark-popover p{margin:0;font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-body))}
+.mark-popover .mark-value{margin-top:6px;font-variant-numeric:tabular-nums;color:rgba(var(--text-rgb),var(--t-value))}
+@media(max-width:900px){
+  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+  .stage-header{grid-row:1;padding:16px 16px 8px}
+  .figure-area{grid-row:2;padding:8px 16px 4px}
+  .graphic{height:300px}
+  .pillar{grid-column:1;grid-row:3;width:auto;margin:0;border-left:none;border-top:1px solid var(--sep-strong);overflow:visible;padding-bottom:64px}
+  .pillar>.panel{border-radius:0}
+  .playback{right:0}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
+  input[type="range"],button::after,.mark-popover{transition-duration:80ms}
+  .mark-popover{transform:none!important}
+  #next-dot,#preview-arrow,.disclosure .disclosure-body{transition:none!important}
+}
+@media(prefers-reduced-transparency:reduce){
+  :root{--glass:rgb(248,248,248)}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--glass:rgb(30,30,30)}}
+  :root[data-theme="dark"]{--glass:rgb(30,30,30)}
+  *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+}
+@media(prefers-contrast:more){
+  :root{--t-label:.80;--t-hint:.80;--edge:rgba(0,0,0,.40)}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--edge:rgba(255,255,255,.40)}}
+  :root[data-theme="dark"]{--edge:rgba(255,255,255,.40)}
+}
+@media print{
+  :root,:root[data-theme="dark"]{color-scheme:light;--work:#fff;--glass:#fff;--edge:#ddd;--text-rgb:22,22,22;--field:#f5f5f5;--field-edge:#ddd;--inset:#f7f7f7;--sep-strong:#bbb;--sep-soft:#ddd}
+  *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  body{display:block;background:#fff}
+  body::before,body::after,.ground-dots{display:none!important}
+  .theme-toggle,.playback button,input{display:none}
+  .stage-header,.figure-area{padding:0}
+  .pillar{width:auto;margin:16px 0;overflow:visible}
+  .panel{break-inside:avoid;margin-bottom:16px}
+  .graphic{height:320px}
+  .disclosure{display:block}
+}
 </style>
 </head>
 <body>
-<main>
-<header class="demo-header"><h1>When is a step too large?</h1><button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button><p class="intro">f(x) = (x − 3)²</p></header>
-<div class="layout">
-<section class="card stage" aria-label="Gradient descent graph and playback">
-<div class="plot"><svg id="chart" class="graphic" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Gradient descent on a one-dimensional quadratic</title><desc id="chart-description">The curve has its minimum at x = 3. A solid point shows the current x and loss. A purple outlined point and arrow preview one step at the selected learning rate. The axes remain fixed; exact values appear below.</desc><defs><clipPath id="plot-clip"><rect id="clip-rectangle"/></clipPath><marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><path id="grid" fill="none" stroke="var(--border)"/><path id="axes" fill="none" stroke="var(--muted)" stroke-opacity=".55"/><path id="minimum-guide" fill="none" stroke="var(--border)" stroke-dasharray="4 6"/><g id="axis-labels"></g><g clip-path="url(#plot-clip)"><path id="curve" fill="none" stroke="var(--muted)" stroke-width="2.5"/><path id="trail" fill="none" stroke="var(--ink)" stroke-width="1.7" stroke-opacity=".65" stroke-dasharray="5 5"/><path id="preview-arrow" class="preview-line" marker-end="url(#arrowhead)"/><circle id="next-dot" r="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2.5"/><circle id="current-dot" r="6" fill="var(--ink)" stroke="var(--surface)" stroke-width="2"/></g></svg><div id="graph-notice" class="graph-notice" hidden></div></div>
-<div class="actions"><button id="run" class="primary">Run</button><button id="step">Step</button><button id="reset">Reset</button></div>
-<p id="playback-status" class="playback-status">Ready · up to 30 steps</p>
-<div class="legend" aria-label="Graph legend"><span><i class="key-line" aria-hidden="true"></i>Loss curve</span><span><i class="key-current" aria-hidden="true"></i>Current</span><span><i class="key-next" aria-hidden="true"></i>Next step</span></div>
-<div class="metrics" aria-label="Current model values"><dl><dt>Step</dt><dd id="step-value">0</dd></dl><dl><dt>x</dt><dd id="x-value">−2</dd></dl><dl><dt>Loss</dt><dd id="loss-value">25</dd></dl></div>
-</section>
-<div>
-<section class="card" aria-labelledby="controls-title"><h2 id="controls-title">Shape the next step</h2><div class="control"><label for="start">Starting x <output id="start-output" for="start">−2</output></label><input id="start" type="range" min="-10" max="16" step="0.5" value="-2"></div><div class="control"><label for="rate">Learning rate η <output id="rate-output" for="rate">0.25</output></label><input id="rate" type="range" min="0.05" max="1.2" step="0.05" value="0.25"></div><details class="prediction"><summary>Try a prediction</summary><fieldset><legend>After the next step, the distance to x = 3 is…</legend><label><input type="radio" name="prediction" value="closer">Smaller</label><label><input type="radio" name="prediction" value="same">The same</label><label><input type="radio" name="prediction" value="farther">Larger</label></fieldset><button id="check-prediction" disabled>Check prediction</button><p id="prediction-result" class="prediction-result" aria-live="polite" hidden></p></details></section>
-<section class="feedback" aria-labelledby="feedback-title" aria-live="polite" aria-atomic="true"><h2 id="feedback-title">A smaller distance</h2><p id="interpretation">The next step moves closer to the minimum.</p><details><summary>See the calculation</summary><p id="calculation" class="equation"></p><p id="next-value" class="detail"></p><p class="equation">x next − 3 = (1 − 2η) · (x − 3)</p></details></section>
-</div>
-</div>
-<details class="model-notes"><summary>Model notes</summary><p>This is one exact, one-dimensional quadratic with derivative 2(x − 3), a constant positive learning rate, and no noise. For this function, 0 &lt; η &lt; 1 converges, η = 1 oscillates at a fixed distance, and η &gt; 1 diverges. Starting exactly at x = 3 stays there for every rate.</p><p>The run advances discrete steps every 700 ms, stops after 30 steps or at the graph boundary, and pauses whenever you change a parameter. The view is framed from the starting x and stays fixed through playback and learning-rate changes. Updates are instant, including with reduced motion enabled. This graph does not model other loss functions or multiple dimensions.</p></details>
-<noscript><p>Interactive controls need JavaScript. At x = −2 and η = 0.25, the next x is 0.5 and the loss falls from 25 to 6.25.</p></noscript>
+<div class="ground-dots" aria-hidden="true"></div>
+<header class="stage-header">
+<div><h1>When is a step too large?</h1><p class="intro">f(x)&nbsp;=&nbsp;(x&nbsp;−&nbsp;3)²</p></div>
+<button id="theme-toggle" class="theme-toggle" aria-label="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">Dark</span></button>
+</header>
+<main class="figure-area">
+<div class="plot"><svg id="chart" class="graphic" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Gradient descent on a one-dimensional quadratic</title><desc id="chart-description">The curve has its minimum at x = 3. A solid amber point shows the current x and loss. A coral outlined point and arrow preview one step at the selected learning rate. The axes remain fixed; exact values appear in the bar below.</desc><defs><clipPath id="plot-clip"><rect id="clip-rectangle"/></clipPath><linearGradient id="ember-stroke" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="var(--amber)"/><stop offset="1" stop-color="var(--coral)"/></linearGradient><marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="var(--coral)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><path id="grid" fill="none" stroke="var(--grid-line)"/><path id="axes" fill="none" stroke="var(--axis-line)"/><g id="axis-labels"></g><g clip-path="url(#plot-clip)"><g id="mark-minimum" class="mark" data-mark role="button" tabindex="0" focusable="true" aria-label="Minimum at x = 3"><path id="minimum-guide-hit" class="mark-hit" fill="none"/><path id="minimum-guide" fill="none" stroke="var(--axis-line)" stroke-dasharray="4 6" pointer-events="none"/></g><g id="mark-curve" class="mark" data-mark role="button" tabindex="0" focusable="true" aria-label="Loss curve"><path id="curve-hit" class="mark-hit" fill="none"/><path id="curve" fill="none" stroke="var(--mark-neutral)" stroke-width="2.5" pointer-events="none"/></g><path id="trail" fill="none" stroke="rgba(var(--text-rgb),.5)" stroke-width="1.7" stroke-dasharray="5 5" pointer-events="none"/><g id="preview-arrow" class="mark" data-mark role="button" tabindex="0" focusable="true" aria-label="Step"><path id="preview-arrow-hit" class="mark-hit" fill="none"/><path id="preview-arrow-line" fill="none" stroke="url(#ember-stroke)" stroke-width="2" marker-end="url(#arrowhead)" pointer-events="none"/></g><g id="next-dot" class="mark" data-mark role="button" tabindex="0" focusable="true" aria-label="Next step"><circle r="22" fill="transparent" stroke="none"/><circle r="10" fill="none" stroke="var(--coral)" stroke-width="2.5" pointer-events="none"/></g><g id="current-dot" class="mark" data-mark role="button" tabindex="0" focusable="true" aria-label="Current point"><circle r="22" fill="transparent" stroke="none"/><circle r="7" fill="var(--amber)" stroke="var(--work)" stroke-width="2" pointer-events="none"/></g></g></svg><div id="graph-notice" class="notice" hidden></div></div>
+<div class="playback"><button id="run" class="primary">Run</button><button id="step">Step</button><button id="reset">Reset</button><div class="readouts" aria-label="Current model values"><dl><dt>Step</dt><dd id="step-value">0</dd></dl><dl><dt>x</dt><dd id="x-value">−2</dd></dl><dl><dt>Loss</dt><dd id="loss-value">25</dd></dl></div></div>
+<div class="figure-meta"><div class="legend" aria-label="Graph legend"><button data-mark-for="mark-curve"><i class="key-line" aria-hidden="true"></i>Loss curve</button><button data-mark-for="current-dot"><i class="key-current" aria-hidden="true"></i>Current</button><button data-mark-for="next-dot"><i class="key-next" aria-hidden="true"></i>Next step</button></div><p id="playback-status" class="playback-status">Ready · up to 30 steps</p></div>
 </main>
+<aside class="pillar">
+<section class="panel" aria-labelledby="controls-title"><h2 id="controls-title">Shape the next step</h2><div class="control"><label for="start">Starting x <output id="start-output" for="start">−2</output></label><input id="start" type="range" min="-10" max="16" step="0.5" value="-2"></div><div class="control"><label for="rate">Learning rate η <output id="rate-output" for="rate">0.25</output></label><input id="rate" type="range" min="0.05" max="1.2" step="0.05" value="0.25"></div><details class="disclosure prediction"><summary><span class="summary-label">Try a prediction</span></summary><div class="disclosure-body"><div class="disclosure-inner"><fieldset><legend>After the next step, the distance to x = 3 is…</legend><label><input type="radio" name="prediction" value="closer">Smaller</label><label><input type="radio" name="prediction" value="same">The same</label><label><input type="radio" name="prediction" value="farther">Larger</label></fieldset><button id="check-prediction" disabled>Check prediction</button><p id="prediction-result" class="prediction-result" aria-live="polite" hidden></p></div></div></details></section>
+<section class="panel" aria-labelledby="feedback-title"><div class="feedback" aria-live="polite" aria-atomic="true"><h2 id="feedback-title">A smaller distance</h2><p id="interpretation">The next step moves closer to the minimum.</p></div><details class="disclosure"><summary><span class="summary-label">See the calculation</span></summary><div class="disclosure-body"><div class="disclosure-inner"><p id="calculation" class="equation"></p><p id="next-value" class="detail"></p><p class="equation">x next − 3 = (1\u00a0−\u00a02η)\u00a0·\u00a0(x\u00a0−\u00a03)</p></div></div></details><details class="disclosure"><summary><span class="summary-label">Model notes</span></summary><div class="disclosure-body"><div class="disclosure-inner"><p>This is one exact, one-dimensional quadratic with derivative 2(x − 3), a constant positive learning rate, and no noise. For this function, 0 &lt; η &lt; 1 converges, η = 1 oscillates at a fixed distance, and η &gt; 1 diverges. Starting exactly at x = 3 stays there for every rate.</p><p>The run advances discrete steps every 700 ms, stops after 30 steps or at the graph boundary, and pauses whenever you change a parameter. The view is fixed for the whole slider range; updates are instant, including with reduced motion enabled. This graph does not model other loss functions or multiple dimensions.</p></div></div></details></section>
+</aside>
+<noscript><p>Interactive controls need JavaScript. At x&nbsp;=&nbsp;−2 and η&nbsp;=&nbsp;0.25, the next x is 0.5 and the loss falls from 25 to 6.25.</p></noscript>
 <script>
 const $ = id => document.getElementById(id);
 const themeButton = $('theme-toggle');
 const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 function currentTheme(){return document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light');}
 function updateThemeButton(){const dark = currentTheme() === 'dark';$('theme-label').textContent = dark ? 'Light' : 'Dark';themeButton.setAttribute('aria-label',dark ? 'Switch to light theme' : 'Switch to dark theme');}
 try{const savedTheme = localStorage.getItem('socratic-workshop-theme');if(savedTheme === 'dark' || savedTheme === 'light')document.documentElement.dataset.theme = savedTheme;}catch{}
@@ -116,13 +362,91 @@ themeButton.addEventListener('click',()=>{const theme = currentTheme() === 'dark
 systemTheme.addEventListener('change',updateThemeButton);
 updateThemeButton();
 
-const VIEW = {left:-5,right:11,top:64};
+const markPopover=document.createElement('div');
+markPopover.className='mark-popover';
+markPopover.setAttribute('role','dialog');
+markPopover.hidden=true;
+document.body.appendChild(markPopover);
+let markAnchor=null,markBounds=null,markValueEl=null,markValueFn=null,popTimer=0;
+function openMarkPopover(anchor,content,bounds){
+  closeMarkPopover();
+  clearTimeout(popTimer);
+  markAnchor=anchor;
+  markBounds=bounds||null;
+  anchor.classList.add('is-open');
+  const data=typeof content==='function'?content():content;
+  markPopover.replaceChildren();
+  if(data.title){const h=document.createElement('h3');h.textContent=data.title;markPopover.append(h);}
+  if(data.body){const p=document.createElement('p');p.textContent=data.body;markPopover.append(p);}
+  markValueEl=null;markValueFn=null;
+  if(data.value!=null){markValueEl=document.createElement('p');markValueEl.className='mark-value';markPopover.append(markValueEl);
+    if(typeof data.value==='function'){markValueFn=data.value;markValueEl.textContent=markValueFn();}
+    else markValueEl.textContent=data.value;}
+  markPopover.hidden=false;
+  markPopover.classList.remove('is-open');
+  positionMarkPopover();
+  requestAnimationFrame(()=>markPopover.classList.add('is-open'));
+}
+function positionMarkPopover(){
+  if(!markAnchor)return;
+  const r=markAnchor.getBoundingClientRect();
+  const b=markBounds?markBounds.getBoundingClientRect():{left:8,top:8,right:innerWidth-8,bottom:innerHeight-8};
+  const pw=markPopover.offsetWidth,ph=markPopover.offsetHeight;
+  let side='right';
+  let left=r.right+14;
+  if(left+pw>b.right-8){left=r.left-14-pw;side='left';}
+  left=Math.max(b.left+8,Math.min(left,b.right-8-pw));
+  const top=Math.max(b.top+8,Math.min(r.top+r.height/2-ph/2,b.bottom-8-ph));
+  markPopover.dataset.side=side;
+  markPopover.style.left=left+'px';
+  markPopover.style.top=top+'px';
+}
+function closeMarkPopover(){
+  if(!markAnchor)return;
+  markAnchor.classList.remove('is-open');
+  markAnchor=null;markValueFn=null;markValueEl=null;
+  markPopover.classList.remove('is-open');
+  clearTimeout(popTimer);
+  popTimer=setTimeout(()=>{markPopover.hidden=true;},130);
+}
+function toggleMarkPopover(anchor,content,bounds){
+  if(markAnchor===anchor)closeMarkPopover();
+  else openMarkPopover(anchor,content,bounds);
+}
+function refreshMarkPopover(){
+  if(markValueFn&&markValueEl)markValueEl.textContent=markValueFn();
+  positionMarkPopover();
+}
+function bindMark(el,content,bounds){
+  el.addEventListener('click',event=>{event.stopPropagation();toggleMarkPopover(el,content,bounds||el);});
+  el.addEventListener('keydown',event=>{
+    if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMarkPopover(el,content,bounds||el);}
+  });
+}
+document.addEventListener('click',event=>{
+  if(markAnchor&&!markPopover.contains(event.target)&&!markAnchor.contains(event.target))closeMarkPopover();
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&markAnchor){const m=markAnchor;closeMarkPopover();if(m.focus)m.focus();}
+});
+
+const plotEl=document.querySelector('.plot');
+const markContent={
+  'mark-curve':()=>({title:'Loss curve',body:'f(x)\u00a0=\u00a0(x\u00a0−\u00a03)², the error at every x. Lower is better.'}),
+  'current-dot':()=>({title:'Current point',body:'Where the descent stands now. Every step starts here.',value:()=>`x\u00a0=\u00a0${number(current())}\u00a0·\u00a0loss\u00a0=\u00a0${number(loss(current()))}`}),
+  'next-dot':()=>({title:'Next step',body:'Where one update lands: x\u00a0−\u00a0η\u00a0·\u00a02(x\u00a0−\u00a03). Change η to move it.',value:()=>{const n=nextValue(current());return `x\u00a0=\u00a0${number(n)}\u00a0·\u00a0loss\u00a0=\u00a0${number(loss(n))}`;}}),
+  'preview-arrow':()=>({title:'Step',body:'Its length is η times the slope 2(x − 3). Steeper ground, longer step.',value:()=>`Δx\u00a0=\u00a0${number(nextValue(current())-current())}`}),
+  'mark-minimum':()=>({title:'Minimum',body:'At x\u00a0=\u00a03 the slope is zero, so updates stop moving.',value:'loss\u00a0=\u00a00'}),
+};
+
+const VIEW = {left:-11,right:17,top:200};
 const MAX_STEPS = 30;
 let history = [];
 let running = false;
 let timer = null;
 let runEpoch = 0;
 function number(value){if(value !== 0 && Math.abs(value) < 0.001)return value.toExponential(2);return new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(value);}
+function readoutNumber(value){if(value !== 0 && Math.abs(value) < 0.001)return value.toExponential(2);return new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(value);}
 function loss(x){return (x - 3) ** 2;}
 function current(){return history.at(-1);}
 function learningRate(){return Number($('rate').value);}
@@ -131,7 +455,8 @@ function withinView(x){return Number.isFinite(x) && x >= VIEW.left && x <= VIEW.
 function canAdvance(){return history.length - 1 < MAX_STEPS && withinView(current()) && current() !== 3;}
 function attributes(id,values){Object.entries(values).forEach(([key,value]) => $(id).setAttribute(key,value));}
 function geometry(){const width = $('chart').clientWidth || 680;const height = $('chart').clientHeight || 420;return {width,height,left:54,right:width-18,top:32,bottom:height-36};}
-function projected(x,g){return {x:g.left+(x-VIEW.left)/(VIEW.right-VIEW.left)*(g.right-g.left),y:g.bottom-loss(x)/VIEW.top*(g.bottom-g.top)};}
+function projected(x,g){return projectedXY(x,loss(x),g);}
+function projectedXY(mx,my,g){return {x:g.left+(mx-VIEW.left)/(VIEW.right-VIEW.left)*(g.right-g.left),y:g.bottom-my/VIEW.top*(g.bottom-g.top)};}
 function pointString(point){return `${point.x},${point.y}`;}
 function clippedEndpoint(from,to,g){
   const dx = to.x - from.x;
@@ -150,25 +475,47 @@ function axisText(text,x,y,anchor='middle'){
 function renderAxes(g){
   const middleY = g.bottom-(g.bottom-g.top)/2;
   const minimumX = projected(3,g).x;
+  const guideD = `M${minimumX} ${g.top}V${g.bottom}`;
   attributes('axes',{d:`M${g.left} ${g.top}V${g.bottom}H${g.right}`});
   attributes('grid',{d:`M${g.left} ${g.top}H${g.right} M${g.left} ${middleY}H${g.right}`});
-  attributes('minimum-guide',{d:`M${minimumX} ${g.top}V${g.bottom}`});
-  $('axis-labels').replaceChildren(axisText(number(VIEW.top),g.left-9,g.top+5,'end'),axisText(number(VIEW.top/2),g.left-9,middleY+5,'end'),axisText('0',g.left-9,g.bottom+5,'end'),axisText(number(VIEW.left),g.left,g.bottom+24),axisText('x = 3',minimumX,g.bottom+24),axisText(number(VIEW.right),g.right,g.bottom+24),axisText('Loss',g.left,g.top-14,'start'),axisText('x',g.right,g.top-14));
+  attributes('minimum-guide',{d:guideD});
+  attributes('minimum-guide-hit',{d:guideD});
+  $('axis-labels').replaceChildren(axisText(number(VIEW.top),g.left-9,g.top+5,'end'),axisText(number(VIEW.top/2),g.left-9,middleY+5,'end'),axisText('0',g.left-9,g.bottom+5,'end'),axisText(number(VIEW.left),g.left,g.bottom+24),axisText('x\u00a0=\u00a03',minimumX,g.bottom+24),axisText(number(VIEW.right),g.right,g.bottom+24),axisText('Loss',g.left,g.top-14,'start'),axisText('x',g.right,g.top-14));
 }
+/* The drawn position follows the model, owned by a single rAF tick:
+   a critically damped spring while inputs move, a 320 ms travel along the
+   step arrow on each step, then the next preview fades in. */
+let drawnX = null, drawnY = null, drawnV = 0, travel = null, rafId = 0, lastTickT = 0;
+let phase = 'preview', settleT0 = 0; /* preview | travel | settle */
+const SPRING_W = 50; /* rad/s, settles ~120 ms */
 function renderPreview(g){
-  const inView = withinView(current());
+  const mx = drawnX == null ? current() : drawnX;
+  const my = drawnY == null ? loss(current()) : drawnY;
+  const inView = withinView(mx);
+  const dot = projectedXY(mx,my,g);
   $('current-dot').style.display = inView ? '' : 'none';
-  $('preview-arrow').style.display = inView && current() !== 3 ? '' : 'none';
-  $('next-dot').style.display = 'none';
-  if(!inView)return;
-  const now = projected(current(),g);
-  const next = projected(nextValue(current()),g);
-  const endpoint = clippedEndpoint(now,next,g);
-  attributes('current-dot',{cx:now.x,cy:now.y});
-  attributes('preview-arrow',{d:`M${pointString(now)}L${pointString(endpoint)}`});
-  if(!withinView(nextValue(current())))return;
-  $('next-dot').style.display = '';
-  attributes('next-dot',{cx:next.x,cy:next.y});
+  if(inView) attributes('current-dot',{transform:`translate(${dot.x} ${dot.y})`});
+  const settling = phase === 'settle';
+  /* landing: the just-used arrow and ring fade out in place over 120 ms */
+  $('preview-arrow').classList.toggle('is-arriving',settling);
+  $('next-dot').classList.toggle('is-arriving',settling);
+  if(settling) return;
+  const to = travel ? travel.target : {x:nextValue(current()),y:loss(nextValue(current()))};
+  const from = travel ? travel.a : {x:mx,y:my};
+  const A = projectedXY(from.x,from.y,g), B = projectedXY(to.x,to.y,g);
+  const dx = B.x-A.x, dy = B.y-A.y, len = Math.hypot(dx,dy);
+  const arrowOn = inView && len > 13 && (travel || current() !== 3);
+  $('preview-arrow').style.display = arrowOn ? '' : 'none';
+  if(arrowOn){
+    const short = {x:A.x+dx*(1-13/len),y:A.y+dy*(1-13/len)};
+    const end = clippedEndpoint(A,short,g);
+    const d = `M${pointString(A)}L${pointString(end)}`;
+    attributes('preview-arrow-line',{d});
+    attributes('preview-arrow-hit',{d});
+  }
+  const ringOn = withinView(to.x) && (travel ? true : (inView && current() !== 3));
+  $('next-dot').style.display = ringOn ? '' : 'none';
+  if(ringOn) attributes('next-dot',{transform:`translate(${B.x} ${B.y})`});
 }
 function renderGraph(){
   const g = geometry();
@@ -176,42 +523,81 @@ function renderGraph(){
   attributes('clip-rectangle',{x:g.left,y:g.top,width:g.right-g.left,height:g.bottom-g.top});
   renderAxes(g);
   const samples = Array.from({length:121},(_,i) => VIEW.left+(VIEW.right-VIEW.left)*i/120);
-  attributes('curve',{d:samples.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ')});
-  attributes('trail',{d:history.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ')});
+  const curveD = samples.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ');
+  attributes('curve',{d:curveD});
+  attributes('curve-hit',{d:curveD});
+  /* the trail extends only when a step lands */
+  const trailPts = travel ? history.slice(0,-1) : history;
+  attributes('trail',{d:trailPts.map((x,i) => `${i ? 'L' : 'M'}${pointString(projected(x,g))}`).join(' ')});
   renderPreview(g);
   renderGraphNotice();
 }
+function tick(t){
+  rafId = 0;
+  const rm = reducedMotion.matches;
+  const now = performance.now();
+  const dt = Math.min(1/30, lastTickT ? (now-lastTickT)/1000 : 1/60);
+  lastTickT = now;
+  if(travel){
+    const p = rm ? 1 : Math.min(1,(now-travel.t0)/320);
+    const e = p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;
+    drawnX = travel.a.x + (travel.b.x-travel.a.x)*e;
+    drawnY = travel.a.y + (travel.b.y-travel.a.y)*e;
+    if(p>=1){
+      drawnX = travel.target.x; drawnY = travel.target.y;
+      travel = null; phase = 'settle'; settleT0 = now;
+    }
+  } else if(phase === 'settle'){
+    drawnX = current(); drawnY = loss(current()); drawnV = 0;
+    if(now-settleT0 >= 120 || rm) phase = 'preview';
+  } else {
+    const target = current();
+    if(drawnX == null || rm){ drawnX = target; drawnV = 0; }
+    const a = -2*SPRING_W*drawnV - SPRING_W*SPRING_W*(drawnX-target);
+    const prevX = drawnX;
+    drawnV += a*dt; drawnX += drawnV*dt;
+    if(prevX !== target && Math.sign(target-drawnX) !== Math.sign(target-prevX)){ drawnX = target; drawnV = 0; }
+    drawnY = loss(drawnX);
+    if(Math.abs(drawnX-target) < 1e-6 && Math.abs(drawnV) < 1e-4){ drawnX = target; drawnY = loss(target); drawnV = 0; }
+  }
+  renderGraph();
+  refreshMarkPopover();
+  if(travel || phase === 'settle' || drawnX !== current() || Math.abs(drawnV) > 1e-4) rafId = requestAnimationFrame(tick);
+  else lastTickT = 0;
+}
+function kick(){ if(!rafId) rafId = requestAnimationFrame(tick); }
 function renderGraphNotice(){
   $('graph-notice').hidden = true;
+  if(travel)return;
   if(!withinView(current())){
-    $('graph-notice').textContent = `Stopped outside this view: x = ${number(current())}, loss = ${number(loss(current()))}. The axes have not rescaled.`;
+    $('graph-notice').textContent = `Stopped outside this view: x\u00a0=\u00a0${number(current())}, loss = ${number(loss(current()))}. The axes have not rescaled.`;
     $('graph-notice').hidden = false;
     return;
   }
   if(!withinView(nextValue(current()))){
-    $('graph-notice').textContent = `Next point is off-chart: x = ${number(nextValue(current()))}, loss = ${number(loss(nextValue(current())))}. Playback will stop there.`;
+    $('graph-notice').textContent = `Next point is off-chart: x\u00a0=\u00a0${number(nextValue(current()))}, loss = ${number(loss(nextValue(current())))}. Playback will stop there.`;
     $('graph-notice').hidden = false;
   }
 }
 function stepInterpretation(){
   const rate = learningRate();
-  if(rate === 0.5)return ['One step to the minimum','This rate lands exactly at x = 3. The next loss is zero.'];
-  if(rate < 0.5)return ['A smaller distance','The next step stays on this side of x = 3 and moves closer.'];
-  if(rate < 1)return ['Crossing, still converging','The next step crosses x = 3 but lands closer. Crossing is not divergence.'];
+  if(rate === 0.5)return ['One step to the minimum','This rate lands exactly at x\u00a0=\u00a03. The next loss is zero.'];
+  if(rate < 0.5)return ['A smaller distance','The next step stays on this side of x\u00a0=\u00a03 and moves closer.'];
+  if(rate < 1)return ['Crossing, still converging','The next step crosses x\u00a0=\u00a03 but lands closer. Crossing is not divergence.'];
   if(rate === 1)return ['A fixed-distance oscillation','The next step switches sides. The distance and loss stay the same.'];
   return ['Growing distance','The next step crosses x = 3 and lands farther away. Repeating it diverges.'];
 }
 function interpretation(){
   if(!withinView(current()))return ['Beyond the graph',`Stopped at x = ${number(current())}, loss ${number(loss(current()))}. Change an input to restart.`];
-  if(current() === 3)return ['At the minimum','The gradient is zero. Every further step stays at x = 3.'];
-  if(history.length-1 >= MAX_STEPS)return ['30 steps completed',`Distance to x = 3: ${number(Math.abs(current()-3))}. Change an input or reset to restart.`];
+  if(current() === 3)return ['At the minimum','The gradient is zero. Every further step stays at x\u00a0=\u00a03.'];
+  if(history.length-1 >= MAX_STEPS)return ['30 steps completed',`Distance to x\u00a0=\u00a03: ${number(Math.abs(current()-3))}. Change an input or reset to restart.`];
   return stepInterpretation();
 }
 function renderFeedback(){
   const [title,description] = interpretation();
   $('feedback-title').textContent = title;
   $('interpretation').textContent = description;
-  $('calculation').textContent = `x next = ${number(current())} − ${number(learningRate())} × 2 × (${number(current())} − 3) = ${number(nextValue(current()))}`;
+  $('calculation').textContent = `x\u00a0next\u00a0=\u00a0${number(current())} − ${number(learningRate())} × 2 × (${number(current())} − 3) = ${number(nextValue(current()))}`;
   $('next-value').textContent = `Next loss: ${number(loss(nextValue(current())))}. Distance multiplier: |1 − 2η| = ${number(Math.abs(1-2*learningRate()))}.`;
 }
 function updatePlayback(){
@@ -223,13 +609,14 @@ function updatePlayback(){
 }
 function render(){
   $('step-value').textContent = history.length-1;
-  $('x-value').textContent = number(current());
-  $('loss-value').textContent = number(loss(current()));
+  $('x-value').textContent = readoutNumber(current());
+  $('loss-value').textContent = readoutNumber(loss(current()));
   $('start-output').textContent = number(Number($('start').value));
   $('rate-output').textContent = number(learningRate());
   renderGraph();
   renderFeedback();
   updatePlayback();
+  refreshMarkPopover();
 }
 function pause(){running=false;clearTimeout(timer);timer=null;runEpoch+=1;updatePlayback();}
 function clearPrediction(){
@@ -237,18 +624,36 @@ function clearPrediction(){
   $('check-prediction').disabled=true;
   $('prediction-result').hidden=true;
 }
+function syncRangeFill(input){const min=Number(input.min||0),max=Number(input.max||100);input.style.setProperty('--p',(Number(input.value)-min)/(max-min)*100+'%');}
 function resetPath(){
   pause();
-  const start=Number($('start').value);
-  const radius=Math.max(8,Math.ceil(Math.abs(start-3)*1.15));
-  VIEW.left=3-radius;
-  VIEW.right=3+radius;
-  VIEW.top=radius**2;
-  history=[start];
+  history=[Number($('start').value)];
+  travel = null; phase = 'preview';
   clearPrediction();
+  syncRangeFill($('start'));
+  syncRangeFill($('rate'));
   render();
+  kick();
 }
-function advance(){if(!canAdvance())return;history.push(nextValue(current()));clearPrediction();render();}
+function advance(){
+  /* never start a step while one is in flight: finish it instantly first */
+  if(travel){ drawnX = travel.target.x; drawnY = travel.target.y; travel = null; phase = 'preview'; }
+  if(!canAdvance())return;
+  const from = drawnX == null ? current() : drawnX;
+  const to = nextValue(current());
+  history.push(to);
+  clearPrediction();
+  const a = {x:from,y:loss(from)}, d = {x:to,y:loss(to)};
+  /* clip the in-flight end to the view box so an off-chart step still travels to the edge */
+  let f = 1;
+  const ddx = d.x-a.x, ddy = d.y-a.y;
+  if(ddx > 0) f = Math.min(f,(VIEW.right-a.x)/ddx); else if(ddx < 0) f = Math.min(f,(VIEW.left-a.x)/ddx);
+  if(ddy > 0) f = Math.min(f,(VIEW.top-a.y)/ddy); else if(ddy < 0) f = Math.min(f,(0-a.y)/ddy);
+  travel = {a, b: f < 1 ? {x:a.x+ddx*f,y:a.y+ddy*f} : d, target:d, t0:performance.now()};
+  drawnV = 0; phase = 'travel';
+  render();
+  kick();
+}
 function scheduleTick(epoch){
   timer=setTimeout(() => {
     if(!running || epoch !== runEpoch)return;
@@ -284,11 +689,23 @@ function checkPrediction(){
 ['start','rate'].forEach(id => $(id).addEventListener('input',resetPath));
 $('run').addEventListener('click',toggleRun);
 $('step').addEventListener('click',() => {pause();advance();});
-$('reset').addEventListener('click',() => {$('start').value=-2;$('rate').value=0.25;resetPath();});
+$('reset').addEventListener('click',() => {$('start').value=-2;$('rate').value=0.25;drawnX=null;drawnY=null;drawnV=0;travel=null;phase='preview';resetPath();});
 document.querySelectorAll('input[name="prediction"]').forEach(input => input.addEventListener('change',() => {pause();$('check-prediction').disabled=false;$('prediction-result').hidden=true;}));
 $('check-prediction').addEventListener('click',checkPrediction);
 document.addEventListener('visibilitychange',() => {if(document.hidden)pause();});
 new ResizeObserver(renderGraph).observe($('chart'));
+document.querySelectorAll('.disclosure > summary').forEach(summary=>{
+  summary.addEventListener('click',event=>{
+    const d=summary.parentElement;
+    if(d.open){event.preventDefault();d.classList.add('closing');setTimeout(()=>{d.open=false;d.classList.remove('closing');},200);}
+  });
+});
+Object.entries(markContent).forEach(([id,content])=>bindMark($(id),content,plotEl));
+document.querySelectorAll('.legend button').forEach(button=>button.addEventListener('click',event=>{
+  event.stopPropagation();
+  const anchor=$(button.dataset.markFor);
+  toggleMarkPopover(anchor,markContent[anchor.id],plotEl);
+}));
 resetPath();
 </script>
 </body>

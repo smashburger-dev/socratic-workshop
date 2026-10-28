@@ -57,7 +57,21 @@ An illustrative conversation about a Gaussian prior and L2 regularization, rende
 
 [HTML file](examples/bottleneck.html)
 
-These GIFs are rendered previews of the example models.
+### How is it built? Exploded views
+
+Ask how something is assembled, and the tutor can build an exploded view:
+
+```text
+/socratic-workshop How is a mechanical key switch built? Show me the parts, then let me explain how a keypress registers.
+```
+
+![Exploded view of a mechanical key switch: descend from above to eye level and open a part.](media/keyboard-switch.gif)
+
+Scroll to descend from a bird's-eye view to eye level, drag to turn and tilt, and click a part to read its job and its real dimensions. Up and Down walk the parts in assembly order. Parts can separate vertically, horizontally, radially, or each in its own direction.
+
+[Key switch](examples/keyboard-switch.html) (vertical) · [Battery cell](examples/battery-cell.html) · [Flashlight](examples/flashlight.html) · [Click pen](examples/click-pen.html) (horizontal)
+
+These GIFs are rendered previews of the example models. The illustrative prompt above was written for this demo.
 
 Download an HTML file and open it in a browser. Each is standalone, with light/dark themes and no build step. GitHub's file view shows the source.
 
@@ -72,7 +86,8 @@ Use this skill as a starting point. Adjust the visual style, change how hints wo
 ## Credits
 
 - [Miles Cranmer's talk](https://www.youtube.com/watch?v=uXC7OuCas2Q&t=1438), shared by MPhil in Data Intensive Science Cambridge, inspired the learning workflow.
-- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach, adapted from my Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin).
+- [Anatomy](https://github.com/wheresryan22/anatomy) inspired the visual approach and the exploded views, adapted from my Werkbankfiguren work in [Argmin](https://github.com/smashburger-dev/argmin). The exploded-view kit is an independent implementation.
+- The frosted-glass visual language comes from my chiasma design system, with material and legibility guidance from Apple's [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/materials).
 - [Source notes](references/sources.md) separate the talk's ideas from this skill's additions.
 
 ## License
