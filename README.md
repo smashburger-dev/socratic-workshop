@@ -86,7 +86,7 @@ Each figure has one job, picked from your level on the subskill:
 | transfer | map the same mechanism onto a second domain |
 | break | find the planted flaw |
 
-The tutor builds one without being asked when the same gap survives two attempts in words, or when the subskill is about structure, a process, or quantities that interact. What you saw in the figure goes back into your own explanation, and that explanation is what counts.
+The tutor builds one without being asked when the same gap survives two attempts in words, or when you miss a question on a subskill about structure, a process, or quantities that interact. What you saw in the figure goes back into your own explanation, and that explanation is what counts.
 
 ### Gradient descent
 

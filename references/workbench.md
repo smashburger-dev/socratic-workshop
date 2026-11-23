@@ -25,7 +25,7 @@ A hint file contains no later solution in its HTML, SVG, JavaScript, data, comme
 
 ## Give the figure one job
 
-The main skill picks the job from the subskill's level. The job decides what the figure withholds and which question the learner answers afterwards in chat. A figure produces an observation; the explanation that follows is the evidence.
+The main skill picks the job from the subskill's level and the open gap. The job decides what the figure withholds and which question the learner answers afterwards in chat. A figure produces an observation; the explanation that follows is the evidence.
 
 | Job | Level | The figure shows | The figure withholds | End on a question like |
 | --- | --- | --- | --- | --- |
