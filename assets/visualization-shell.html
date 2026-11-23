@@ -231,6 +231,28 @@ input[type="range"]::-moz-range-thumb{width:3px;height:36px;border:none;border-r
 .feedback .detail{font-size:15px;line-height:20px;color:rgba(var(--text-rgb),var(--t-hint))}
 .equation{font-family:var(--mono);font-size:15px;overflow-wrap:anywhere}
 
+/* Segmented control: one field track, equal segments; the active segment takes
+   the selection fill as a plain square, rounded only by the track itself. */
+.segmented{display:flex;padding:0;overflow:hidden;background:var(--field);border:1px solid var(--field-edge);border-radius:10px}
+.segmented button{flex:1 1 0;min-width:0;min-height:42px;padding:0 14px;border:none;border-radius:0;background-color:transparent;color:rgba(var(--text-rgb),var(--t-value));transition:color .2s}
+.segmented button+button::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:1px;background:var(--sep-soft)}
+.segmented button[aria-checked="true"]{background-image:var(--select-bg);color:rgba(var(--text-rgb),var(--t-strong))}
+.segmented button:focus-visible{outline-offset:-3px}
+
+/* Prediction gate: question, choices, Commit, then the choice beside the outcome.
+   The result line keeps its height so committing never moves the layout. */
+.prediction fieldset{border:0;padding:0;margin:0 0 12px;min-width:0}
+.prediction legend{padding:0;font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-body));margin-bottom:8px}
+.prediction label{display:flex;align-items:center;gap:10px;min-height:44px;font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-body));cursor:pointer}
+.prediction input[type="radio"]{width:19px;height:19px;margin:0;accent-color:var(--amber);flex:none}
+.prediction fieldset:disabled label{cursor:default}
+.prediction fieldset:disabled label:has(input:not(:checked)){color:rgba(var(--text-rgb),var(--t-off))}
+.prediction-actions{display:flex;gap:8px}
+.prediction-actions button{flex:1 1 0}
+.prediction-result{min-height:44px;margin:12px 0 0;font-size:17px;line-height:22px;color:rgba(var(--text-rgb),var(--t-value))}
+/* While a gate is closed, anything marked data-outcome stays out of the figure. */
+[data-gate="closed"] [data-outcome]{visibility:hidden}
+
 /* Disclosures: a soft separator, a 52 px row with a centred chevron; the body
    opens by animating its row height. */
 .disclosure{border-top:1px solid var(--sep-soft)}
@@ -380,7 +402,7 @@ a{color:rgba(var(--text-rgb),var(--t-hint));text-underline-offset:4px}
   *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   body{display:block;background:#fff}
   body::before{display:none!important}
-  .theme-toggle,.playback,input,select,.prediction{display:none}
+  .theme-toggle,.playback,input,select,.prediction,.segmented{display:none}
   .stage-header,.figure-area{padding:0}
   .pillar{width:auto;margin:16px 0;overflow:visible}
   .panel{break-inside:avoid;margin-bottom:16px}
@@ -412,6 +434,10 @@ a{color:rgba(var(--text-rgb),var(--t-hint));text-underline-offset:4px}
 <template id="comparison-row-pattern"><div class="comparison-row"><span class="comparison-label" data-slot="label"></span><div class="comparison-track"><div class="comparison-bar" data-slot="bar"></div><i class="comparison-guide" aria-hidden="true"></i></div><span class="comparison-value" data-slot="value"></span></div></template>
 <template id="annotated-item-pattern"><li class="annotated-item"><span class="item-role" aria-hidden="true"></span><span class="item-body"></span></li></template>
 <template id="reference-task-pattern"><section class="panel learning-layout"><div class="reference-panel"><h2 data-slot="reference-title"></h2><div class="panel-content" data-slot="reference"></div></div><div class="target-panel"><h2 data-slot="task-title"></h2><div class="context-row" data-slot="context"></div><div class="task-prompt" data-slot="question"></div><div class="actions" data-slot="actions"></div></div></section></template>
+<!-- Prediction gate (figure job: predict). Clone one <label> per choice; bindPredictionGate wires it. -->
+<template id="prediction-gate-pattern"><form class="prediction"><fieldset><legend data-slot="question"></legend><label><input type="radio" name="prediction" value=""><span data-slot="choice"></span></label></fieldset><div class="prediction-actions"><button type="submit" class="primary" disabled>Commit</button><button type="reset" disabled>Try again</button></div><p class="prediction-result" role="status"></p></form></template>
+<!-- Transfer lens (figure job: transfer). One <button> per domain; bindLens fills every [data-role] from the active lens. -->
+<template id="lens-pattern"><div class="control"><label id="lens-label" data-slot="label"></label><div class="segmented" role="radiogroup" aria-labelledby="lens-label"><button type="button" role="radio" aria-checked="true" data-lens=""></button><button type="button" role="radio" aria-checked="false" data-lens=""></button></div></div></template>
 <script>
 const themeButton = document.getElementById('theme-toggle');
 const systemTheme = matchMedia('(prefers-color-scheme: dark)');
@@ -493,6 +519,61 @@ function toggleMarkPopover(anchor,content,bounds){
 function refreshMarkPopover(){
   if(markValueFn&&markValueEl)markValueEl.textContent=markValueFn();
   positionMarkPopover();
+}
+/* Prediction gate: the outcome stays out of the figure until the learner commits.
+   scope is the element that holds the outcome marks (data-outcome); the gate sets
+   data-gate="closed" on it and opens it on Commit. outcome() reads the model at
+   commit time and returns {value, text}: value is compared with the chosen
+   radio's value, text names the result. The choice stays visible beside it.
+   Call the returned close() when an input changes, so the next state is gated again. */
+function bindPredictionGate(form,scope,outcome){
+  const fieldset=form.querySelector('fieldset');
+  const [commit,again]=form.querySelectorAll('.prediction-actions button');
+  const result=form.querySelector('.prediction-result');
+  function close(){
+    form.querySelectorAll('input[type="radio"]').forEach(input=>{input.checked=false;});
+    fieldset.disabled=false;commit.disabled=true;again.disabled=true;
+    result.textContent='';
+    scope.dataset.gate='closed';
+  }
+  form.addEventListener('change',()=>{commit.disabled=false;});
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    const choice=form.querySelector('input[type="radio"]:checked');
+    if(!choice)return;
+    const actual=outcome();
+    fieldset.disabled=true;commit.disabled=true;again.disabled=false;
+    scope.dataset.gate='open';
+    result.textContent=(choice.value===String(actual.value)?'Your prediction matches. ':'The model gives a different result. ')+actual.text;
+  });
+  form.addEventListener('reset',event=>{event.preventDefault();close();});
+  close();
+  return close;
+}
+
+/* Transfer lens: one model, several domains. lenses maps a lens id to
+   {role: label}; switching fills every [data-role] element from the active lens
+   and leaves the model, the geometry and the numbers alone. A role missing from
+   a lens renders empty, which is how a mapping question keeps its answer out of
+   the file. onChange(id) lets the scene redraw domain-specific marks. */
+function bindLens(group,lenses,onChange){
+  const buttons=[...group.querySelectorAll('[data-lens]')];
+  function select(id){
+    buttons.forEach(button=>button.setAttribute('aria-checked',String(button.dataset.lens===id)));
+    document.querySelectorAll('[data-role]').forEach(el=>{el.textContent=lenses[id][el.dataset.role]||'';});
+    document.documentElement.dataset.lens=id;
+    if(onChange)onChange(id);
+  }
+  group.addEventListener('click',event=>{const button=event.target.closest('[data-lens]');if(button)select(button.dataset.lens);});
+  group.addEventListener('keydown',event=>{
+    if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;
+    event.preventDefault();
+    const at=buttons.findIndex(button=>button.getAttribute('aria-checked')==='true');
+    const next=buttons[(at+(event.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length];
+    next.focus();select(next.dataset.lens);
+  });
+  select(buttons[0].dataset.lens);
+  return select;
 }
 function bindMark(el,content,bounds){
   el.addEventListener('click',event=>{event.stopPropagation();toggleMarkPopover(el,content,bounds||el);});

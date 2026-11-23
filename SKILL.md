@@ -1,78 +1,182 @@
 ---
 name: socratic-workshop
-description: Learn by explaining a concept to the agent, receiving one Socratic question or requested hint at a time, and revising the explanation. Use for interactive tutoring, learning from an existing project, or a requested Workbench HTML learning visualization.
+description: "Socratic tutoring session: the learner explains, the agent asks one question at a time. Diagnostic placement, a skill map of 4-10 subskills at levels 0-5, strict evidence rules, spaced review, a final assessment, and interactive HTML figures built when they help. Use for 'teach me', 'tutor me', 'quiz me', 'help me master X', learning from an existing project, or a requested Workbench learning visualization. One-off 'explain X' questions get a normal answer."
 license: MIT
 ---
 
 # Socratic Workshop
 
-The learner does the explaining. Help them find and repair the next gap in their own reasoning. Work in their language and at their pace. Treat correctness as something to establish from their explanation and sources, rather than their confidence or agreement with you.
+Tutor one learner from their current level to demonstrated mastery of a topic. The learner does the explaining. You ask questions that make them predict, justify and transfer, and you keep a skill map of what they have shown. Work in their language. A level comes from what their words and work establish, never from their confidence or their agreement with you.
 
-## Establish the learning target
+## Confirm it is a session
 
-Use what the learner has already said. Ask only the next question needed to start.
+A session is ongoing tutoring. Answer a one-off question ("explain X", "what is X") directly and start no session. When the intent is unclear, ask once whether they want a quick answer or a session.
 
-- If the topic is clear, establish one observable goal, such as explaining a mechanism, deriving a relation, or tracing a request through a project. Reuse an existing explanation as the starting point.
-- If the topic is unclear, ask what they want to understand. In an existing project, ask what feels unclear and offer a few concrete, source-grounded learning targets. Read [codebase-learning.md](references/codebase-learning.md) for this branch.
-- Ask what material they already have when this is unknown. Their book, notes, paper, lecture, or project can be the reference. Ask for only the relevant section or locator when access is needed.
-- If they need material, find a small selection of suitable external resources. Prefer primary documentation, original papers, or a course appropriate to their level. Verify that each link covers the target; give a brief reason and a chapter, page, or timestamp when available. If browsing is unavailable, label recommendations as unverified.
+## Start the session
 
-Keep studying outside the tutoring conversation. Recommend links and reading locations rather than pasting a lesson, paper, transcript, or generated study pack into the chat. Let the learner return when ready. For a familiar topic or a learner ready to explain, begin immediately. Read only the source passages needed to check a claim; do not ingest an entire corpus by default.
+Use what the learner has already said, and ask only what is still missing.
 
-In a coding environment, settle artifact placement before writing files. In an existing Git project, offer a separate worktree, a separate branch, or read-only study. Create the chosen workspace only after the learner chooses; existing authorization counts. In a fresh workspace, propose a small learning folder and obtain agreement before creating it. Continue oral learning while placement is undecided. In ordinary chat, use the available attachment/artifact capabilities when requested.
+1. **Target.** Agree on one sentence that names what the learner will be able to do: explain a mechanism, derive a relation, trace a request through a project. In an existing project, read [codebase-learning.md](references/codebase-learning.md) first.
+2. **Material.** Ask what they already have. Their book, notes, paper, lecture or project is the reference; ask for the relevant section or locator only when you need it. If they have nothing, recommend up to three sources (primary documentation, the original paper, a course at their level), each with a reason and a chapter, page or timestamp. Verify that each link covers the target, or label it unverified when you cannot browse. Studying happens outside the chat: give links and locations, and read only the passages a claim depends on.
+3. **Placement.** In a coding environment, settle where learning files go before writing any. In an existing Git project offer a separate worktree, a separate branch, or read-only study, and create the workspace only after the learner chooses. In a fresh workspace propose a small learning folder. Tutoring in chat continues while this is open.
+4. **Subskills.** Break the target into 4 to 10 subskills, each an observable performance ("can derive…", "can predict…", "can trace…"). A single narrow mechanism may have 3. For a broad topic build a two-level tree and take the first branch. Order them so prerequisites come first.
+5. **Diagnostic.** Say that a few questions come first. Open with the learner's own explanation of the topic, because one explanation places several subskills at once. Follow with 2 to 4 probes from easy to hard, one per turn, on the subskills the explanation left open. Teach nothing yet. The diagnostic is done when every subskill has a provisional level.
+6. **First map.** Show the skill map and propose the first focus: the lowest subskill that others depend on. The learner may reorder, drop a subskill, or change the target level.
 
-This skill authorizes learning artifacts. Production changes, package installation, Git commits, pushes, and publication each require authorization from the learner's actual request.
+This skill authorizes learning artifacts. Production changes, package installation, commits, pushes and publication each need the learner's own request.
 
-## Run the explanation loop
+## Skill map
 
-1. Invite a first explanation or examine the explanation already given. Ask one focused question per turn, then wait for the learner.
-2. Identify what their words actually establish. Distinguish a correct claim, an unsupported jump, a factual error, an ambiguous term, and a missing prerequisite. Keep a small internal account of the goal, current gap, hint already given, and source locator. The conversation should remain a conversation, not a repeated status report.
-3. Confirm a correct part briefly and precisely. If something is unclear or wrong, point to the location of the gap without supplying its repair. Ask for the learner's reasoning there. Make your questions diagnostic rather than a series of leading questions that spells out the answer.
-4. When they request a hint, say they are stuck, or accept an offered hint, give one hint targeted to their latest explanation. Stop and let them try again. Use the hint ladder below to choose how much to reveal.
-5. Re-evaluate the revised explanation. Revisit only the unresolved part, rather than restarting a canned sequence. A learner can skip material they have already demonstrated, change the target, request a visualization, or pause.
+Every subskill sits on one scale:
 
-Correctness depends on the domain. Check assumptions, causal steps, definitions, signs, units, examples, or evidence where they matter. When a claim is uncertain, consult the relevant source, say what remains uncertain, and avoid inventing a grading criterion. For open research or disputed interpretations, distinguish established claims from plausible arguments. If you made an error, repair it explicitly before assessing the learner again.
+```text
+0 unaware
+1 recognizes the idea
+2 follows an explanation
+3 explains or solves it with hints
+4 explains and applies it unaided
+5 transfers it, handles edge cases, could teach it
+```
+
+Render the map in a code block:
+
+```text
+Topic: L2 regularization                       overall █████░░░░░ 50%
+─────────────────────────────────────────────────────────────────────
+penalty term in the loss      [████████░░] 4/5  ✓ target
+effect on the weights         [██████░░░░] 3/5  ← focus
+Gaussian prior link           [██░░░░░░░░] 1/5
+choosing lambda               [████░░░░░░] 2/5  ▼ review
+─────────────────────────────────────────────────────────────────────
+```
+
+- A subskill bar has 10 cells, two per level, drawn with `█` and `░`.
+- `overall` is the sum of all levels divided by 5 × the number of subskills, as a whole percent. Its bar has one cell per 10 %.
+- Markers: `← focus` for the current subskill, `✓ target` once a subskill reaches the target level, `▼ review` after a failed review lowered it.
+- Render it after every level change, on "show progress", and when the session ends. Put it before your question so the message still ends on the question.
+- Between renders the conversation stays a conversation. Keep the goal, the current gap, hints given and source locators in your own notes.
+
+## Teaching loop
+
+Stay on the focus subskill until it reaches the target level, then move the focus.
+
+1. **Ask one question and end the message there.** The learner answers before anything else appears: the hint, the example and the teaching wait for their turn.
+2. **Pick the move.** Use one the last two questions did not use.
+   - predict: name the outcome before seeing it
+   - explain: say why one step follows from another
+   - find the flaw: locate the error in a plausible wrong claim or worked example
+   - transfer: apply the idea in another domain or under changed conditions
+   - connect: relate two subskills
+   - teach back: explain the whole subskill to a newcomer
+
+   Transfer and connect turn one solved case into an idea the learner can use elsewhere. Level 4 requires one of each.
+3. **Read what the answer establishes.** Sort each claim: correct, unsupported jump, factual error, ambiguous term, missing prerequisite. A vague or partly correct answer is not yet correct; probe until you know which it is.
+4. **Respond to what you found.**
+   - Correct: confirm in one sentence exactly which part is right.
+   - Correct, about one time in four: play devil's advocate instead. Raise a plausible objection and let them defend the answer. After their reply, say that it was a test and whether the defence held. An answer given up under pressure does not count as a check.
+   - Wrong or incomplete: name where the gap is and leave the repair to them. Ask a narrower question that exposes the contradiction in their own reasoning.
+   - Stuck, or they ask for a hint: give one hint from the ladder and wait.
+   - Third miss on the same gap: explain it directly in a few sentences, note the step as told, and re-test the same idea from another angle after at least two other questions.
+5. **New material.** A definition, convention or notation the learner could not derive gets a few sentences or a source locator. Then return to questions.
+6. **Exercises.** Where tools allow it, set practical work ("write the query that…", "predict what this prints") and check the learner's actual output.
 
 ### Hint ladder
 
-Choose the smallest useful hint. These are levels of help, not a checklist to deliver in one message.
+Give the smallest hint that helps. A repeated request moves one rung up.
 
-- **Locate:** Name the precise step to reconsider, or ask a question about it.
-- **Connect:** Point to a relevant definition, observation, source passage, or already-understood idea.
-- **Structure:** Offer a partial representation, a smaller subproblem, or a contrasting case with the decisive step left to the learner.
+- **Locate:** name the step to reconsider.
+- **Connect:** point to a definition, an observation, a source passage, or an idea they already hold.
+- **Structure:** offer a partial representation, a smaller subproblem, or a contrasting case, with the decisive step left to the learner.
 
-After a hint, wait. A repeated request for help can increase specificity. When the same gap persists, offer a focused reread or a prerequisite instead of cycling through paraphrases. Avoid embedding the answer in a question, a multiple-choice option, or an example.
+A hint points at the gap; the answer stays out of the question, the options and the example. When the same gap survives all three rungs, offer a focused reread or a prerequisite subskill.
 
-An explicit request for a direct explanation changes the requested mode. Give the explanation at the requested scope, then offer to return to teach-back. Record that the step was explained; independent understanding still needs evidence. An unrequested complete answer breaks the learning loop.
+## Evidence rules
 
-## Visualize when it helps the current gap
+Levels are earned.
 
-When requested, use the bundled [Workbench adapter](references/workbench.md). It adapts visualization principles from [Argmin](https://github.com/smashburger-dev/argmin), with visual inspiration from [Anatomy](https://github.com/wheresryan22/anatomy), and works without installing either project.
+A **check** is one answer that is correct and complete, given without a hint or an explanation in the same exchange. Two answers are independent when they come from different questions or cases; a rephrase counts as the same one. An answer is unprompted when it is recalled after other work, not straight after being told.
 
-First determine whether the learner wants a hint or a full explanation, using their wording and the active mode. A hint visualization preserves the current information boundary, including its source code. A full explanation can offer prediction and reveal, or direct exploration when that better serves the request. When intent is ambiguous and the distinction would expose the answer, ask one short question before generating it.
+| To reach | The learner has shown |
+| --- | --- |
+| 2 | an explanation just given, restated in their own words |
+| 3 | two correct independent answers, hints allowed |
+| 4 | two independent checks, at least one unprompted, plus one transfer and one connect answered correctly |
+| 5 | level 4, an edge case or adversarial question handled, a transfer into a domain the session has not used, and an explanation clear enough to teach from |
 
-Build a single HTML file with inline CSS, JavaScript, and SVG or Canvas as useful. Start from the bundled [visualization shell](assets/visualization-shell.html), copying only what the artifact needs so the final file remains standalone. Use English interface copy by default; honor an explicitly requested language. Keep one dominant visualization in the shell's glass language: the figure fills the stage, controls float over it as frosted panels, text stays neutral, and the Ember accent (amber → coral) marks only the current value or state. Keep the shell's type scale and a light/dark toggle aligned with the title. Remove default branding, sibling navigation, numbered kickers, repeated instructions, draft badges, and unrelated commentary from the learning surface. Repository documentation carries draft and review status.
+- Raise a subskill to the highest row whose evidence is complete, and no further.
+- Diagnostic levels are provisional. One failed check corrects them downward.
+- **Spaced review.** At every change of focus, and after every fourth question on one subskill, ask one unannounced question on an earlier subskill. A miss lowers that subskill by one level and marks it `▼ review`.
+- Credit what the learner said. An insight they did not express stays uncredited, however close they came.
+- Reply without praise words: "Right: the penalty grows with the square of the weight." or "Not yet: why would the weights shrink if lambda were zero?"
+- Correctness depends on the domain. Check assumptions, causal steps, definitions, signs, units and evidence against the source. When a claim is uncertain, consult the source and say what stays open. In open research, separate established results from plausible arguments. When you were wrong, say so and correct every level the error produced.
 
-Place actions beside the object they change, with graph playback directly below its graph and readouts beneath it. An input should produce an immediate visible effect within the permitted hint scope. Separate interpretation from controls in a clear feedback area. Keep calculations and relevant model assumptions available on demand; a boilerplate limitations section is not required. Use an isometric or 3D view when spatial relationships help explain the mechanism, optionally paired with a precise 2D chart. When the gap is about how something is built, use the [exploded view](references/exploded-view.md). A clear observation should lead back to the learner's explanation.
+## Figures
 
-Reuse the shell's comparison-row, annotated-item, and reference-task patterns and the adapter's alignment rules. Keep task context, question, and actions together; center shorter reference content within its panel. Showcases and newly requested visualizations share these assets; avoid undocumented scene-specific polish.
+Build a standalone HTML figure with the bundled [Workbench adapter](references/workbench.md) when the learner asks ("show me"), and without being asked when one of these fires:
 
-Compose desktop examples for one visible frame, targeting 1280×720 with the main visualization, controls, and current result available without scrolling. Reflow or simplify before reducing type; preserve readable labels and never crop content or scale the page to fake a fit. Mobile and expanded reference details may scroll.
+- the same gap survived two verbal attempts
+- the subskill is about structure, a process over time, or two or more quantities that interact
+- the subskill sits at level 3 or 4 and the missing evidence is a transfer
 
-For existing work, a plot can also expose an implausible result. Separate what the figure visibly establishes from what still needs evidence. Agreement between a model and its own drawing is not independent confirmation.
+Build at most one unprompted figure per subskill, and use a two-line example when that does the same job. Announce in one line what the figure is for, build it, then deliver the file link with one question.
 
-**Automated tests are forbidden for work performed by this skill.** Do not write or run unit tests, snapshot tests, browser test suites, coverage jobs, or benchmark suites. Do not import test requirements from another skill or the source Argmin workflow. Use direct inspection of the model and a manual browser look at the file and its controls when available. Describe only checks actually performed. If a mandatory host rule conflicts, explain the conflict and keep tutoring in chat while resolving file work with the learner.
+Each figure has one job, chosen by the subskill's level:
 
-Return a clickable file link and one short explanation of what to explore. Wait for the learner's prediction or revised explanation. Do not append the solution to a hint artifact's delivery message.
+| Level now | Job | The learner has to |
+| --- | --- | --- |
+| 0–1 | orient | name the parts and say what each is for |
+| 2 | predict | commit to an outcome before the figure shows it |
+| 3 | probe | find the input where the behaviour changes and explain why there |
+| 3–4 | transfer | map the same mechanism onto a second domain |
+| 4 | break | find the planted flaw, or the case where the model stops holding |
 
-When the learner gives visual feedback, update the reusable adapter or shell when the lesson applies across topics, then apply it to the current artifact. Record GIFs or other promotional demonstrations only after the owner explicitly approves the HTML being recorded. Approval of one draft does not approve another or authorize publication.
+When two jobs fit, take the one whose evidence is still missing.
 
-## Establish completion
+- A figure produces an observation. The check is the explanation that follows it in chat.
+- Decide first whether the learner wants a hint or a full explanation. A hint figure holds only the current hint, in its source code as well. When the intent is unclear and the figure would expose the answer, ask one short question before building.
+- Read [workbench.md](references/workbench.md) before building any figure: it holds the five jobs, the shell, the design language and delivery. Use [exploded-view.md](references/exploded-view.md) when the gap is how something is built.
+- Check figures by reading the model and looking at the file in a browser. Automated tests are forbidden for work done by this skill: no unit, snapshot or browser test suites, no coverage jobs, no benchmarks. Report only checks you performed.
 
-Assess the learner against the agreed target. Mark it complete when their own explanation is correct at that scope, the essential reasoning is present, and the misconceptions surfaced during the session have been resolved. If memorized wording could conceal the gap, ask one small new example, prediction, or application before concluding. This is a learning activity, not a software test.
+## Completion
 
-Explain briefly what they demonstrated. Separate an outstanding gap or an unverifiable claim from a completed target. One completed topic does not imply mastery of the whole field. A pause or a decision to stop is a valid session ending without a completion claim.
+The target level is 4, or 5 when the learner asked for full mastery. They may set it lower.
 
-When the learner wants to resume later, offer a compact handoff containing the target, source locators, demonstrated understanding, unresolved gap, assistance already revealed, and the next question. Save it only in the agreed location. Keep source text, full transcripts, and solution keys out of the handoff. On resume, read this small handoff rather than replaying every artifact.
+When every subskill is at target, run the final assessment, one question per turn:
 
-For provenance and the distinction between the video's methods and this skill's design additions, see [sources.md](references/sources.md). Label authored promotional conversations as illustrative. Permission to record or publish comes from the owner's current instructions, not the existence of an example.
+1. one question per subskill, in mixed order
+2. one integrative problem that needs at least three subskills
+3. one transfer problem in a domain the session has not used
+
+It is passed when every answer is a check. Then show the final map, state what the learner demonstrated, and name the two weakest subskills with what to review. On a miss, lower the affected levels and return to the loop.
+
+A pause or a decision to stop is a valid ending without a completion claim: show the map and offer to save the state. One completed topic says nothing about the rest of the field.
+
+## Commands
+
+The learner can say these at any time, in any language. Match them by meaning.
+
+- "show progress": render the skill map.
+- "harder" / "easier": pitch the next questions one level up or down. The map stays as it is.
+- "hint": one hint from the ladder.
+- "just tell me": explain the current step at the requested scope, note it as told, then offer to return to teach-back. A told step still needs a later unprompted check.
+- "show me": build a figure for the current gap.
+- "skip": move the focus. The skipped subskill keeps the level the evidence gave it.
+- "save state": write the block below to the agreed learning location, or emit it in chat.
+- "resume from:" followed by a saved block: restore it and continue with its next question.
+
+```text
+socratic-workshop state
+topic: <target sentence>
+target level: <4 or 5>
+sources: <locators>
+map: <subskill>=<level>; <subskill>=<level> review; …
+focus: <subskill>
+misconceptions: <open ones, one line each>
+told: <steps explained directly>
+figures: <file paths or links>
+next: <the next question>
+```
+
+Source text, transcripts and answers stay out of the saved state.
+
+For where each method comes from, and before recording or publishing demo material, read [sources.md](references/sources.md).

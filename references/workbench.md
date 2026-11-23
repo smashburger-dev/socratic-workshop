@@ -1,6 +1,6 @@
 # Workbench for Socratic Workshop
 
-Read this reference when an interactive figure can address the current understanding gap. Choose a controllable cause and an observable effect. If interaction adds little, a small static diagram is enough.
+Read this reference before building any figure. Choose a controllable cause and an observable effect, and give the figure one job. If interaction adds little, a small static diagram is enough.
 
 ## Origin and portable assets
 
@@ -10,7 +10,7 @@ The visual approach is also inspired by [Anatomy](https://github.com/wheresryan2
 
 Use [visualization-shell.html](../assets/visualization-shell.html) as a copyable starting point for layout, theme colors, typography, controls, and theme switching. Copy the relevant parts into one HTML file with inline CSS, JavaScript, and SVG or Canvas. Trim unused styles. The output works directly from disk with system fonts and no network, package installation, CDN, or build step.
 
-Copy its comparison-row, annotated-item, or reference-task pattern when applicable. The reference-task wrapper stretches both panels so a shorter reference can center beside the task. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
+Copy its comparison-row, annotated-item, or reference-task pattern when applicable, and its prediction-gate and lens patterns for the predict and transfer jobs below. The reference-task wrapper stretches both panels so a shorter reference can center beside the task. The showcase examples use these same patterns; apply general refinements here before adapting a particular scene.
 
 ## Preserve the learning boundary
 
@@ -23,7 +23,25 @@ The main skill determines the permitted scope:
 
 A hint file contains no later solution in its HTML, SVG, JavaScript, data, comments, accessible names, or computed states. Hiding content with CSS or a disabled button does not preserve this boundary. Keep sliders and previews within the permitted scope. A prediction or click cannot authorize another hint level. Add a new level only when the learner requests it.
 
-Prediction is useful when comparing expectation with an observation. It is not a mandatory gate on every slider or every figure. For a full exploration, show the effect of changing a value immediately. In a prediction activity, keep the learner's choice visible beside a separately presented outcome. Grade only a bounded factual choice; leave open explanations for discussion rather than matching a string.
+## Give the figure one job
+
+The main skill picks the job from the subskill's level. The job decides what the figure withholds and which question the learner answers afterwards in chat. A figure produces an observation; the explanation that follows is the evidence.
+
+| Job | Level | The figure shows | The figure withholds | End on a question like |
+| --- | --- | --- | --- | --- |
+| orient | 0–1 | the whole and its parts, in order | each part's name and purpose until the learner has said it | "Open part 3. What is it for, and what fails without it?" |
+| predict | 2 | the current state and the input about to change | the outcome, until the learner commits a choice | "It landed there. Why?" |
+| probe | 3 | the live effect across the control's whole range | the threshold and the rule behind it | "At which value does it flip, and why there?" |
+| transfer | 3–4 | the same model under a second domain's labels and units | the role mapping, when the mapping is the question | "Which thing here plays the bottleneck's role?" |
+| break | 4 | a plausible figure with one planted flaw, or the model driven past its valid range | where the flaw is and why | "Which mark is wrong, and what should it be?" |
+
+- **Orient.** For structure, use the [exploded view](exploded-view.md) with `recall: 'start'`: each part shows only its number until the learner presses Reveal. For a process, draw the stages in order and put the names in mark popovers. Names the learner meets for the first time may show at once; orient withholds what they can work out.
+- **Predict.** Use the shell's prediction gate (`prediction-gate-pattern`, `bindPredictionGate`). Give the marks that draw the outcome a `data-outcome` attribute. The gate keeps them out of view until Commit, then shows the learner's choice beside the result, and closes again when an input changes. Gate one outcome per figure state; every other control still responds at once. The figure grades a bounded factual choice only, and open explanations go to chat. The gate needs about 250 px of pillar height, so drop a disclosure before shrinking type.
+- **Probe.** Give the control its whole range on fixed axes, so the change of behaviour is visible when the learner reaches it. Readouts name what happens (the distance, the output). No label, tick, colour or snap point marks the threshold in advance.
+- **Transfer.** Use the lens (`lens-pattern`, `bindLens`): a segmented control switches the domain. Labels, units and marks come from one `lenses` table, while the model, the geometry and the numbers are shared, so the learner sees that only the names changed. Pick a second domain far from the first: a factory line and a checkout queue, gradient descent and a thermostat. When the mapping is the question, leave those roles out of the second lens; they render empty and the learner supplies them in chat.
+- **Break.** Plant exactly one flaw that follows from a misconception this learner showed, or a common one: a step in the wrong direction, a bar past its limit, a part out of order, a curve outside its valid range. Every candidate is a focusable mark, and the learner names the mark in chat. Add a prediction gate ("Which mark is wrong?") when the figure should confirm the location; the reason stays for chat. No comment, id, class, accessible name or note in the file points at the flaw. Once the learner has answered, deliver the corrected figure or state the correction in chat, so no wrong picture is left standing.
+
+In hint mode a job works inside the hint's scope: a gate holds only an outcome the hint already permits, and recall, the gate and an empty lens role never stand in for leaving later material out of the file.
 
 ## Make the mechanism visible
 
@@ -38,6 +56,8 @@ Choose the representation for the question:
 - An exploded view answers "what is this made of and in which order": the object comes apart along its assembly axis, and each part explains itself on click. Read [exploded-view.md](exploded-view.md).
 
 These are examples, not a fixed subject catalog. Apply the same cause-and-effect reasoning to science, mathematics, language, code, planning, or business. Every visible object should carry a meaning or a control.
+
+For existing work, a plot can also expose an implausible result. Separate what the figure visibly establishes from what still needs evidence. Agreement between a model and its own drawing is not independent confirmation.
 
 Use crisp vector geometry and legible HTML labels where possible. Label axes, units, and scale. Keep the scale stable during a comparison or playback so rescaling cannot disguise growth. Fix the axes for the whole range of every control, not for its current value: dragging an input moves the mark across a still chart and never rescales it. If a value leaves the view, show that fact and the actual value rather than clamping it silently. A second chart should answer another necessary question, not decorate the first.
 
@@ -78,7 +98,7 @@ The visual language is Noa's `design-glass`, adapted for learning. In one senten
 - **Rows centre their content optically.** A disclosure row (Try a prediction, See the calculation, Model notes) is exactly 52 px from its separator to the next separator (or to the panel's padding edge), with its label centred on cap height, not on the line box: use `text-box: trim-both cap alphabetic` where supported and an equivalent padding fallback. Measure it: the gap from the separator to the cap top equals the gap from the baseline to the next line, within 1 px. The chevron sits on the same optical centre at the panel's right padding. Opened content starts 8 below the row and ends 16 above the next separator.
 - **Fills never touch lines.** A hover, press or selection fill is its content box plus equal padding on every side (at least 8 horizontal, 4 vertical), with the content centred inside it. It never touches or covers a separator, a panel edge or a neighbouring fill; keep at least 4 px clear. Consecutive rows have no margins between them: the space between two separators belongs to exactly one row, split equally above and below its content. Measure separator to separator, not the element's own box, and check the hover state, not only the resting state.
 - **One button type everywhere.** Every button in every visualization, including the theme switch, is the same type: 44 px high, padding 0 16, radius 10, field fill and field edge at rest, Subheadline 15 label, an optional 18 px icon 8 px before the label, the shared hover/press/focus states. Primary or active = the selection look on that same shape. No pills, no one-off button styles.
-- **Choices of one state are a segmented control.** Two or more mutually exclusive states (Assembled / Exploded) form one control in the button type: one field-look track (r10), equal-width segments divided by a 1 px soft separator inset 10 px top and bottom. The track has no inner padding and clips its content (`overflow: hidden`). The active segment's whole area takes the selection gradient as a plain square fill; only the track's own outer radius rounds it at the ends. There is no inner pill, no inner radius and no inner edge. The gradient fill crossfades between segments in 200 ms. Actions that are not states (Above, Eye level) stay separate buttons.
+- **Choices of one state are a segmented control.** Two or more mutually exclusive states (Assembled / Exploded) form one control in the button type: one field-look track (r10), equal-width segments divided by a 1 px soft separator inset 10 px top and bottom. The track has no inner padding and clips its content (`overflow: hidden`). The active segment's whole area takes the selection gradient as a plain square fill; only the track's own outer radius rounds it at the ends. There is no inner pill, no inner radius and no inner edge. The gradient fill crossfades between segments in 200 ms. The shell's `.segmented` class implements it. Actions that are not states (Above, Eye level) stay separate buttons.
 - **Toolbar controls use the room they have.** In a docked toolbar the action group fills the space up to the status group: each text control grows equally (`flex: 1 1 0`) from its content width up to 200 px (a segmented control counts as one unit per segment), and shrinks back to content width before the toolbar starts scrolling. Icon buttons never stretch; they stay 44 × 44.
 - **The header has one layout.** Title, then the intro 4 px below, then the keyboard legend 8 px below that, all sharing one left edge at the stage padding (check the glyph ink, not the boxes: the title's larger size must not sit visibly indented or outdented against the lines below). The theme button sits at the top right, its centre on the title's first line. Nothing else goes in the header. The intro line is set in the Ember gradient (amber to coral, `linear-gradient(90deg in oklab, …)` clipped to the text, weight 500); it is the one decorative use of the accent. Dark theme uses the theme's amber and coral; light theme uses darker stops (`oklch(0.55 0.15 60)` to `oklch(0.52 0.17 35)`) so the text keeps at least 4.5:1 against the ground. The title stays neutral.
 - **A figure that runs under the header gets a docked top bar.** When the figure fills the whole stage (3D scenes, exploded views), the header becomes a docked top bar in the same glass as the toolbar: full width, square, 1 px edge only at the bottom, padding 20 top and bottom, so the figure passes visibly under it instead of being cut off. In a docked top bar the theme button is centred vertically in the bar, not on the title line. When the figure sits beside the header (charts), the header stays on the work.

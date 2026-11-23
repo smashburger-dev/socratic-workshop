@@ -16,6 +16,12 @@ The design was informed by YouTube's timestamped English automatic captions, ret
 
 This repository paraphrases the methods and links to the source. It does not redistribute the transcript, slides, or video. The video is inspiration, not an endorsement of this skill or evidence of its learning effectiveness.
 
+## Jane Street's socratic-tutor
+
+The November 2026 revision adopts the session structure of Jane Street's [socratic-tutor](https://github.com/janestreet/agent_skills/tree/master/socratic-tutor) skill (repository MIT-licensed, checked 23 November 2026): the intent guard, the split into 4 to 10 subskills, the diagnostic before any teaching, the 0 to 5 level scale and its ASCII skill map, the question types, devil's advocate on correct answers, two independent checks with one unprompted before a level rises, spaced review that can lower a level, the final mixed assessment, and the session commands. The text here is rewritten for this skill; no file from that repository is bundled.
+
+This skill's additions on top of that structure: the learner's own explanation as the first diagnostic move, the evidence table per level, transfer and connect as a condition for level 4, saying afterwards that a devil's-advocate objection was a test, the transfer problem in the final assessment, the hint ladder kept from the first version, and figures with one job per level (orient, predict, probe, transfer, break) together with the recall mode, the prediction gate and the lens. They should not be attributed to Jane Street.
+
 ## Noa's design brief
 
 The project owner specified learner-led explanations, requested hints, external study material, retrospective project learning, standalone HTML, a portable Workbench visualization adapter, no automated tests, and private development until approved examples and recordings exist. The private voice-note text is not bundled with the repository.
