@@ -409,6 +409,9 @@ a{color:rgba(var(--text-rgb),var(--t-hint));text-underline-offset:4px}
   .graphic{height:320px}
   .disclosure{display:block}
 }
+/* Narrow header: reserve the theme button's room; below 600 px it is an icon button. */
+@media(max-width:900px){.stage-header{padding-right:132px}.stage-header .theme-toggle{top:12px;right:16px}}
+@media(max-width:600px){.stage-header{padding-right:76px}.stage-header .theme-toggle{width:44px;padding:0;justify-content:center}.stage-header .theme-toggle #theme-label{display:none}}
 </style>
 
 <!-- Desktop height budget: keep the working scene and controls in one visible frame at 1280x720. -->
