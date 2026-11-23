@@ -8,7 +8,7 @@ Ask what they find unclear. If they want suggestions, follow the environment's r
 
 Offer a few targets tied to actual files or symbols and the idea each teaches. Examples might be tracing one request, explaining an invariant, understanding a data transformation, or comparing an implementation with its algorithm. These examples are possible targets, not claims about an uninspected repository.
 
-Agree on one target. Use exact file/symbol locators and the current checkout as the source of truth. Check whether documentation describes another revision before grading against it. Expand context only when a missing relationship blocks the learner's explanation.
+Agree on one target. Derive its subskills from the slice: each names something the learner can trace, predict or explain in this checkout. Use exact file/symbol locators and the current checkout as the source of truth. Check whether documentation describes another revision before grading against it. Expand context only when a missing relationship blocks the learner's explanation.
 
 ## Preserve the learner's work
 

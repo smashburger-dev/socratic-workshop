@@ -158,6 +158,8 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outlin
 .td-pop-actions{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--sep-soft)}
 .td-pop-actions button{width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;color:rgba(var(--text-rgb),var(--t-value))}
 .td-pop-actions svg{width:16px;height:16px}
+.td-pop-actions .td-reveal{width:auto;padding:0 16px;margin-right:auto;color:rgba(var(--text-rgb),var(--t-strong));background-color:transparent;background-image:var(--select-bg);border-color:var(--select-edge)}
+.td-bar>button[aria-pressed="true"]{background-color:transparent;background-image:var(--select-bg);border-color:var(--select-edge);color:rgba(var(--text-rgb),var(--t-strong))}
 .notice{
   position:absolute;top:16px;left:16px;right:16px;
   background:var(--glass);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
@@ -572,6 +574,13 @@ const MATERIALS = {
 function mount(root, config) {
   const parts = config.parts;
   const axis = config.axis || 'vertical';
+  /* Recall (figure job: orient/predict). recall: true offers the toggle,
+     recall: 'start' opens with it on. While on, a part shows only its number
+     until the learner has said what it is for and presses Reveal. */
+  const recallOffered = !!config.recall;
+  const recall = { on: config.recall === 'start', revealed: new Set() };
+  const masked = i => recall.on && !recall.revealed.has(i);
+  const partLabel = i => masked(i) ? `Part ${i + 1}` : parts[i].name;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   root.classList.add('td-root');
@@ -602,6 +611,7 @@ function mount(root, config) {
     '<button type="button" role="radio" aria-checked="true" data-e="1">Exploded</button></div>' +
     '<button type="button" data-view="above">Above</button>' +
     '<button type="button" data-view="eye">Eye level</button>' +
+    (recallOffered ? `<button type="button" data-view="recall" aria-pressed="${recall.on}">Recall</button>` : '') +
     '<button type="button" class="td-icon" data-view="export" aria-label="Export" data-tip="Export">' +
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11"/><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/><path d="M4 20h16"/></svg>' +
     '<span class="td-tip" role="tooltip">Export</span></button>' +
@@ -621,7 +631,7 @@ function mount(root, config) {
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = `Part ${i + 1} of ${parts.length}, ${p.name}`;
+    b.dataset.part = i;
     b.addEventListener('click', () => api.open(i));
     li.append(b);
     list.append(li);
@@ -631,6 +641,9 @@ function mount(root, config) {
   live.setAttribute('aria-live', 'polite');
   (document.querySelector('.stage-header') || root).appendChild(hint);
   root.append(bar, list, live);
+  function spoken(i) { return `Part ${i + 1} of ${parts.length}` + (masked(i) ? '' : `, ${parts[i].name}`); }
+  function syncList() { list.querySelectorAll('button').forEach(b => { b.textContent = spoken(+b.dataset.part); }); }
+  syncList();
 
   const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: true });
 
@@ -1390,17 +1403,37 @@ function mount(root, config) {
 
   function popHtml(i) {
     const p = parts[i];
+    const hide = masked(i);
     pop.innerHTML =
-      `<div class="td-pop-head"><h3>${p.name}</h3><span class="td-pop-pos">${i + 1} / ${parts.length}</span></div>` +
-      `<p class="td-pop-job">${p.job}</p>` +
-      `<dl class="td-specs">${p.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` +
+      `<div class="td-pop-head"><h3>${partLabel(i)}</h3><span class="td-pop-pos">${i + 1} / ${parts.length}</span></div>` +
+      (hide
+        ? '<p class="td-pop-job">What is this part for? Say it, then reveal.</p>'
+        : `<p class="td-pop-job">${p.job}</p>` +
+          `<dl class="td-specs">${p.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`) +
       '<div class="td-pop-actions">' +
+      (hide ? '<button type="button" class="td-reveal" data-reveal>Reveal</button>' : '') +
       `<button type="button" data-up aria-label="Part above" title="Up"${i >= parts.length - 1 ? ' disabled' : ''}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` +
       `<button type="button" data-down aria-label="Part below" title="Down"${i <= 0 ? ' disabled' : ''}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` +
       '<button type="button" data-close aria-label="Close" title="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>';
     pop.querySelector('[data-up]').addEventListener('click', () => api.open(i + 1));
     pop.querySelector('[data-down]').addEventListener('click', () => api.open(i - 1));
     pop.querySelector('[data-close]').addEventListener('click', () => api.open(null));
+    if (hide) pop.querySelector('[data-reveal]').addEventListener('click', () => api.reveal(i));
+  }
+  /* Re-fill the open popover after its content changed; the side is picked again
+     because a revealed part needs more room than a masked one. */
+  function refreshOpen() {
+    syncList();
+    const i = state.openPart;
+    if (i < 0) return;
+    popHtml(i); popPos.side = pickPopSide(i); updatePopover(); announce(i);
+    requestRender();
+  }
+  function setRecall(on) {
+    recall.on = !!on; recall.revealed.clear();
+    const b = bar.querySelector('[data-view="recall"]');
+    if (b) b.setAttribute('aria-pressed', String(recall.on));
+    refreshOpen();
   }
 
   /* Popovers sit beside, never on top: candidates right, left, above, below at a
@@ -1516,7 +1549,7 @@ function mount(root, config) {
   }
 
   function announce(i) {
-    live.textContent = i < 0 ? 'All parts' : `Part ${i + 1} of ${parts.length}, ${parts[i].name}`;
+    live.textContent = i < 0 ? 'All parts' : spoken(i);
   }
   function setOpen(i) {
     state.openPart = i;
@@ -1634,6 +1667,8 @@ function mount(root, config) {
     } else if ((key === 'e' || key === 'E')) {
       api.setExploded(state.eAnim ? state.eAnim.to < 0.5 : state.e < 0.5);
       e.preventDefault();
+    } else if (recallOffered && (key === 'r' || key === 'R') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      setRecall(!recall.on); bumpInput(); e.preventDefault();
     }
   });
   new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -1653,6 +1688,7 @@ function mount(root, config) {
     else if (b.dataset.view === 'above') state.zTarget = 0.12;
     else if (b.dataset.view === 'eye') state.zTarget = 0.72;
     else if (b.dataset.view === 'export') toggleExportMenu(b);
+    else if (b.dataset.view === 'recall') setRecall(!recall.on);
     else if (b.dataset.view === 'reset') { state.z = state.zTarget = 0.12; state.yaw = state.yawTarget = DEFAULT_YAW; state.yawVel = 0; state.tiltTarget = 0; focusFrom = TAnim.slice().concat([state.tilt]); focusT0 = reducedMotion.matches ? 0 : performance.now(); api.open(null); }
     requestRender();
   });
@@ -1759,7 +1795,7 @@ function mount(root, config) {
       const lx = si === 0 ? x0 - 32 : x1 + 32;
       let y = 28;
       lane.forEach(t => {
-        const name = parts[t.i].name;
+        const name = partLabel(t.i);
         const tw = textW(name, 13);
         let ly = Math.max(t.y, y);
         for(let guard = 0; guard < 40; guard++){
@@ -1994,7 +2030,7 @@ function mount(root, config) {
     const r1 = v => Math.round(v * 10) / 10;
     ordered.forEach(t => {
       const f = hex(t.fill);
-      if(t.p.name !== cur){ flush(); if(cur) svg += '</g>'; svg += `<g><title>${t.p.name}</title>`; cur = t.p.name; }
+      if(t.p.name !== cur){ flush(); if(cur) svg += '</g>'; svg += `<g><title>${partLabel(parts.indexOf(t.p))}</title>`; cur = t.p.name; }
       if(f !== curFill){ flush(); curFill = f; }
       const [a,b,c] = t.s;
       d += `M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}L${r1(c[0])} ${r1(c[1])}Z`;
@@ -2100,6 +2136,8 @@ const api = {
       seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', String((b.dataset.e === '1') === on)));
       requestRender();
     },
+    setRecall(on) { setRecall(on); },
+    reveal(index) { recall.revealed.add(index); refreshOpen(); },
     setYaw(deg) { state.yaw = state.yawTarget = deg * Math.PI / 180; state.yawVel = 0; state.lastInput = performance.now(); requestRender(); },
     /* diagnostics for manual inspection, not part of the contract */
     frameCount: () => frameTotal,
@@ -2226,7 +2264,7 @@ themeButton.addEventListener('click',()=>{const theme = currentTheme() === 'dark
 systemTheme.addEventListener('change',updateThemeButton);
 updateThemeButton();
 
-ExplodedViewKit.mount(document.querySelector('.figure-area'),{parts,axis:'vertical'});
+ExplodedViewKit.mount(document.querySelector('.figure-area'),{parts,axis:'vertical',recall:true});
 </script>
 </body>
 </html>
