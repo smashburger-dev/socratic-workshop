@@ -318,6 +318,9 @@ input[type="range"]::-moz-range-thumb{width:3px;height:36px;border:none;border-r
   .graphic{height:320px}
   .disclosure{display:block}
 }
+/* Narrow header: reserve the theme button's room; below 600 px it is an icon button. */
+@media(max-width:900px){.stage-header{padding-right:132px}.stage-header .theme-toggle{top:12px;right:16px}}
+@media(max-width:600px){.stage-header{padding-right:76px}.stage-header .theme-toggle{width:44px;padding:0;justify-content:center}.stage-header .theme-toggle #theme-label{display:none}}
 </style>
 </head>
 <body>
